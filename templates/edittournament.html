@@ -1,0 +1,553 @@
+{% extends 'template.html' %}
+
+{% block style %}
+
+<style>
+
+    .edit-tournament {
+        width: 100%;
+        max-width: 650px;
+    }
+
+    .edit-tournament form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .edit-tournament label {
+        font-weight: 600;
+        color: var(--text);
+        margin-top: 5px;
+    }
+
+    .edit-tournament input,
+    .edit-tournament select,
+    .edit-tournament button {
+        box-sizing: border-box;
+        padding: 11px 12px;
+        font-size: 16px;
+        font-family: inherit;
+    }
+
+    .edit-tournament input[type="text"],
+    .edit-tournament select {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: white;
+        color: var(--text);
+        outline: none;
+    }
+
+    .edit-tournament input[type="text"]:focus,
+    .edit-tournament select:focus {
+        border-color: #2d7ff9;
+        box-shadow: 0 0 0 3px rgba(45, 127, 249, 0.12);
+    }
+
+    .tag-container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        min-height: 48px;
+        border: 1px solid var(--border);
+        padding: 7px 10px;
+        border-radius: 8px;
+        background: white;
+        box-sizing: border-box;
+    }
+
+    .tag-container:focus-within {
+        border-color: #2d7ff9;
+        box-shadow: 0 0 0 3px rgba(45, 127, 249, 0.12);
+    }
+
+    .tag-container input {
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        flex: 1;
+        min-width: 120px;
+        padding: 7px 2px;
+        font-size: 15px;
+    }
+
+    .tag {
+        background: #2d7ff9;
+        color: white;
+        padding: 6px 10px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 14px;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .tag button {
+        border: none;
+        background: none;
+        color: white;
+        cursor: pointer;
+        padding: 0;
+        margin: 0;
+        font-size: 18px;
+        line-height: 1;
+    }
+
+    .tag button:hover {
+        opacity: 0.75;
+    }
+
+    #addTag {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        flex-shrink: 0;
+        cursor: pointer;
+        border: none;
+        border-radius: 8px;
+        background: #2d7ff9;
+        color: white;
+        font-size: 22px;
+        line-height: 1;
+    }
+
+    #addTag:hover {
+        background: #1769d5;
+    }
+
+    .help-text {
+        margin-top: -8px;
+        color: var(--text-light);
+        font-size: 13px;
+    }
+
+    .tournament-code {
+        background: #f5f5f5 !important;
+        cursor: not-allowed;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .save-button {
+        border: none;
+        border-radius: 8px;
+        background: #198754;
+        color: white;
+        cursor: pointer;
+        font-weight: 600;
+        flex: 1;
+    }
+
+    .save-button:hover {
+        background: #157347;
+    }
+
+    .cancel-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        padding: 11px 12px;
+        border-radius: 8px;
+        background: #e9ecef;
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 600;
+        flex: 1;
+    }
+
+    .cancel-button:hover {
+        background: #d9dde1;
+    }
+
+    .danger-zone {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+    }
+
+    .danger-zone h3 {
+        margin: 0 0 5px;
+        color: #dc3545;
+    }
+
+    .danger-zone p {
+        margin: 0 0 12px;
+        color: var(--text-light);
+        font-size: 14px;
+    }
+
+    .delete-button {
+        padding: 10px 14px;
+        border: none;
+        border-radius: 8px;
+        background: #dc3545;
+        color: white;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .delete-button:hover {
+        background: #bb2d3b;
+    }
+
+    @media (max-width: 600px) {
+
+        .edit-tournament {
+            max-width: 100%;
+        }
+
+        .actions {
+            flex-direction: column;
+        }
+
+        .save-button,
+        .cancel-button {
+            width: 100%;
+            min-height: 44px;
+        }
+
+        #addTag {
+            width: 38px;
+            height: 38px;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+{% block header %}
+Edit tournament
+{% endblock %}
+
+{% block main %}
+
+<div class="edit-tournament">
+
+<form
+    action="{{ url_for('editTournamentPost', tournamentId=tournament.id) }}"
+    method="post"
+>
+
+    <label for="name">
+        Tournament name
+    </label>
+
+    <input
+        type="text"
+        name="name"
+        id="name"
+        value="{{ tournament.name }}"
+        maxlength="100"
+        required
+    >
+
+
+    <label for="visibility">
+        Visibility
+    </label>
+
+    <select
+        name="visibility"
+        id="visibility"
+        required
+    >
+
+        <option
+            value="public"
+            {% if tournament.visibility == "public" %}selected{% endif %}
+        >
+            Public
+        </option>
+
+        <option
+            value="private"
+            {% if tournament.visibility == "private" %}selected{% endif %}
+        >
+            Private
+        </option>
+
+        <option
+            value="unlisted"
+            {% if tournament.visibility == "unlisted" %}selected{% endif %}
+        >
+            Unlisted
+        </option>
+
+    </select>
+
+
+    <label>
+        Tags
+    </label>
+
+    <div
+        class="tag-container"
+        id="tagContainer"
+    >
+
+        <input
+            type="text"
+            id="tagInput"
+            placeholder="Type a tag..."
+            autocomplete="off"
+        >
+
+        <button
+            type="button"
+            id="addTag"
+            aria-label="Add tag"
+        >
+            +
+        </button>
+
+    </div>
+
+    <div class="help-text">
+        Add tags to make your tournament easier to find.
+    </div>
+
+
+    <input
+        type="hidden"
+        name="tags"
+        id="tags"
+    >
+
+
+    <label for="code">
+        Tournament code
+    </label>
+
+    <input
+        type="text"
+        id="code"
+        value="{{ tournament.code }}"
+        class="tournament-code"
+        readonly
+    >
+
+    <div class="help-text">
+        The tournament code cannot be changed.
+    </div>
+
+
+    <div class="actions">
+
+        <button
+            type="submit"
+            class="save-button"
+        >
+            Save changes
+        </button>
+
+        <a
+            href="{{ url_for('myTournaments') }}"
+            class="cancel-button"
+        >
+            Cancel
+        </a>
+
+    </div>
+
+</form>
+
+
+<div class="danger-zone">
+
+    <h3>Danger zone</h3>
+
+    <p>
+        Deleting this tournament cannot be undone.
+    </p>
+
+    <form
+        method="POST"
+        action="{{ url_for('delete_tournament', tournament_id=tournament.id) }}"
+        onsubmit="return confirm('Weet je zeker dat je dit toernooi wilt verwijderen? Dit kan niet ongedaan worden gemaakt.');"
+    >
+
+        <button
+            type="submit"
+            class="delete-button"
+        >
+            Delete tournament
+        </button>
+
+    </form>
+
+</div>
+
+</div>
+
+<script>
+
+    const input = document.getElementById("tagInput");
+    const addButton = document.getElementById("addTag");
+    const container = document.getElementById("tagContainer");
+    const hidden = document.getElementById("tags");
+
+    /*
+     * Existing tags from Flask.
+     *
+     * This supports:
+     * - ["football", "final"]
+     * - [{"name": "football"}, {"name": "final"}]
+     */
+    const existingTags = {{ tournament.tags | default([]) | tojson }};
+
+    let tags = existingTags.map(tag => {
+
+        if (typeof tag === "string") {
+            return tag;
+        }
+
+        if (tag && typeof tag === "object" && tag.name) {
+            return tag.name;
+        }
+
+        return "";
+
+    }).filter(tag => tag.trim() !== "");
+
+
+    function updateTags() {
+
+        hidden.value = tags.join(",");
+
+    }
+
+
+    function createTagElement(value) {
+
+        const tag = document.createElement("div");
+
+        tag.className = "tag";
+
+        const text = document.createElement("span");
+
+        text.textContent = value;
+
+        const removeButton = document.createElement("button");
+
+        removeButton.type = "button";
+        removeButton.textContent = "×";
+        removeButton.setAttribute("aria-label", `Remove ${value}`);
+
+        removeButton.addEventListener("click", function() {
+
+            tags = tags.filter(tag => tag !== value);
+
+            tag.remove();
+
+            updateTags();
+
+        });
+
+        tag.appendChild(text);
+        tag.appendChild(removeButton);
+
+        return tag;
+    }
+
+
+    function renderTags() {
+
+        container
+            .querySelectorAll(".tag")
+            .forEach(tag => tag.remove());
+
+        tags.forEach(value => {
+
+            const tag = createTagElement(value);
+
+            container.insertBefore(tag, input);
+
+        });
+
+        updateTags();
+
+    }
+
+
+    function addTag() {
+
+        const value = input.value.trim();
+
+        if (value === "") {
+            return;
+        }
+
+        if (tags.some(tag => tag.toLowerCase() === value.toLowerCase())) {
+
+            input.value = "";
+
+            return;
+
+        }
+
+        tags.push(value);
+
+        input.value = "";
+
+        renderTags();
+
+        input.focus();
+
+    }
+
+
+    addButton.addEventListener("click", addTag);
+
+
+    input.addEventListener("keydown", function(e) {
+
+        if (e.key === "Enter") {
+
+            e.preventDefault();
+
+            addTag();
+
+        }
+
+    });
+
+
+    /*
+     * Allow removing the last tag with Backspace
+     * when the input is empty.
+     */
+    input.addEventListener("keydown", function(e) {
+
+        if (
+            e.key === "Backspace" &&
+            input.value === "" &&
+            tags.length > 0
+        ) {
+
+            tags.pop();
+
+            renderTags();
+
+        }
+
+    });
+
+
+    renderTags();
+
+</script>
+
+{% endblock %}

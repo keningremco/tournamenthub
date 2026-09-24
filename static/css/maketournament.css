@@ -1,0 +1,664 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: #f7f7f8;
+}
+
+.builder {
+    max-width: 780px;
+    margin: 0 auto;
+}
+
+/* =========================================================
+   PROGRESS SLIDER
+   ========================================================= */
+
+.progress-wrapper {
+    margin: 10px 0 30px;
+}
+
+.progress-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 9px;
+}
+
+.progress-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.progress-counter {
+    font-size: 13px;
+    color: #888;
+}
+
+.progress-track {
+    position: relative;
+    height: 8px;
+    background: #e5e5e7;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 14.28%;
+    background: linear-gradient(90deg, #2d7ff9, #5b9cff);
+    border-radius: 20px;
+    transition: width .3s ease;
+}
+
+.progress-steps {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-top: 8px;
+}
+
+.progress-step {
+    font-size: 11px;
+    color: #999;
+    text-align: center;
+    transition: .2s;
+}
+
+.progress-step.active {
+    color: #2d7ff9;
+    font-weight: 700;
+}
+
+/* =========================================================
+   PAGES
+   ========================================================= */
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.card {
+    background: white;
+    border: 1px solid #dedee2;
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 15px;
+}
+
+.card h2 {
+    margin: 0 0 5px;
+    font-size: 21px;
+}
+
+.card-description {
+    color: #777;
+    margin: 0 0 22px;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+.field {
+    margin-bottom: 18px;
+}
+
+.field:last-child {
+    margin-bottom: 0;
+}
+
+.field label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 7px;
+}
+
+.optional {
+    color: #999;
+    font-weight: normal;
+    font-size: 13px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="datetime-local"],
+select,
+textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: white;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #2d7ff9;
+    box-shadow: 0 0 0 3px rgba(45,127,249,.08);
+}
+
+textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.field-help {
+    color: #888;
+    font-size: 13px;
+    margin-top: 6px;
+    line-height: 1.4;
+}
+
+#soloManualPointsInfo .field-help {
+    margin-top: 0;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+/* =========================================================
+   CREATION MODE
+   ========================================================= */
+
+.creation-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.creation-option input {
+    display: none;
+}
+
+.creation-card {
+    display: block;
+    border: 2px solid #ddd;
+    border-radius: 11px;
+    padding: 17px;
+    cursor: pointer;
+    transition: .15s;
+    height: 100%;
+}
+
+.creation-card:hover {
+    border-color: #aaa;
+}
+
+.creation-option input:checked + .creation-card {
+    border-color: #2d7ff9;
+    background: #f4f8ff;
+}
+
+.creation-title {
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.creation-description {
+    color: #777;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* =========================================================
+   EVENT TYPE
+   ========================================================= */
+
+.event-types {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.event-option input {
+    display: none;
+}
+
+.event-card {
+    border: 2px solid #ddd;
+    border-radius: 11px;
+    padding: 17px;
+    cursor: pointer;
+    display: block;
+    transition: .15s;
+}
+
+.event-card:hover {
+    border-color: #aaa;
+}
+
+.event-option input:checked + .event-card {
+    border-color: #2d7ff9;
+    background: #f4f8ff;
+}
+
+.event-title {
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.event-description {
+    font-size: 13px;
+    color: #777;
+    line-height: 1.4;
+}
+
+/* =========================================================
+   FORMAT
+   ========================================================= */
+
+.format-list {
+    display: grid;
+    gap: 10px;
+}
+
+.format-option input {
+    display: none;
+}
+
+.format-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #ddd;
+    border-radius: 9px;
+    padding: 14px;
+    cursor: pointer;
+    transition: .15s;
+}
+
+.format-card:hover {
+    border-color: #aaa;
+}
+
+.format-option input:checked + .format-card {
+    border-color: #2d7ff9;
+    background: #f4f8ff;
+}
+
+.format-name {
+    font-weight: 600;
+}
+
+.format-info {
+    color: #888;
+    font-size: 13px;
+    margin-top: 3px;
+}
+
+.format-check {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    flex-shrink: 0;
+}
+
+.format-option input:checked + .format-card .format-check {
+    border: 6px solid #2d7ff9;
+}
+
+/* =========================================================
+   CONDITIONAL BOXES
+   ========================================================= */
+
+.conditional {
+    display: none;
+    margin-top: 15px;
+    padding: 16px;
+    border-radius: 10px;
+    background: #f7f9fc;
+    border: 1px solid #e3e7ee;
+}
+
+.conditional.active {
+    display: block;
+}
+
+.conditional-title {
+    font-size: 13px;
+    text-transform: uppercase;
+    color: #2d7ff9;
+    font-weight: 700;
+    margin-bottom: 13px;
+}
+
+/* =========================================================
+   DYNAMIC ROWS
+   ========================================================= */
+
+.dynamic-list {
+    display: grid;
+    gap: 9px;
+    margin-bottom: 10px;
+}
+
+.team-row {
+    display: flex;
+    gap: 8px;
+}
+
+.team-row input {
+    flex: 1;
+}
+
+.remove-team {
+    width: 42px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 8px;
+    background: #f0f0f0;
+    color: #777;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.remove-team:hover {
+    background: #fee;
+    color: #e74c3c;
+}
+
+.add-team {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    background: #2d7ff9;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.add-team:hover {
+    background: #1f6fe5;
+}
+
+.team-count {
+    margin-top: 10px;
+    color: #888;
+    font-size: 13px;
+}
+
+.empty-list {
+    padding: 15px;
+    text-align: center;
+    color: #999;
+    border: 1px dashed #ccc;
+    border-radius: 9px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+/* =========================================================
+   TOGGLE
+   ========================================================= */
+
+.setting {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.setting:first-child {
+    padding-top: 0;
+}
+
+.setting:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.setting-info {
+    flex: 1;
+}
+
+.setting-title {
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+
+.setting-description {
+    color: #888;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.switch {
+    position: relative;
+    width: 48px;
+    height: 27px;
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: #d4d4d4;
+    border-radius: 30px;
+    transition: .2s;
+}
+
+.slider:before {
+    content: "";
+    position: absolute;
+    width: 21px;
+    height: 21px;
+    left: 3px;
+    top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: .2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+
+.switch input:checked + .slider {
+    background: #2d7ff9;
+}
+
+.switch input:checked + .slider:before {
+    transform: translateX(21px);
+}
+
+/* =========================================================
+   POINTS
+   ========================================================= */
+
+.points-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+/* =========================================================
+   SOLO POINTS
+   ========================================================= */
+
+#soloPointsSettings {
+    display: none;
+}
+
+#soloPointsSettings.active {
+    display: block;
+}
+
+#soloManualPointsInfo.active {
+    display: block;
+}
+
+/* =========================================================
+   SCHEDULE
+   ========================================================= */
+
+.schedule-settings {
+    display: none;
+    margin-top: 18px;
+}
+
+.schedule-settings.active {
+    display: block;
+}
+
+/* =========================================================
+   REVIEW
+   ========================================================= */
+
+.review-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.review-row:last-child {
+    border-bottom: none;
+}
+
+.review-label {
+    color: #888;
+}
+
+.review-value {
+    font-weight: 600;
+    text-align: right;
+}
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 18px;
+}
+
+.button {
+    border: none;
+    border-radius: 8px;
+    padding: 12px 19px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.back {
+    background: #e9e9eb;
+    color: #222;
+}
+
+.next {
+    margin-left: auto;
+    background: #2d7ff9;
+    color: white;
+}
+
+.next:hover,
+.generate:hover {
+    background: #1f6fe5;
+}
+
+.manual {
+    width: 100%;
+    background: #eee;
+    color: #222;
+    padding: 15px;
+}
+
+.manual:hover {
+    background: #ddd;
+}
+
+.generate {
+    width: 100%;
+    background: #2d7ff9;
+    color: white;
+    padding: 15px;
+}
+
+.final-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.final-description {
+    display: block;
+    font-size: 12px;
+    font-weight: normal;
+    opacity: .7;
+    margin-top: 4px;
+}
+
+/* =========================================================
+   HIDDEN
+   ========================================================= */
+
+.hidden {
+    display: none !important;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+    .progress-steps {
+        grid-template-columns: repeat(7, 1fr);
+    }
+
+    .progress-step {
+        font-size: 9px;
+    }
+
+    .creation-options,
+    .event-types,
+    .grid-2,
+    .points-grid,
+    .final-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .card {
+        padding: 17px;
+    }
+
+    .review-row {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .review-value {
+        text-align: left;
+    }
+}

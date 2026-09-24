@@ -1,0 +1,1434 @@
+{% extends 'template.html' %}
+
+{% block header %}
+    {{ lobby.name }}
+{% endblock %}
+
+{% block style %}
+<style>
+
+html {
+    scroll-behavior: auto;
+}
+
+.lobby-page {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Algemene meldingen */
+
+.error,
+.success {
+    margin-bottom: 20px;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.error {
+    color: #8f2929;
+    background: #fff1f1;
+    border: 1px solid #e4aaaa;
+}
+
+.success {
+    color: #2f6b3e;
+    background: #e5f5e8;
+    border: 1px solid #b7ddbd;
+}
+
+
+/* Lobby informatie */
+
+.lobby-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding: 18px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.lobby-info h1 {
+    margin: 0 0 8px;
+    font-size: 26px;
+}
+
+.lobby-info p {
+    margin: 0;
+    color: #64748B;
+}
+
+.back-link {
+    color: inherit;
+}
+
+.lobby-code {
+    width: fit-content;
+    padding: 10px 14px;
+    color: #334155;
+    font-weight: 600;
+    background: #eee;
+    border-radius: 8px;
+}
+
+
+/* Titels */
+
+.section-title {
+    margin: 35px 0 18px;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.round-title {
+    margin: 25px 0 18px;
+    font-size: 22px;
+}
+
+
+/* Scoreboard */
+
+.scoreboard {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0px !important;
+}
+
+.scoreboard-player {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 0px !important;
+}
+
+.rank {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    place-items: center;
+    font-weight: 700;
+    background: #eee;
+    border-radius: 8px;
+}
+
+.player-name {
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.player-points {
+    margin-left: auto;
+    color: #64748B;
+}
+
+
+/* Rondes tabs */
+
+.round-tabs {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 10px 0;
+    border-bottom: 1px solid #ccc;
+}
+
+.round-tab {
+    flex: 0 0 auto;
+    padding: 12px 20px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.round-tab:hover {
+    background: #e5e5e5;
+}
+
+.round-tab.active {
+    color: white;
+    background: #2d7ff9;
+}
+
+
+/* Ronde inhoud */
+
+.round-content {
+    display: none;
+}
+
+.round-content.active {
+    display: block;
+    min-height: 50vh;
+}
+
+
+/* Wedstrijden */
+
+.game-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+
+.game-card {
+    padding: 16px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.game-top {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.game-date {
+    color: #64748B;
+    font-size: 14px;
+}
+
+.game-status {
+    width: fit-content;
+    padding: 6px 10px;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 600;
+    background: #eee;
+    border-radius: 6px;
+}
+
+.game-status.finished {
+    color: #2f6b3e;
+    background: #e5f5e8;
+}
+
+.game-status.cancelled {
+    color: #8f2929;
+    background: #fff1f1;
+}
+
+
+/* Teams + score */
+
+.teams {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.team-card {
+    padding: 15px;
+    text-align: center;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.team-name {
+    overflow: hidden;
+    font-size: 16px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.team-score {
+    margin-top: 8px;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.vs {
+    text-align: center;
+    color: #64748B;
+    font-weight: 700;
+}
+
+
+/* Voorspelling */
+
+.prediction-box {
+    padding: 12px;
+    background: #eee;
+    border-radius: 8px;
+}
+
+.prediction-title {
+    margin-bottom: 10px;
+    color: #64748B;
+    font-weight: 600;
+}
+
+.prediction-form {
+    display: grid;
+    grid-template-columns: 1fr 70px 20px 70px 1fr;
+    gap: 8px;
+    align-items: center;
+}
+
+.prediction-team {
+    display: block;
+}
+
+.prediction-form input {
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    font-size: 16px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.prediction-separator {
+    text-align: center;
+    font-weight: 700;
+}
+
+.prediction-form button {
+    grid-column: 1 / -1;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.prediction-locked {
+    padding: 10px;
+    text-align: center;
+    color: #64748B;
+    background: #eee;
+    border-radius: 6px;
+}
+
+
+/* Geen data */
+
+.no-games {
+    padding: 25px;
+    color: #64748B;
+    text-align: center;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+
+.scoreboard-container {
+    width: 100%;
+    max-width: 600px;
+}
+
+
+.scoreboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+
+.refresh-button {
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 6px;
+    border: none;
+}
+
+
+.scoreboard {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.scoreboard-player {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: #eee;
+    border-radius: 8px;
+}
+
+
+.rank {
+    width: 40px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+
+.player-name {
+    flex: 1;
+}
+
+
+.player-points {
+    font-weight: bold;
+}
+
+
+.leaderboard-loading {
+    text-align: center;
+    padding: 15px;
+}
+
+.game-card {
+    scroll-margin-top: 30px;
+    transition: box-shadow 0.3s, transform 0.3s;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.game-evaluation {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.game-card.highlight-game {
+    box-shadow: 0 0 0 3px #2d7ff9;
+    transform: scale(1.01);
+}
+
+
+/* Game evaluation */
+
+.game-evaluation {
+    margin-top: 15px;
+}
+
+.evaluation-toggle {
+    width: 100%;
+    padding: 14px 16px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 16px;
+    font-weight: 700;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.evaluation-toggle:hover {
+    background: #f5f5f5;
+}
+
+.evaluation-dropdown {
+    display: none;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin-top: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
+}
+
+.evaluation-dropdown.active {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    box-sizing: border-box;
+}
+
+.evaluation-player {
+    width: max-content;
+    min-width: 100%;
+    max-width: none;
+    margin-bottom: 20px;
+    padding: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.evaluation-table {
+    width: max-content;
+    min-width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    white-space: nowrap;
+}
+
+.evaluation-table th,
+.evaluation-table td {
+    padding: 11px 16px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    border-right: 1px solid #eee;
+    background: white;
+}
+
+.evaluation-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    font-size: 14px;
+    font-weight: 700;
+    background: #f5f5f5;
+}
+
+.evaluation-table .sticky {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    min-width: 200px;
+    text-align: left;
+    background: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.06);
+}
+
+.evaluation-table thead .sticky {
+    z-index: 6;
+    background: #f5f5f5;
+}
+
+.evaluation-table .total-row th,
+.evaluation-table .total-row td {
+    font-weight: 700;
+}
+
+.evaluation-table .user-name {
+    min-width: 120px;
+}
+
+.evaluation-table .last-column {
+    border-right: 0;
+}
+
+.info-icon {
+    display: inline-grid;
+    width: 17px;
+    height: 17px;
+    margin-left: 4px;
+    place-items: center;
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 700;
+    color: #64748B;
+    background: #eee;
+    border-radius: 50%;
+    cursor: help;
+}
+
+.compact-points {
+    display: none;
+}
+
+@media (max-width: 500px) {
+    .scoreboard-player {
+        display: grid;
+        grid-template-columns: 40px 1fr;
+        gap: 6px 10px;
+    }
+
+    .rank {
+        grid-row: 1 / span 2;
+    }
+
+    .player-name {
+        min-width: 0;
+    }
+
+    .player-points {
+        margin-left: 0;
+        grid-column: 2;
+    }
+    .normal-points,
+    .bonus-points,
+    .total-points {
+        display: none;
+    }
+
+    .compact-points {
+        display: block;
+        grid-column: 2;
+        margin-left: 0;
+        font-weight: bold;
+    }
+}
+
+@media (min-width: 700px) {
+
+    .lobby-info {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+
+    .game-top {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .game-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .teams {
+        grid-template-columns: 1fr auto 1fr;
+    }
+
+    .prediction-team {
+        display: block;
+    }
+
+    .prediction-form {
+        grid-template-columns: 1fr 70px 22px 70px 1fr;
+    }
+
+    .scoreboard {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+}
+
+</style>
+{% endblock %}
+
+
+{% block main %}
+
+<div class="lobby-page">
+
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    {% if success %}
+        <p class="success">{{ success }}</p>
+    {% endif %}
+
+
+    <section class="lobby-info">
+
+        <div>
+
+            <h1>
+                {{ lobby.name }}
+            </h1>
+
+            <p>
+                Tournament:
+
+                <a
+                    class="back-link"
+                    href="/tournament/{{ tournament.code }}"
+                >
+                    {{ tournament.name }}
+                </a>
+            </p>
+
+        </div>
+
+
+        <div class="lobby-code">
+            Lobby code: {{ lobby.code }}
+        </div>
+
+    </section>
+
+
+    <section>
+
+        {% if leaderboard %}
+
+            <div class="scoreboard-container">
+
+
+                <div class="scoreboard-header">
+
+                    <h2>
+                        Leaderboard
+                    </h2>
+
+
+                    <button
+                        type="button"
+                        id="refreshLeaderboard"
+                        class="refresh-button"
+                        style="display: none;"
+                    >
+                        Refresh
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="scoreboard"
+                    id="scoreboard"
+                >
+
+                    {% for player in leaderboard %}
+
+                        <div class="scoreboard-player">
+
+                            <div class="rank">
+                                {{ loop.index }}
+                            </div>
+
+
+                            <div class="player-name">
+                                {{ player.username }}
+                            </div>
+
+
+                            <div class="player-points normal-points">
+                                {{ player.points }} pts
+                            </div>
+
+                            <div class="player-points bonus-points">
+                                +{{ player.bonus_points }} bonus pts
+                            </div>
+
+                            <div class="player-points total-points">
+                                = {{ player.totaal_points }} totaal pts
+                            </div>
+
+                            <div class="player-points compact-points">
+                                {{ player.points }} + {{ player.bonus_points }} = {{ player.totaal_points }}
+                            </div>
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <div
+                    id="leaderboard-loading"
+                    class="leaderboard-loading"
+                    style="display:none;"
+                >
+                    Loading...
+                </div>
+
+
+            </div>
+
+        {% else %}
+
+            <div class="no-games">
+                There are no players in this lobby yet.
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <h2 class="section-title">
+        Predictions
+    </h2>
+
+
+    <div class="round-tabs">
+
+        {% if not rounds %}
+
+            <div class="round-tab">
+                No rounds found
+            </div>
+
+        {% endif %}
+
+
+        {% for round in rounds %}
+
+            <div
+                class="round-tab {% if loop.first %}active{% endif %}"
+                data-round="{{ round.id }}"
+            >
+                {{ round.name }}
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <div class="round-contents">
+
+
+        {% for round in rounds %}
+
+            <section
+                class="round-content {% if loop.first %}active{% endif %}"
+                id="round-{{ round.id }}"
+            >
+
+                <h3 class="round-title">
+                    Round {{ round.roundNumber }} — {{ round.name }}
+                    {% if round.points is not none %}- {{ round.points }} points{% endif %}
+                </h3>
+
+
+
+                {% if round.games %}
+
+                    <div class="game-list">
+
+
+                        {% for game in round.games %}
+
+                            <article
+                                class="game-card"
+                                id="{{ game.id }}"
+                            >
+
+
+                                <div class="game-top">
+
+                                    <div class="game-date">
+
+                                        {% if game.start_time %}
+
+                                            {{ game.start_time.strftime('%d-%m-%Y %H:%M') }}
+
+                                        {% else %}
+
+                                            Start time not set
+
+                                        {% endif %}
+
+                                    </div>
+
+
+                                    <span class="game-status
+                                        {% if game.status == 'completed' %}finished{% endif %}
+                                        {% if game.status == 'cancelled' %}cancelled{% endif %}
+                                    ">
+
+                                        {{ game.status }}
+
+                                    </span>
+
+                                </div>
+
+
+                                {% if game.teams|length >= 2 %}
+
+
+                                    <div class="teams">
+
+
+                                        <div class="team-card">
+
+                                            <div class="team-name">
+                                                {{ game.teams[0].name }}
+                                            </div>
+
+
+                                            {% if game.status == 'completed' %}
+
+                                                <div class="team-score">
+                                                    {{ game.teams[0].score }}
+                                                </div>
+
+                                            {% endif %}
+
+                                        </div>
+
+                                        <div class="vs">
+                                            VS
+                                        </div>
+
+
+                                        <div class="team-card">
+
+                                            <div class="team-name">
+                                                {{ game.teams[1].name }}
+                                            </div>
+
+
+                                            {% if game.status == 'completed' %}
+
+                                                <div class="team-score">
+                                                    {{ game.teams[1].score }}
+                                                </div>
+
+                                            {% endif %}
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                    <div class="prediction-box">
+
+
+                                        <div class="prediction-title">
+                                            Your prediction
+                                        </div>
+
+
+                                        {% if game.status == 'scheduled' %}
+
+
+                                            <form
+                                                class="prediction-form"
+                                                action="{{ url_for('savePrediction', lobbyCode=lobby.code) }}"
+                                                method="post"
+                                            >
+
+
+                                                <input
+                                                    type="hidden"
+                                                    name="game_id"
+                                                    value="{{ game.id }}"
+                                                >
+
+
+                                                <div class="prediction-team">
+                                                    {{ game.teams[0].name }}
+                                                </div>
+
+
+                                                <input
+                                                    type="number"
+                                                    name="team1_score"
+                                                    min="0"
+                                                    value="{{ game.teams[0].predictedScore if game.teams[0].predictedScore != None else '' }}"
+                                                    required
+                                                    aria-label="Score {{ game.teams[0].name }}"
+                                                >
+
+
+                                                <div class="prediction-separator">
+                                                    -
+                                                </div>
+
+
+                                                <input
+                                                    type="number"
+                                                    name="team2_score"
+                                                    min="0"
+                                                    value="{{ game.teams[1].predictedScore if game.teams[1].predictedScore != None else '' }}"
+                                                    required
+                                                    aria-label="Score {{ game.teams[1].name }}"
+                                                >
+
+
+                                                <input
+                                                    type="hidden"
+                                                    name="game_ids"
+                                                    value='{{ {"team1Id": game.teams[0].id, "team2Id": game.teams[1].id } | tojson }}'
+                                                >
+
+
+                                                <div class="prediction-team">
+                                                    {{ game.teams[1].name }}
+                                                </div>
+
+
+                                                <button type="submit" id="error">
+                                                    Save prediction
+                                                </button>
+
+
+                                            </form>
+
+
+                                        {% else %}
+
+
+                                            <div class="prediction-locked">
+
+
+                                                {% if game.teams[0].predictedScore != None %}
+
+                                                    Your prediction:
+
+                                                    <strong>
+
+                                                        {{ game.teams[0].predictedScore }}
+
+                                                        -
+
+                                                        {{ game.teams[1].predictedScore }}
+
+                                                    </strong>
+
+
+                                                {% else %}
+
+                                                    Predictions can no longer be changed.
+
+                                                {% endif %}
+
+
+                                            </div>
+
+
+                                        {% endif %}
+
+
+                                    </div>
+                                    
+
+                                    {% if game.status == 'completed' %}
+
+                                        <div class="game-evaluation">
+
+
+                                            <button
+                                                type="button"
+                                                class="evaluation-toggle"
+                                                data-game-id="{{ game.id }}"
+                                            >
+                                                View predictions
+                                            </button>
+
+
+                                            <div
+                                                class="evaluation-dropdown"
+                                                id="evaluation-dropdown-{{ game.id }}"
+                                            ></div>
+
+
+                                        </div>
+
+                                    {% endif %}
+
+
+                                {% else %}
+
+
+                                    <div class="no-games">
+                                        This game does not have two teams yet.
+                                    </div>
+
+
+                                {% endif %}
+
+
+                            </article>
+
+                        {% endfor %}
+
+
+                    </div>
+
+
+                {% else %}
+
+
+                    <div class="no-games">
+                        No games have been added to this round yet.
+                    </div>
+
+
+                {% endif %}
+
+
+            </section>
+
+        {% endfor %}
+
+
+    </div>
+
+    <script>
+    document.querySelectorAll(".prediction-form").forEach(form => {
+        form.addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+            const button = form.querySelector('button[type="submit"]');
+
+            try {
+                const response = await fetch(form.action, {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error("Request failed");
+                }
+
+                // Verander de tekst van de knop
+                button.textContent = "Prediction saved!";
+
+                // Na 1,5 seconde weer terug
+                setTimeout(() => {
+                    button.textContent = "Save prediction";
+                }, 1500);
+
+            } catch (err) {
+                console.error("Error saving prediction:", err);
+            }
+        });
+    });
+
+    </script>
+    <script>
+
+        const tabs = document.querySelectorAll(".round-tab");
+
+        const contents = document.querySelectorAll(
+            ".round-content"
+        );
+
+
+        function openRound(roundId) {
+
+            tabs.forEach(tab => {
+
+                tab.classList.toggle(
+
+                    "active",
+
+                    tab.dataset.round === String(roundId)
+
+                );
+
+            });
+
+
+            contents.forEach(content => {
+
+                content.classList.toggle(
+
+                    "active",
+
+                    content.id === "round-" + roundId
+
+                );
+
+            });
+
+        }
+
+
+        tabs.forEach(tab => {
+
+            tab.addEventListener("click", () => {
+
+                openRound(tab.dataset.round);
+
+            });
+
+        });
+
+
+        function openGameFromHash() {
+
+            const hash = window.location.hash;
+
+
+            if (!hash) {
+                return;
+            }
+
+
+            const gameId = hash.substring(1);
+
+
+            if (!/^\d+$/.test(gameId)) {
+                return;
+            }
+
+
+            const game = document.getElementById(gameId);
+
+
+            if (!game) {
+                return;
+            }
+
+
+            const round = game.closest(
+                ".round-content"
+            );
+
+
+            if (round) {
+
+                const roundId = round.id.replace(
+                    "round-",
+                    ""
+                );
+
+                openRound(roundId);
+
+            }
+
+
+            setTimeout(() => {
+
+                game.scrollIntoView({
+
+                    behavior: "smooth",
+
+                    block: "center"
+
+                });
+
+
+                game.classList.add(
+                    "highlight-game"
+                );
+
+
+                setTimeout(() => {
+
+                    game.classList.remove(
+                        "highlight-game"
+                    );
+
+                }, 2500);
+
+
+            }, 50);
+
+        }
+
+
+        function escapeHtml(value) {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+
+        function renderGameEvaluation(gameId, data) {
+
+            const dropdown = document.getElementById(
+                "evaluation-dropdown-" + gameId
+            );
+
+
+            if (!dropdown) {
+                return;
+            }
+
+
+            dropdown.innerHTML = "";
+
+
+            if (!data || !Array.isArray(data.players) || data.players.length === 0) {
+                dropdown.innerHTML = `
+                    <div class="no-games">
+                        No prediction data available.
+                    </div>
+                `;
+                return;
+            }
+
+
+            const rows = [
+                {
+                    label: "Prediction",
+                    key: "prediction_score",
+                    title: "The prediction a player made"
+                },
+                {
+                    label: "Perfect score",
+                    key: "perfect_score",
+                    title: "The complete predicted score is correct."
+                },
+                {
+                    label: "Correct winner",
+                    key: "correct_winner",
+                    title: "The predicted winner is correct."
+                },
+                {
+                    label: "Correct draw",
+                    key: "correct_draw",
+                    title: "The predicted result is a draw."
+                },
+                {
+                    label: "Exact team score",
+                    key: "exact_team_score",
+                    title: "A team's predicted score is exactly correct."
+                },
+                {
+                    label: "Score difference",
+                    key: "correct_score_difference",
+                    title: "The predicted score difference is correct."
+                },
+                {
+                    label: "Exact total score",
+                    key: "exact_total_score",
+                    title: "The total number of goals or points is correct."
+                },
+                {
+                    label: "Total",
+                    key: "total",
+                    title: "The total points earned for this prediction."
+                }
+            ];
+
+
+            const userHeaders = data.players.map((player, index) => `
+                <th scope="col" class="user-name ${index === data.players.length - 1 ? "last-column" : ""}">
+                    ${escapeHtml(player.username)}
+                </th>
+            `).join("");
+
+
+            const bodyRows = rows.map((row, rowIndex) => `
+                <tr class="${row.key === "total" ? "total-row" : ""}">
+                    <th scope="row" class="sticky">
+                        ${escapeHtml(row.label)}
+                        <span
+                            class="info-icon"
+                            title="${escapeHtml(row.title)}"
+                        >i</span>
+                    </th>
+
+                    ${data.players.map((player, index) => `
+                        <td class="${index === data.players.length - 1 ? "last-column" : ""}">
+                            ${escapeHtml(player[row.key])}
+                        </td>
+                    `).join("")}
+                </tr>
+            `).join("");
+
+
+            dropdown.innerHTML = `
+                <div class="evaluation-player">
+                    <table class="evaluation-table">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="sticky">Statistic</th>
+                                ${userHeaders}
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            ${bodyRows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+
+        async function loadEvaluationData() {
+
+            try {
+
+
+                const response = await fetch(
+
+                    `/api/lobby/{{ lobby.code }}/evaluations`
+
+                );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Could not load evaluation data"
+                    );
+
+                }
+
+
+                const evaluationData = await response.json();
+
+
+                Object.entries(evaluationData).forEach(
+
+                    ([gameId, data]) => {
+
+                        renderGameEvaluation(
+                            gameId,
+                            data
+                        );
+
+                    }
+
+                );
+
+
+            } catch (error) {
+
+
+                console.error(
+
+                    "Error loading evaluation data:",
+
+                    error
+
+                );
+
+
+            }
+
+        }
+
+
+        document.querySelectorAll(
+            ".evaluation-toggle"
+        ).forEach(button => {
+
+
+            button.addEventListener("click", () => {
+
+
+                const gameId = button.dataset.gameId;
+
+
+                const dropdown = document.getElementById(
+
+                    "evaluation-dropdown-" + gameId
+
+                );
+
+
+                dropdown.classList.toggle("active");
+
+
+            });
+
+
+        });
+
+
+        window.addEventListener(
+            "load",
+            openGameFromHash
+        );
+
+
+        window.addEventListener(
+            "hashchange",
+            openGameFromHash
+        );
+
+
+        loadEvaluationData();
+
+    </script>
+
+
+</div>
+
+{% endblock %}

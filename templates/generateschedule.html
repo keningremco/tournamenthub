@@ -1,0 +1,4175 @@
+
+{% extends 'template.html' %}
+
+{% block header %}
+Schema Editor
+{% endblock %}
+
+{% block style %}
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: #f5f6f8;
+}
+
+.schedule-editor {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* =========================
+   TOPBAR
+========================= */
+
+.editor-topbar {
+    background: white;
+    border: 1px solid #e1e4e8;
+    border-radius: 12px;
+    padding: 15px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 18px;
+}
+
+.editor-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.editor-title-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 9px;
+    background: #2563eb;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.editor-title h1 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.editor-title p {
+    margin: 3px 0 0;
+    color: #777;
+    font-size: 13px;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.editor-button {
+    border: 1px solid #d8dce1;
+    background: white;
+    color: #222;
+    border-radius: 7px;
+    padding: 9px 14px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.editor-button:hover {
+    background: #f5f6f8;
+}
+
+.editor-button.primary {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+.editor-button.primary:hover {
+    background: #1d4ed8;
+}
+
+/* =========================
+   MAIN EDITOR
+========================= */
+
+.editor-layout {
+    display: grid;
+    grid-template-columns: 330px minmax(400px, 1fr) 270px;
+    gap: 18px;
+    align-items: start;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.editor-sidebar {
+    background: white;
+    border: 1px solid #e1e4e8;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.sidebar-tabs {
+    display: flex;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.sidebar-tab {
+    flex: 1;
+    border: none;
+    background: white;
+    padding: 12px 5px;
+    cursor: pointer;
+    color: #777;
+    font-size: 12px;
+}
+
+.sidebar-tab.active {
+    color: #2563eb;
+    font-weight: 600;
+    border-bottom: 2px solid #2563eb;
+}
+
+.sidebar-content {
+    padding: 15px;
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+}
+
+.editor-panel {
+    display: none;
+}
+
+.editor-panel.active {
+    display: block;
+}
+
+.panel-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 4px 0 15px;
+}
+
+.option-group {
+    margin-bottom: 20px;
+}
+
+.option-group-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: #8a8f98;
+    margin-bottom: 10px;
+}
+
+.field {
+    margin-bottom: 12px;
+}
+
+.field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 5px;
+}
+
+.field input[type="text"],
+.field input[type="number"],
+.field input[type="url"],
+.field select {
+    width: 100%;
+    border: 1px solid #d5d9df;
+    border-radius: 6px;
+    padding: 9px 10px;
+    font-size: 13px;
+    background: white;
+    outline: none;
+}
+
+.field input:focus,
+.field select:focus {
+    border-color: #2563eb;
+}
+
+.field input[type="color"] {
+    width: 100%;
+    height: 38px;
+    padding: 3px;
+    border: 1px solid #d5d9df;
+    border-radius: 6px;
+    background: white;
+}
+
+.range-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.range-row input[type="range"] {
+    flex: 1;
+}
+
+.range-value {
+    min-width: 38px;
+    text-align: right;
+    font-size: 12px;
+    color: #666;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 9px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.checkbox-row input {
+    width: 15px;
+    height: 15px;
+}
+
+.segmented {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    border: 1px solid #d5d9df;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.segmented button {
+    border: none;
+    border-right: 1px solid #d5d9df;
+    background: white;
+    padding: 8px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.segmented button:last-child {
+    border-right: none;
+}
+
+.segmented button.active {
+    background: #2563eb;
+    color: white;
+}
+
+/* =========================
+   PREVIEW
+========================= */
+
+.preview-area {
+    min-width: 0;
+}
+
+.preview-toolbar {
+    background: white;
+    border: 1px solid #e1e4e8;
+    border-radius: 12px 12px 0 0;
+    padding: 11px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.preview-toolbar-left,
+.preview-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.preview-label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.preview-status {
+    font-size: 11px;
+    color: #777;
+}
+
+.zoom-button {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.preview-container {
+    background: #dfe3e8;
+    border: 1px solid #e1e4e8;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    min-height: calc(100vh - 180px);
+    padding: 35px;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.paper {
+    background: white;
+    position: relative;
+    box-shadow: 0 8px 30px rgba(0,0,0,.18);
+    transform-origin: top center;
+    transition: width .2s, min-height .2s;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.paper-inner {
+    position: absolute;
+    inset: 0;
+    padding: 35px;
+}
+
+.paper-header {
+    position: relative;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 12px;
+    margin-bottom: 15px;
+}
+
+.paper-header-logo {
+    max-width: 90px;
+    max-height: 45px;
+    object-fit: contain;
+    margin-bottom: 5px;
+}
+
+.paper-header-title {
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--text);
+}
+
+.paper-header-subtitle {
+    font-size: 12px;
+    color: var(--secondary);
+    margin-top: 3px;
+}
+
+.paper-round {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 10px;
+}
+
+.game-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.game-list.two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+}
+
+.preview-game {
+    position: relative;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    padding: 10px 12px;
+    min-height: 70px;
+    color: var(--text);
+}
+
+.preview-game.shadow {
+    box-shadow: 0 3px 10px rgba(0,0,0,.09);
+}
+
+.game-number {
+    position: absolute;
+    top: 7px;
+    right: 8px;
+    font-size: 8px;
+    color: var(--secondary);
+}
+
+.game-meta {
+    font-size: 8px;
+    color: var(--secondary);
+    margin-bottom: 7px;
+}
+
+.game-teams {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.team {
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+.score {
+    font-weight: 800;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.game-bottom {
+    margin-top: 4px;
+    font-size: 8px;
+    color: var(--secondary);
+}
+
+.preview-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8px;
+}
+
+.preview-table th {
+    text-align: left;
+    padding: 6px;
+    background: var(--accent);
+    color: white;
+}
+
+.preview-table td {
+    padding: 6px;
+    border-bottom: 1px solid var(--border);
+}
+
+.paper-footer {
+    position: absolute;
+    bottom: 15px;
+    left: 35px;
+    right: 35px;
+    border-top: 1px solid var(--border);
+    padding-top: 6px;
+    font-size: 8px;
+    color: var(--secondary);
+    display: flex;
+    justify-content: space-between;
+}
+
+.watermark {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    color: #000;
+    opacity: .05;
+    font-size: 50px;
+    font-weight: 900;
+    transform: rotate(-30deg);
+    white-space: nowrap;
+}
+
+/* =========================
+   RIGHT PANEL
+========================= */
+
+.properties-panel {
+    background: white;
+    border: 1px solid #e1e4e8;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.properties-header {
+    padding: 14px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.properties-body {
+    padding: 14px;
+}
+
+.info-box {
+    background: #f5f7fa;
+    border-radius: 7px;
+    padding: 11px;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #666;
+}
+
+.color-preview {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.color-dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+/* =========================
+   MODALS
+========================= */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.modal-overlay.open {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    width: min(600px, calc(100% - 30px));
+    max-height: 80vh;
+    overflow: auto;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.modal h2 {
+    margin-top: 0;
+    font-size: 18px;
+}
+
+.modal textarea {
+    width: 100%;
+    min-height: 250px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1200px) {
+
+    .editor-layout {
+        grid-template-columns: 300px minmax(400px, 1fr);
+    }
+
+    .properties-panel {
+        display: none;
+    }
+}
+
+@media (max-width: 850px) {
+
+    .editor-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .editor-sidebar {
+        order: 2;
+    }
+
+    .preview-area {
+        order: 1;
+    }
+
+    .sidebar-content {
+        max-height: none;
+    }
+
+    .preview-container {
+        min-height: 600px;
+    }
+
+    .editor-topbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .editor-actions {
+        justify-content: stretch;
+    }
+
+    .editor-actions button {
+        flex: 1;
+    }
+}
+
+</style>
+{% endblock %}
+
+
+{% block main %}
+
+<div class="schedule-editor">
+
+    <!-- TOPBAR -->
+
+    <div class="editor-topbar">
+
+        <div class="editor-title">
+
+            <div class="editor-title-icon">
+                TH
+            </div>
+
+            <div>
+                <h1>Schema Editor</h1>
+                <p>Ontwerp je wedstrijdschema en exporteer het als PDF.</p>
+            </div>
+
+        </div>
+
+        <div class="editor-actions">
+
+            <button class="editor-button"
+                    onclick="resetEditor()">
+                Reset
+            </button>
+
+            <button class="editor-button"
+                    onclick="openSettingsExport()">
+                Instellingen
+            </button>
+
+            <button class="editor-button"
+                    onclick="generateTournamentPDF(true)">
+                Voorbeeld PDF
+            </button>
+
+            <button class="editor-button primary"
+                    onclick="generateTournamentPDF(false)">
+                PDF genereren
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="editor-layout">
+
+        <!-- =========================
+             LEFT EDITOR
+        ========================== -->
+
+        <div class="editor-sidebar">
+
+            <div class="sidebar-tabs">
+
+                <button class="sidebar-tab active"
+                        data-panel="page">
+                    Pagina
+                </button>
+
+                <button class="sidebar-tab"
+                        data-panel="layout">
+                    Layout
+                </button>
+
+                <button class="sidebar-tab"
+                        data-panel="style">
+                    Stijl
+                </button>
+
+                <button class="sidebar-tab"
+                        data-panel="content">
+                    Inhoud
+                </button>
+
+            </div>
+
+
+            <div class="sidebar-content">
+
+
+                <!-- =====================
+                     PAGINA
+                ====================== -->
+
+                <div class="editor-panel active"
+                     id="panel-page">
+
+                    <div class="panel-title">
+                        Pagina
+                    </div>
+
+                    <div class="option-group">
+
+                        <div class="option-group-title">
+                            Formaat
+                        </div>
+
+                        <div class="field">
+
+                            <label>Paginaformaat</label>
+
+                            <select id="pageFormat">
+                                <option value="a4">A4</option>
+                                <option value="a3">A3</option>
+                                <option value="a5">A5</option>
+                                <option value="letter">Letter</option>
+                            </select>
+
+                        </div>
+
+                        <div class="field">
+
+                            <label>Oriëntatie</label>
+
+                            <select id="orientation">
+                                <option value="portrait">Staand</option>
+                                <option value="landscape">Liggend</option>
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="option-group">
+
+                        <div class="option-group-title">
+                            Marges
+                        </div>
+
+                        <div class="field">
+                            <label>Boven</label>
+
+                            <div class="range-row">
+
+                                <input type="range"
+                                       id="marginTop"
+                                       min="5"
+                                       max="50"
+                                       value="15">
+
+                                <span class="range-value"
+                                      id="marginTopValue">
+                                    15
+                                </span>
+
+                            </div>
+                        </div>
+
+
+                        <div class="field">
+                            <label>Onder</label>
+
+                            <div class="range-row">
+
+                                <input type="range"
+                                       id="marginBottom"
+                                       min="5"
+                                       max="50"
+                                       value="15">
+
+                                <span class="range-value"
+                                      id="marginBottomValue">
+                                    15
+                                </span>
+
+                            </div>
+                        </div>
+
+
+                        <div class="field">
+                            <label>Links</label>
+
+                            <div class="range-row">
+
+                                <input type="range"
+                                       id="marginLeft"
+                                       min="5"
+                                       max="50"
+                                       value="15">
+
+                                <span class="range-value"
+                                      id="marginLeftValue">
+                                    15
+                                </span>
+
+                            </div>
+                        </div>
+
+
+                        <div class="field">
+                            <label>Rechts</label>
+
+                            <div class="range-row">
+
+                                <input type="range"
+                                       id="marginRight"
+                                       min="5"
+                                       max="50"
+                                       value="15">
+
+                                <span class="range-value"
+                                      id="marginRightValue">
+                                    15
+                                </span>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="option-group">
+
+                        <div class="option-group-title">
+                            Pagina
+                        </div>
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="newPageRound"
+                                   checked>
+                            Nieuwe pagina per ronde
+                        </label>
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="showPageNumbers"
+                                   checked>
+                            Paginanummers
+                        </label>
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="showTotalPages"
+                                   checked>
+                            Totaal aantal pagina's
+                        </label>
+
+                    </div>
+
+
+                    <div class="option-group">
+
+                        <div class="option-group-title">
+                            Achtergrond
+                        </div>
+
+                        <div class="field">
+
+                            <label>Achtergrondkleur</label>
+
+                            <input type="color"
+                                   id="backgroundColor"
+                                   value="#ffffff">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================
+                     LAYOUT
+                ====================== -->
+
+                <div class="editor-panel"
+                     id="panel-layout">
+
+                    <div class="panel-title">
+                        Layout
+                    </div>
+
+
+                    <div class="option-group">
+
+                        <div class="option-group-title">
+                            Wedstrijden
+                        </div>
+
+                        <div class="field">
+
+                            <label>Layout</label>
+
+                            <select id="layout">
+
+                                <option value="cards">
+                                    Wedstrijdkaarten
+                                </option>
+
+                                <option value="compact">
+                                    Compact
+                                </option>
+
+                                <option value="table">
+                                    Tabel
+                                </option>
+
+                                <option value="two-columns">
+                                    2 kolommen
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>Ruimte tussen wedstrijden</label>
+
+                            <div class="range-row">
+
+                                <input type="range"
+                                       id="gameSpacing"
+                                       min="2"
+                                       max="25"
+                                       value="8">
+
+                                <span class="range-value"
+                                      id="gameSpacingValue">
+                                    8
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="option-group">
+
+                        <div class="option-group-title">
+                            Kaarten
+                        </div>
+
+                        <div class="field">
+
+                            <label>Kaart hoogte</label>
+
+                            <div class="range-row">
+
+                                <input type="range"
+                                       id="cardHeight"
+                                       min="45"
+                                       max="130"
+                                       value="70">
+
+                                <span class="range-value"
+                                      id="cardHeightValue">
+                                    70
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>Kaart padding</label>
+
+                            <div class="range-row">
+
+                                <input type="range"
+                                       id="cardPadding"
+                                       min="4"
+                                       max="25"
+                                       value="10">
+
+                                <span class="range-value"
+                                      id="cardPaddingValue">
+                                    10
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="cardShadow"
+                                   checked>
+                            Schaduw
+                        </label>
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="showGameNumber"
+                                   checked>
+                            Wedstrijdnummer
+                        </label>
+
+                    </div>
+
+
+                    <div class="option-group">
+
+                        <div class="option-group-title">
+                            Tabel
+                        </div>
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="tableHeader"
+                                   checked>
+                            Tabelkop
+                        </label>
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="tableLines"
+                                   checked>
+                            Rijlijnen
+                        </label>
+
+                    </div>
+
+
+                    <div class="option-group">
+
+                        <div class="option-group-title">
+                            Sortering
+                        </div>
+
+                        <div class="field">
+
+                            <label>Sorteren op</label>
+
+                            <select id="sortBy">
+
+                                <option value="round">
+                                    Ronde
+                                </option>
+
+                                <option value="date">
+                                    Datum
+                                </option>
+
+                                <option value="time">
+                                    Tijd
+                                </option>
+
+                                <option value="location">
+                                    Locatie
+                                </option>
+
+                                <option value="number">
+                                    Wedstrijdnummer
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================
+                     STYLE
+                ====================== -->
+
+                <div class="editor-panel"
+                     id="panel-style">
+
+                    <div class="panel-title">
+                        Stijl
+                    </div>
+
+
+                    <div class="option-group">
+
+                        <div class="option-group-title">
+                            Kleuren
+                        </div>
+
+                        <div class="field">
+                            <label>Accentkleur</label>
+                            <input type="color"
+                                   id="accentColor"
+                                   value="#2563eb">
+                        </div>
+
+                        <div class="field">
+                            <label>Tekstkleur</label>
+                            <input type="color"
+                                   id="textColor"
+                                   value="#222222">
+                        </div>
+
+                        <div class="field">
+                            <label>Secundaire tekst</label>
+                            <input type="color"
+                                   id="secondaryColor"
+                                   value="#777777">
+                        </div>
+
+                        <div class="field">
+                            <label>Kaartkleur</label>
+                            <input type="color"
+                                   id="cardColor"
+                                   value="#ffffff">
+                        </div>
+
+                        <div class="field">
+                            <label>Borderkleur</label>
+                            <input type="color"
+                                   id="borderColor"
+                                   value="#dddddd">
+                        </div>
+
+                    </div>
+
+
+                    <div class="option-group">
+
+                        <div class="option-group-title">
+                            Lettertype
+                        </div>
+
+                        <div class="field">
+
+                            <label>Lettertype</label>
+
+                            <select id="fontFamily">
+
+                                <option value="helvetica">
+                                    Helvetica
+                                </option>
+
+                                <option value="times">
+                                    Times
+                                </option>
+
+                                <option value="courier">
+                                    Courier
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>Basissgrootte</label>
+
+                            <div class="range-row">
+
+                                <input type="range"
+                                       id="baseFontSize"
+                                       min="6"
+                                       max="18"
+                                       value="10">
+
+                                <span class="range-value"
+                                      id="baseFontSizeValue">
+                                    10
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="option-group">
+
+                        <div class="option-group-title">
+                            Borders
+                        </div>
+
+                        <div class="field">
+
+                            <label>Border dikte</label>
+
+                            <div class="range-row">
+
+                                <input type="range"
+                                       id="borderWidth"
+                                       min="0"
+                                       max="4"
+                                       step=".5"
+                                       value="1">
+
+                                <span class="range-value"
+                                      id="borderWidthValue">
+                                    1
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>Radius</label>
+
+                            <div class="range-row">
+
+                                <input type="range"
+                                       id="borderRadius"
+                                       min="0"
+                                       max="20"
+                                       value="7">
+
+                                <span class="range-value"
+                                      id="borderRadiusValue">
+                                    7
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================
+                     CONTENT
+                ====================== -->
+
+                <div class="editor-panel"
+                     id="panel-content">
+
+                    <div class="panel-title">
+                        Inhoud
+                    </div>
+
+
+                    <div class="option-group">
+
+                        <div class="option-group-title">
+                            Wedstrijd
+                        </div>
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="showDate"
+                                   checked>
+                            Datum
+                        </label>
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="showTime"
+                                   checked>
+                            Tijd
+                        </label>
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="showLocation"
+                                   checked>
+                            Locatie
+                        </label>
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="showScores"
+                                   checked>
+                            Scores
+                        </label>
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="showStatus">
+                            Status
+                        </label>
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="showRound"
+                                   checked>
+                            Ronde
+                        </label>
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="showVs"
+                                   checked>
+                            VS tonen
+                        </label>
+
+                    </div>
+
+
+                    <div class="option-group">
+
+                        <div class="option-group-title">
+                            Header
+                        </div>
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="showHeader"
+                                   checked>
+                            Header tonen
+                        </label>
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="showLogo">
+                            Logo tonen
+                        </label>
+
+                        <div class="field">
+
+                            <label>Logo URL</label>
+
+                            <input type="url"
+                                   id="logoUrl"
+                                   placeholder="https://...">
+
+                        </div>
+
+                        <div class="field">
+
+                            <label>Titel</label>
+
+                            <input type="text"
+                                   id="headerTitle"
+                                   value="TournamentHub">
+
+                        </div>
+
+                        <div class="field">
+
+                            <label>Subtitel</label>
+
+                            <input type="text"
+                                   id="headerSubtitle"
+                                   value="Wedstrijdschema">
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="option-group">
+
+                        <div class="option-group-title">
+                            Footer
+                        </div>
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="showFooter"
+                                   checked>
+                            Footer tonen
+                        </label>
+
+                        <div class="field">
+
+                            <label>Footer tekst</label>
+
+                            <input type="text"
+                                   id="footerText"
+                                   value="TournamentHub.nl">
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="option-group">
+
+                        <div class="option-group-title">
+                            Watermerk
+                        </div>
+
+                        <label class="checkbox-row">
+                            <input type="checkbox"
+                                   id="showWatermark">
+                            Watermerk tonen
+                        </label>
+
+                        <div class="field">
+
+                            <label>Tekst</label>
+
+                            <input type="text"
+                                   id="watermarkText"
+                                   value="TournamentHub">
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="option-group">
+
+                        <div class="option-group-title">
+                            Filter
+                        </div>
+
+                        <div class="field">
+
+                            <label>Ronde</label>
+
+                            <select id="roundFilter">
+
+                                <option value="all">
+                                    Alle rondes
+                                </option>
+
+                                {% for round in rounds %}
+
+                                <option value="{{ round.id }}">
+                                    {{ round.name }}
+                                </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>Status</label>
+
+                            <select id="statusFilter">
+
+                                <option value="all">
+                                    Alle wedstrijden
+                                </option>
+
+                                <option value="scheduled">
+                                    Gepland
+                                </option>
+
+                                <option value="in_progress">
+                                    Bezig
+                                </option>
+
+                                <option value="awaiting_scores">
+                                    Wacht op score
+                                </option>
+
+                                <option value="completed">
+                                    Afgerond
+                                </option>
+
+                                <option value="cancelled">
+                                    Geannuleerd
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             PREVIEW
+        ========================== -->
+
+        <div class="preview-area">
+
+            <div class="preview-toolbar">
+
+                <div class="preview-toolbar-left">
+
+                    <span class="preview-label">
+                        Live voorbeeld
+                    </span>
+
+                    <span class="preview-status"
+                          id="previewStatus">
+                        Automatisch bijgewerkt
+                    </span>
+
+                </div>
+
+                <div class="preview-toolbar-right">
+
+                    <button class="zoom-button"
+                            onclick="changeZoom(-.1)">
+                        −
+                    </button>
+
+                    <span id="zoomValue"
+                          style="font-size:11px;">
+                        80%
+                    </span>
+
+                    <button class="zoom-button"
+                            onclick="changeZoom(.1)">
+                        +
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="preview-container"
+                 id="previewContainer">
+
+                <div class="paper"
+                     id="paper">
+
+                    <div class="watermark"
+                         id="previewWatermark">
+                        TournamentHub
+                    </div>
+
+                    <div class="paper-inner">
+
+                        <div class="paper-header"
+                             id="previewHeader">
+
+                            <img class="paper-header-logo"
+                                 id="previewLogo"
+                                 style="display:none;">
+
+                            <div class="paper-header-title"
+                                 id="previewTitle">
+                                TournamentHub
+                            </div>
+
+                            <div class="paper-header-subtitle"
+                                 id="previewSubtitle">
+                                Wedstrijdschema
+                            </div>
+
+                        </div>
+
+
+                        <div class="paper-round"
+                             id="previewRound">
+                            Ronde 1
+                        </div>
+
+
+                        <div class="game-list"
+                             id="previewGames">
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="paper-footer"
+                         id="previewFooter">
+
+                        <span id="previewFooterText">
+                            TournamentHub.nl
+                        </span>
+
+                        <span>
+                            Pagina 1
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             RIGHT INFO
+        ========================== -->
+
+        <div class="properties-panel">
+
+            <div class="properties-header">
+                Schema informatie
+            </div>
+
+            <div class="properties-body">
+
+                <div class="info-box">
+
+                    <strong>Live editor</strong>
+                    <br><br>
+
+                    Wijzig een instelling links en
+                    de preview wordt automatisch
+                    bijgewerkt.
+
+                </div>
+
+                <br>
+
+                <div class="option-group-title">
+                    Kleuren
+                </div>
+
+                <div class="color-preview">
+
+                    <div class="color-dot"
+                         id="dotAccent"></div>
+
+                    <div class="color-dot"
+                         id="dotText"></div>
+
+                    <div class="color-dot"
+                         id="dotCard"></div>
+
+                    <div class="color-dot"
+                         id="dotBorder"></div>
+
+                </div>
+
+                <br>
+
+                <div class="option-group-title">
+                    Wedstrijden
+                </div>
+
+                <div id="gameCount"
+                     style="font-size:24px;font-weight:700;">
+                    0
+                </div>
+
+                <div style="font-size:11px;color:#777;">
+                    wedstrijden geselecteerd
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     SETTINGS MODAL
+========================== -->
+
+<div class="modal-overlay"
+     id="settingsModal">
+
+    <div class="modal">
+
+        <h2>Instellingen exporteren</h2>
+
+        <p style="font-size:13px;color:#777;">
+            Je kunt deze instellingen opslaan en later
+            opnieuw importeren.
+        </p>
+
+        <textarea id="settingsData"></textarea>
+
+        <div class="modal-actions">
+
+            <button class="editor-button"
+                    onclick="closeSettingsModal()">
+                Sluiten
+            </button>
+
+            <button class="editor-button"
+                    onclick="copySettings()">
+                Kopiëren
+            </button>
+
+            <button class="editor-button primary"
+                    onclick="importSettings()">
+                Importeren
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block script %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+
+/* =========================================================
+   DATA VAN FLASK
+========================================================= */
+
+const rounds = {{ rounds | tojson }};
+
+
+/* =========================================================
+   EDITOR STATE
+========================================================= */
+
+let zoom = 0.8;
+
+const defaultSettings = {
+
+    pageFormat: "a4",
+    orientation: "portrait",
+
+    marginTop: 15,
+    marginBottom: 15,
+    marginLeft: 15,
+    marginRight: 15,
+
+    backgroundColor: "#ffffff",
+
+    layout: "cards",
+
+    gameSpacing: 8,
+    cardHeight: 70,
+    cardPadding: 10,
+    cardShadow: true,
+    showGameNumber: true,
+
+    tableHeader: true,
+    tableLines: true,
+
+    sortBy: "round",
+
+    accentColor: "#2563eb",
+    textColor: "#222222",
+    secondaryColor: "#777777",
+    cardColor: "#ffffff",
+    borderColor: "#dddddd",
+
+    fontFamily: "helvetica",
+    baseFontSize: 10,
+
+    borderWidth: 1,
+    borderRadius: 7,
+
+    showDate: true,
+    showTime: true,
+    showLocation: true,
+    showScores: true,
+    showStatus: false,
+    showRound: true,
+    showVs: true,
+
+    showHeader: true,
+    showLogo: false,
+    logoUrl: "",
+    headerTitle: "TournamentHub",
+    headerSubtitle: "Wedstrijdschema",
+
+    showFooter: true,
+    footerText: "TournamentHub.nl",
+
+    showWatermark: false,
+    watermarkText: "TournamentHub",
+
+    roundFilter: "all",
+    statusFilter: "all",
+
+    newPageRound: true,
+    showPageNumbers: true,
+    showTotalPages: true
+
+};
+
+let settings = {...defaultSettings};
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function $(id) {
+    return document.getElementById(id);
+}
+
+
+function getSettingsFromUI() {
+
+    settings.pageFormat = $("pageFormat").value;
+    settings.orientation = $("orientation").value;
+
+    settings.marginTop = Number($("marginTop").value);
+    settings.marginBottom = Number($("marginBottom").value);
+    settings.marginLeft = Number($("marginLeft").value);
+    settings.marginRight = Number($("marginRight").value);
+
+    settings.backgroundColor = $("backgroundColor").value;
+
+    settings.layout = $("layout").value;
+
+    settings.gameSpacing = Number($("gameSpacing").value);
+    settings.cardHeight = Number($("cardHeight").value);
+    settings.cardPadding = Number($("cardPadding").value);
+
+    settings.cardShadow = $("cardShadow").checked;
+    settings.showGameNumber = $("showGameNumber").checked;
+
+    settings.tableHeader = $("tableHeader").checked;
+    settings.tableLines = $("tableLines").checked;
+
+    settings.sortBy = $("sortBy").value;
+
+    settings.accentColor = $("accentColor").value;
+    settings.textColor = $("textColor").value;
+    settings.secondaryColor = $("secondaryColor").value;
+    settings.cardColor = $("cardColor").value;
+    settings.borderColor = $("borderColor").value;
+
+    settings.fontFamily = $("fontFamily").value;
+    settings.baseFontSize = Number($("baseFontSize").value);
+
+    settings.borderWidth = Number($("borderWidth").value);
+    settings.borderRadius = Number($("borderRadius").value);
+
+    settings.showDate = $("showDate").checked;
+    settings.showTime = $("showTime").checked;
+    settings.showLocation = $("showLocation").checked;
+    settings.showScores = $("showScores").checked;
+    settings.showStatus = $("showStatus").checked;
+    settings.showRound = $("showRound").checked;
+    settings.showVs = $("showVs").checked;
+
+    settings.showHeader = $("showHeader").checked;
+    settings.showLogo = $("showLogo").checked;
+    settings.logoUrl = $("logoUrl").value;
+    settings.headerTitle = $("headerTitle").value;
+    settings.headerSubtitle = $("headerSubtitle").value;
+
+    settings.showFooter = $("showFooter").checked;
+    settings.footerText = $("footerText").value;
+
+    settings.showWatermark = $("showWatermark").checked;
+    settings.watermarkText = $("watermarkText").value;
+
+    settings.roundFilter = $("roundFilter").value;
+    settings.statusFilter = $("statusFilter").value;
+
+    settings.newPageRound = $("newPageRound").checked;
+    settings.showPageNumbers = $("showPageNumbers").checked;
+    settings.showTotalPages = $("showTotalPages").checked;
+
+    return settings;
+}
+
+
+function applySettingsToUI() {
+
+    $("pageFormat").value = settings.pageFormat;
+    $("orientation").value = settings.orientation;
+
+    $("marginTop").value = settings.marginTop;
+    $("marginBottom").value = settings.marginBottom;
+    $("marginLeft").value = settings.marginLeft;
+    $("marginRight").value = settings.marginRight;
+
+    $("backgroundColor").value = settings.backgroundColor;
+
+    $("layout").value = settings.layout;
+
+    $("gameSpacing").value = settings.gameSpacing;
+    $("cardHeight").value = settings.cardHeight;
+    $("cardPadding").value = settings.cardPadding;
+
+    $("cardShadow").checked = settings.cardShadow;
+    $("showGameNumber").checked = settings.showGameNumber;
+
+    $("tableHeader").checked = settings.tableHeader;
+    $("tableLines").checked = settings.tableLines;
+
+    $("sortBy").value = settings.sortBy;
+
+    $("accentColor").value = settings.accentColor;
+    $("textColor").value = settings.textColor;
+    $("secondaryColor").value = settings.secondaryColor;
+    $("cardColor").value = settings.cardColor;
+    $("borderColor").value = settings.borderColor;
+
+    $("fontFamily").value = settings.fontFamily;
+    $("baseFontSize").value = settings.baseFontSize;
+
+    $("borderWidth").value = settings.borderWidth;
+    $("borderRadius").value = settings.borderRadius;
+
+    $("showDate").checked = settings.showDate;
+    $("showTime").checked = settings.showTime;
+    $("showLocation").checked = settings.showLocation;
+    $("showScores").checked = settings.showScores;
+    $("showStatus").checked = settings.showStatus;
+    $("showRound").checked = settings.showRound;
+    $("showVs").checked = settings.showVs;
+
+    $("showHeader").checked = settings.showHeader;
+    $("showLogo").checked = settings.showLogo;
+    $("logoUrl").value = settings.logoUrl;
+    $("headerTitle").value = settings.headerTitle;
+    $("headerSubtitle").value = settings.headerSubtitle;
+
+    $("showFooter").checked = settings.showFooter;
+    $("footerText").value = settings.footerText;
+
+    $("showWatermark").checked = settings.showWatermark;
+    $("watermarkText").value = settings.watermarkText;
+
+    $("roundFilter").value = settings.roundFilter;
+    $("statusFilter").value = settings.statusFilter;
+
+    $("newPageRound").checked = settings.newPageRound;
+    $("showPageNumbers").checked = settings.showPageNumbers;
+    $("showTotalPages").checked = settings.showTotalPages;
+
+    updateRangeLabels();
+}
+
+
+/* =========================================================
+   RANGE LABELS
+========================================================= */
+
+function updateRangeLabels() {
+
+    const ranges = [
+        ["marginTop", "marginTopValue"],
+        ["marginBottom", "marginBottomValue"],
+        ["marginLeft", "marginLeftValue"],
+        ["marginRight", "marginRightValue"],
+        ["gameSpacing", "gameSpacingValue"],
+        ["cardHeight", "cardHeightValue"],
+        ["cardPadding", "cardPaddingValue"],
+        ["baseFontSize", "baseFontSizeValue"],
+        ["borderWidth", "borderWidthValue"],
+        ["borderRadius", "borderRadiusValue"]
+    ];
+
+    for (const [input, output] of ranges) {
+
+        if ($(input) && $(output)) {
+            $(output).textContent = $(input).value;
+        }
+    }
+}
+
+
+/* =========================================================
+   FILTER GAMES
+========================================================= */
+
+function getFilteredRounds() {
+
+    let result = [];
+
+    for (const round of rounds) {
+
+        if (
+            settings.roundFilter !== "all" &&
+            String(round.id) !== String(settings.roundFilter)
+        ) {
+            continue;
+        }
+
+        if (!round.games) {
+            continue;
+        }
+
+        let games = round.games.filter(game => {
+
+            if (
+                !game.teams ||
+                game.teams.length < 2
+            ) {
+                return false;
+            }
+
+            if (
+                settings.statusFilter !== "all" &&
+                game.status !== settings.statusFilter
+            ) {
+                return false;
+            }
+
+            return true;
+        });
+
+        games = sortGames(games);
+
+        if (games.length > 0) {
+
+            result.push({
+                ...round,
+                games: games
+            });
+
+        }
+
+    }
+
+    return result;
+}
+
+
+function sortGames(games) {
+
+    return [...games].sort((a, b) => {
+
+        if (settings.sortBy === "date") {
+            return new Date(a.start_time) -
+                   new Date(b.start_time);
+        }
+
+        if (settings.sortBy === "time") {
+            return new Date(a.start_time) -
+                   new Date(b.start_time);
+        }
+
+        if (settings.sortBy === "location") {
+            return String(a.location || "")
+                .localeCompare(
+                    String(b.location || "")
+                );
+        }
+
+        return 0;
+    });
+}
+
+
+/* =========================================================
+   DATE / TIME
+========================================================= */
+
+function formatDate(value) {
+
+    if (!value) {
+        return "-";
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return "-";
+    }
+
+    return date.toLocaleDateString(
+        "nl-NL",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        }
+    );
+}
+
+
+function formatTime(value) {
+
+    if (!value) {
+        return "-";
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return "-";
+    }
+
+    return date.toLocaleTimeString(
+        "nl-NL",
+        {
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+}
+
+
+function getStatusText(status) {
+
+    const statuses = {
+
+        scheduled: "Gepland",
+
+        in_progress: "Bezig",
+
+        awaiting_scores: "Wacht op score",
+
+        completed: "Afgerond",
+
+        cancelled: "Geannuleerd"
+
+    };
+
+    return statuses[status] || status || "-";
+}
+
+
+/* =========================================================
+   PREVIEW PAPER
+========================================================= */
+
+function updatePaperSize() {
+
+    const paper = $("paper");
+
+    let width;
+    let height;
+
+    if (settings.pageFormat === "a3") {
+        width = 794;
+        height = 1123;
+    }
+
+    else if (settings.pageFormat === "a5") {
+        width = 420;
+        height = 594;
+    }
+
+    else if (settings.pageFormat === "letter") {
+        width = 816;
+        height = 1056;
+    }
+
+    else {
+        width = 595;
+        height = 842;
+    }
+
+    if (settings.orientation === "landscape") {
+
+        const temp = width;
+        width = height;
+        height = temp;
+
+    }
+
+    paper.style.width = width + "px";
+    paper.style.height = height + "px";
+
+    paper.style.backgroundColor =
+        settings.backgroundColor;
+
+    paper.style.transform =
+        `scale(${zoom})`;
+
+    $("previewContainer").style.minHeight =
+        Math.max(
+            600,
+            height * zoom + 80
+        ) + "px";
+}
+
+
+function updatePaperCSS() {
+
+    const paper = $("paper");
+
+    paper.style.setProperty(
+        "--accent",
+        settings.accentColor
+    );
+
+    paper.style.setProperty(
+        "--text",
+        settings.textColor
+    );
+
+    paper.style.setProperty(
+        "--secondary",
+        settings.secondaryColor
+    );
+
+    paper.style.setProperty(
+        "--card",
+        settings.cardColor
+    );
+
+    paper.style.setProperty(
+        "--border",
+        settings.borderColor
+    );
+
+    paper.style.setProperty(
+        "--border-width",
+        settings.borderWidth + "px"
+    );
+
+    paper.style.setProperty(
+        "--radius",
+        settings.borderRadius + "px"
+    );
+}
+
+
+/* =========================================================
+   HEADER PREVIEW
+========================================================= */
+
+function updateHeaderPreview(round) {
+
+    $("previewHeader").style.display =
+        settings.showHeader ? "block" : "none";
+
+    $("previewTitle").textContent =
+        settings.headerTitle ||
+        round?.tournamentName ||
+        "TournamentHub";
+
+    $("previewSubtitle").textContent =
+        settings.headerSubtitle ||
+        "";
+
+    $("previewLogo").style.display =
+        settings.showLogo && settings.logoUrl
+            ? "block"
+            : "none";
+
+    if (settings.logoUrl) {
+
+        $("previewLogo").src =
+            settings.logoUrl;
+
+    }
+
+    $("previewRound").style.display =
+        settings.showRound ? "block" : "none";
+
+    $("previewRound").textContent =
+        round?.name || "Ronde 1";
+}
+
+
+/* =========================================================
+   GAME PREVIEW
+========================================================= */
+
+function createGameCard(game, number) {
+
+    const home = game.teams[0];
+    const away = game.teams[1];
+
+    const element =
+        document.createElement("div");
+
+    element.className =
+        "preview-game" +
+        (settings.cardShadow
+            ? " shadow"
+            : "");
+
+    element.style.minHeight =
+        settings.cardHeight + "px";
+
+    element.style.padding =
+        settings.cardPadding + "px";
+
+
+    if (settings.showGameNumber) {
+
+        const numberElement =
+            document.createElement("div");
+
+        numberElement.className =
+            "game-number";
+
+        numberElement.textContent =
+            "#" + number;
+
+        element.appendChild(numberElement);
+    }
+
+
+    const meta =
+        document.createElement("div");
+
+    meta.className =
+        "game-meta";
+
+    const metaParts = [];
+
+    if (settings.showDate) {
+        metaParts.push(
+            formatDate(game.start_time)
+        );
+    }
+
+    if (settings.showTime) {
+        metaParts.push(
+            formatTime(game.start_time)
+        );
+    }
+
+    if (settings.showRound) {
+        // Round is already in header.
+    }
+
+    meta.textContent =
+        metaParts.join(" • ");
+
+    if (metaParts.length > 0) {
+        element.appendChild(meta);
+    }
+
+
+    const teams =
+        document.createElement("div");
+
+    teams.className =
+        "game-teams";
+
+
+    const teamNames =
+        document.createElement("div");
+
+    teamNames.innerHTML = `
+        <div class="team">
+            ${escapeHtml(home.name || "Team 1")}
+        </div>
+
+        <div class="team">
+            ${escapeHtml(away.name || "Team 2")}
+        </div>
+    `;
+
+
+    const score =
+        document.createElement("div");
+
+    score.className =
+        "score";
+
+
+    if (
+        settings.showScores &&
+        game.status === "completed"
+    ) {
+
+        score.textContent =
+            `${home.score ?? 0} - ${away.score ?? 0}`;
+
+    }
+
+    else if (settings.showVs) {
+
+        score.textContent = "VS";
+
+    }
+
+
+    teams.appendChild(teamNames);
+    teams.appendChild(score);
+
+    element.appendChild(teams);
+
+
+    const bottom =
+        document.createElement("div");
+
+    bottom.className =
+        "game-bottom";
+
+    const bottomParts = [];
+
+    if (settings.showLocation) {
+
+        bottomParts.push(
+            game.location ||
+            "Locatie onbekend"
+        );
+
+    }
+
+    if (settings.showStatus) {
+
+        bottomParts.push(
+            getStatusText(game.status)
+        );
+
+    }
+
+    bottom.textContent =
+        bottomParts.join(" • ");
+
+    if (bottomParts.length > 0) {
+        element.appendChild(bottom);
+    }
+
+    return element;
+}
+
+
+/* =========================================================
+   TABLE PREVIEW
+========================================================= */
+
+function createTable(games) {
+
+    const table =
+        document.createElement("table");
+
+    table.className =
+        "preview-table";
+
+
+    if (settings.tableHeader) {
+
+        const thead =
+            document.createElement("thead");
+
+        const row =
+            document.createElement("tr");
+
+        const headers = [
+            "Wedstrijd"
+        ];
+
+        if (settings.showDate) {
+            headers.push("Datum");
+        }
+
+        if (settings.showTime) {
+            headers.push("Tijd");
+        }
+
+        if (settings.showLocation) {
+            headers.push("Locatie");
+        }
+
+        if (settings.showScores) {
+            headers.push("Score");
+        }
+
+        if (settings.showStatus) {
+            headers.push("Status");
+        }
+
+        for (const header of headers) {
+
+            const th =
+                document.createElement("th");
+
+            th.textContent = header;
+
+            row.appendChild(th);
+        }
+
+        thead.appendChild(row);
+        table.appendChild(thead);
+    }
+
+
+    const tbody =
+        document.createElement("tbody");
+
+
+    for (const game of games) {
+
+        const row =
+            document.createElement("tr");
+
+        const home = game.teams[0];
+        const away = game.teams[1];
+
+        const values = [];
+
+        values.push(
+            `${home.name} - ${away.name}`
+        );
+
+        if (settings.showDate) {
+            values.push(
+                formatDate(game.start_time)
+            );
+        }
+
+        if (settings.showTime) {
+            values.push(
+                formatTime(game.start_time)
+            );
+        }
+
+        if (settings.showLocation) {
+            values.push(
+                game.location || "-"
+            );
+        }
+
+        if (settings.showScores) {
+
+            values.push(
+                game.status === "completed"
+                    ? `${home.score ?? 0} - ${away.score ?? 0}`
+                    : "-"
+            );
+
+        }
+
+        if (settings.showStatus) {
+            values.push(
+                getStatusText(game.status)
+            );
+        }
+
+        for (const value of values) {
+
+            const td =
+                document.createElement("td");
+
+            td.textContent = value;
+
+            row.appendChild(td);
+        }
+
+        tbody.appendChild(row);
+    }
+
+    table.appendChild(tbody);
+
+    return table;
+}
+
+
+/* =========================================================
+   UPDATE PREVIEW
+========================================================= */
+
+function renderPreview() {
+
+    getSettingsFromUI();
+
+    updateRangeLabels();
+
+    updatePaperSize();
+
+    updatePaperCSS();
+
+    const filtered =
+        getFilteredRounds();
+
+    const gamesContainer =
+        $("previewGames");
+
+    gamesContainer.innerHTML = "";
+
+    let gameCount = 0;
+
+    if (filtered.length === 0) {
+
+        gamesContainer.innerHTML = `
+            <div style="
+                padding:30px;
+                text-align:center;
+                color:#777;
+                font-size:12px;
+            ">
+                Geen wedstrijden beschikbaar.
+            </div>
+        `;
+
+    }
+
+    else {
+
+        const firstRound =
+            filtered[0];
+
+        updateHeaderPreview(firstRound);
+
+
+        if (settings.layout === "table") {
+
+            for (const round of filtered) {
+
+                if (settings.showRound) {
+
+                    const title =
+                        document.createElement("div");
+
+                    title.style.fontWeight = "700";
+                    title.style.fontSize = "11px";
+                    title.style.margin =
+                        "10px 0 6px";
+
+                    title.textContent =
+                        round.name;
+
+                    gamesContainer.appendChild(title);
+                }
+
+                gamesContainer.appendChild(
+                    createTable(round.games)
+                );
+
+                gameCount +=
+                    round.games.length;
+            }
+
+        }
+
+        else {
+
+            if (
+                settings.layout ===
+                "two-columns"
+            ) {
+
+                gamesContainer.classList.add(
+                    "two-column"
+                );
+
+            }
+
+            else {
+
+                gamesContainer.classList.remove(
+                    "two-column"
+                );
+
+            }
+
+
+            let number = 1;
+
+            for (const round of filtered) {
+
+                if (
+                    filtered.length > 1 &&
+                    settings.showRound
+                ) {
+
+                    const roundTitle =
+                        document.createElement("div");
+
+                    roundTitle.style.fontWeight =
+                        "700";
+
+                    roundTitle.style.fontSize =
+                        "11px";
+
+                    roundTitle.style.margin =
+                        "10px 0 4px";
+
+                    roundTitle.textContent =
+                        round.name;
+
+                    gamesContainer.appendChild(
+                        roundTitle
+                    );
+                }
+
+
+                for (const game of round.games) {
+
+                    const card =
+                        createGameCard(
+                            game,
+                            number++
+                        );
+
+                    gamesContainer.appendChild(
+                        card
+                    );
+
+                    gameCount++;
+                }
+            }
+        }
+
+    }
+
+
+    $("gameCount").textContent =
+        gameCount;
+
+
+    $("previewFooter").style.display =
+        settings.showFooter
+            ? "flex"
+            : "none";
+
+    $("previewFooterText").textContent =
+        settings.footerText;
+
+
+    $("previewWatermark").style.display =
+        settings.showWatermark
+            ? "flex"
+            : "none";
+
+    $("previewWatermark").textContent =
+        settings.watermarkText;
+
+
+    $("dotAccent").style.background =
+        settings.accentColor;
+
+    $("dotText").style.background =
+        settings.textColor;
+
+    $("dotCard").style.background =
+        settings.cardColor;
+
+    $("dotBorder").style.background =
+        settings.borderColor;
+
+
+    $("zoomValue").textContent =
+        Math.round(zoom * 100) + "%";
+
+    $("previewStatus").textContent =
+        "Bijgewerkt";
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+
+/* =========================================================
+   ZOOM
+========================================================= */
+
+function changeZoom(amount) {
+
+    zoom += amount;
+
+    zoom = Math.max(
+        .4,
+        Math.min(1.5, zoom)
+    );
+
+    renderPreview();
+}
+
+
+/* =========================================================
+   TABS
+========================================================= */
+
+document
+    .querySelectorAll(".sidebar-tab")
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                document
+                    .querySelectorAll(".sidebar-tab")
+                    .forEach(btn =>
+                        btn.classList.remove(
+                            "active"
+                        )
+                    );
+
+                document
+                    .querySelectorAll(".editor-panel")
+                    .forEach(panel =>
+                        panel.classList.remove(
+                            "active"
+                        )
+                    );
+
+                button.classList.add(
+                    "active"
+                );
+
+                const panel =
+                    $("panel-" +
+                      button.dataset.panel);
+
+                if (panel) {
+                    panel.classList.add(
+                        "active"
+                    );
+                }
+            }
+        );
+
+    });
+
+
+/* =========================================================
+   AUTOMATIC UPDATE
+========================================================= */
+
+document
+    .querySelectorAll(
+        ".editor-sidebar input, .editor-sidebar select"
+    )
+    .forEach(element => {
+
+        element.addEventListener(
+            "input",
+            renderPreview
+        );
+
+        element.addEventListener(
+            "change",
+            renderPreview
+        );
+
+    });
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+function resetEditor() {
+
+    if (
+        !confirm(
+            "Wil je alle editorinstellingen resetten?"
+        )
+    ) {
+        return;
+    }
+
+    settings =
+        {...defaultSettings};
+
+    applySettingsToUI();
+
+    renderPreview();
+}
+
+
+/* =========================================================
+   SETTINGS EXPORT / IMPORT
+========================================================= */
+
+function openSettingsExport() {
+
+    $("settingsData").value =
+        JSON.stringify(
+            getSettingsFromUI(),
+            null,
+            4
+        );
+
+    $("settingsModal")
+        .classList.add("open");
+}
+
+
+function closeSettingsModal() {
+
+    $("settingsModal")
+        .classList.remove("open");
+}
+
+
+async function copySettings() {
+
+    await navigator.clipboard.writeText(
+        $("settingsData").value
+    );
+
+    alert(
+        "Instellingen gekopieerd."
+    );
+}
+
+
+function importSettings() {
+
+    try {
+
+        const imported =
+            JSON.parse(
+                $("settingsData").value
+            );
+
+        settings = {
+            ...defaultSettings,
+            ...imported
+        };
+
+        applySettingsToUI();
+
+        renderPreview();
+
+        closeSettingsModal();
+
+    }
+
+    catch (error) {
+
+        alert(
+            "De instellingen zijn geen geldige JSON."
+        );
+
+    }
+}
+
+
+/* =========================================================
+   HEX → RGB
+========================================================= */
+
+function hexToRgb(hex) {
+
+    hex = hex.replace("#", "");
+
+    return {
+
+        r: parseInt(
+            hex.substring(0, 2),
+            16
+        ),
+
+        g: parseInt(
+            hex.substring(2, 4),
+            16
+        ),
+
+        b: parseInt(
+            hex.substring(4, 6),
+            16
+        )
+
+    };
+}
+
+
+/* =========================================================
+   PDF HELPERS
+========================================================= */
+
+function getPDFPageSize(format) {
+
+    if (format === "a3") {
+        return [297, 420];
+    }
+
+    if (format === "a5") {
+        return [148, 210];
+    }
+
+    if (format === "letter") {
+        return [215.9, 279.4];
+    }
+
+    return [210, 297];
+}
+
+
+function pdfText(
+    pdf,
+    text,
+    x,
+    y,
+    size,
+    style = "normal"
+) {
+
+    pdf.setFont(
+        settings.fontFamily,
+        style
+    );
+
+    pdf.setFontSize(size);
+
+    pdf.setTextColor(
+        ...Object.values(
+            hexToRgb(settings.textColor)
+        )
+    );
+
+    pdf.text(
+        String(text),
+        x,
+        y
+    );
+}
+
+
+function drawPDFHeader(
+    pdf,
+    round,
+    pageWidth,
+    y
+) {
+
+    const margin =
+        settings.marginLeft;
+
+    if (!settings.showHeader) {
+        return y;
+    }
+
+
+    if (
+        settings.showLogo &&
+        settings.logoUrl
+    ) {
+
+        // jsPDF kan externe afbeeldingen
+        // niet altijd direct laden.
+        // De URL blijft daarom bewust
+        // optioneel voor de preview.
+    }
+
+
+    pdfText(
+        pdf,
+        settings.headerTitle ||
+        round.tournamentName ||
+        "TournamentHub",
+        margin,
+        y,
+        20,
+        "bold"
+    );
+
+    y += 8;
+
+
+    if (settings.headerSubtitle) {
+
+        pdfText(
+            pdf,
+            settings.headerSubtitle,
+            margin,
+            y,
+            9,
+            "normal"
+        );
+
+        y += 6;
+    }
+
+
+    if (settings.showRound) {
+
+        pdfText(
+            pdf,
+            round.name,
+            margin,
+            y,
+            11,
+            "bold"
+        );
+
+        y += 7;
+    }
+
+
+    const accent =
+        hexToRgb(settings.accentColor);
+
+    pdf.setDrawColor(
+        accent.r,
+        accent.g,
+        accent.b
+    );
+
+    pdf.setLineWidth(1);
+
+    pdf.line(
+        margin,
+        y,
+        pageWidth - settings.marginRight,
+        y
+    );
+
+    y += 7;
+
+    return y;
+}
+
+
+/* =========================================================
+   PDF CARD
+========================================================= */
+
+function drawPDFCard(
+    pdf,
+    game,
+    x,
+    y,
+    width
+) {
+
+    const home =
+        game.teams[0];
+
+    const away =
+        game.teams[1];
+
+    const height =
+        Math.max(
+            25,
+            settings.cardHeight * .55
+        );
+
+
+    const border =
+        hexToRgb(
+            settings.borderColor
+        );
+
+    const card =
+        hexToRgb(
+            settings.cardColor
+        );
+
+
+    pdf.setFillColor(
+        card.r,
+        card.g,
+        card.b
+    );
+
+    pdf.setDrawColor(
+        border.r,
+        border.g,
+        border.b
+    );
+
+    pdf.setLineWidth(
+        settings.borderWidth
+    );
+
+
+    pdf.roundedRect(
+        x,
+        y,
+        width,
+        height,
+        settings.borderRadius / 2,
+        settings.borderRadius / 2,
+        "FD"
+    );
+
+
+    let meta = [];
+
+    if (settings.showDate) {
+        meta.push(
+            formatDate(game.start_time)
+        );
+    }
+
+    if (settings.showTime) {
+        meta.push(
+            formatTime(game.start_time)
+        );
+    }
+
+
+    if (meta.length) {
+
+        pdfText(
+            pdf,
+            meta.join(" • "),
+            x + settings.cardPadding / 2,
+            y + 6,
+            7
+        );
+
+    }
+
+
+    pdfText(
+        pdf,
+        home.name || "Team 1",
+        x + settings.cardPadding / 2,
+        y + 14,
+        9,
+        "bold"
+    );
+
+
+    pdfText(
+        pdf,
+        away.name || "Team 2",
+        x + settings.cardPadding / 2,
+        y + 21,
+        9,
+        "bold"
+    );
+
+
+    if (
+        settings.showScores &&
+        game.status === "completed"
+    ) {
+
+        pdfText(
+            pdf,
+            `${home.score ?? 0} - ${away.score ?? 0}`,
+            x + width - 20,
+            y + 17,
+            10,
+            "bold"
+        );
+
+    }
+
+    else if (settings.showVs) {
+
+        pdfText(
+            pdf,
+            "VS",
+            x + width - 17,
+            y + 17,
+            8,
+            "normal"
+        );
+
+    }
+
+
+    let bottom = [];
+
+    if (settings.showLocation) {
+
+        bottom.push(
+            game.location || "Locatie onbekend"
+        );
+
+    }
+
+    if (settings.showStatus) {
+
+        bottom.push(
+            getStatusText(game.status)
+        );
+
+    }
+
+
+    if (bottom.length) {
+
+        pdfText(
+            pdf,
+            bottom.join(" • "),
+            x + settings.cardPadding / 2,
+            y + height - 4,
+            6,
+            "normal"
+        );
+
+    }
+
+    return height;
+}
+
+
+/* =========================================================
+   PDF TABLE
+========================================================= */
+
+function drawPDFTable(
+    pdf,
+    games,
+    x,
+    y,
+    width,
+    pageHeight
+) {
+
+    const rowHeight = 8;
+
+    const columns = [];
+
+    columns.push({
+        title: "Wedstrijd",
+        width: width * .36
+    });
+
+    if (settings.showDate) {
+
+        columns.push({
+            title: "Datum",
+            width: width * .14
+        });
+
+    }
+
+    if (settings.showTime) {
+
+        columns.push({
+            title: "Tijd",
+            width: width * .12
+        });
+
+    }
+
+    if (settings.showLocation) {
+
+        columns.push({
+            title: "Locatie",
+            width: width * .20
+        });
+
+    }
+
+    if (settings.showScores) {
+
+        columns.push({
+            title: "Score",
+            width: width * .12
+        });
+
+    }
+
+    if (settings.showStatus) {
+
+        columns.push({
+            title: "Status",
+            width: width * .12
+        });
+
+    }
+
+
+    if (settings.tableHeader) {
+
+        const accent =
+            hexToRgb(
+                settings.accentColor
+            );
+
+        pdf.setFillColor(
+            accent.r,
+            accent.g,
+            accent.b
+        );
+
+        pdf.rect(
+            x,
+            y,
+            width,
+            rowHeight,
+            "F"
+        );
+
+
+        let currentX = x;
+
+        for (const column of columns) {
+
+            pdf.setTextColor(
+                255,
+                255,
+                255
+            );
+
+            pdf.setFont(
+                settings.fontFamily,
+                "bold"
+            );
+
+            pdf.setFontSize(6);
+
+            pdf.text(
+                column.title,
+                currentX + 2,
+                y + 5
+            );
+
+            currentX += column.width;
+        }
+
+        y += rowHeight;
+    }
+
+
+    for (const game of games) {
+
+        if (
+            y + rowHeight >
+            pageHeight - settings.marginBottom
+        ) {
+
+            pdf.addPage();
+
+            y = settings.marginTop;
+        }
+
+
+        const home =
+            game.teams[0];
+
+        const away =
+            game.teams[1];
+
+
+        const values = [];
+
+        values.push(
+            `${home.name} - ${away.name}`
+        );
+
+        if (settings.showDate) {
+
+            values.push(
+                formatDate(
+                    game.start_time
+                )
+            );
+
+        }
+
+        if (settings.showTime) {
+
+            values.push(
+                formatTime(
+                    game.start_time
+                )
+            );
+
+        }
+
+        if (settings.showLocation) {
+
+            values.push(
+                game.location || "-"
+            );
+
+        }
+
+        if (settings.showScores) {
+
+            values.push(
+                game.status === "completed"
+                    ? `${home.score ?? 0} - ${away.score ?? 0}`
+                    : "-"
+            );
+
+        }
+
+        if (settings.showStatus) {
+
+            values.push(
+                getStatusText(
+                    game.status
+                )
+            );
+
+        }
+
+
+        let currentX = x;
+
+        pdf.setFont(
+            settings.fontFamily,
+            "normal"
+        );
+
+        pdf.setFontSize(6);
+
+        const textColor =
+            hexToRgb(
+                settings.textColor
+            );
+
+        pdf.setTextColor(
+            textColor.r,
+            textColor.g,
+            textColor.b
+        );
+
+
+        for (
+            let i = 0;
+            i < values.length;
+            i++
+        ) {
+
+            pdf.text(
+                String(values[i]),
+                currentX + 2,
+                y + 5
+            );
+
+            currentX +=
+                columns[i].width;
+        }
+
+
+        if (settings.tableLines) {
+
+            const border =
+                hexToRgb(
+                    settings.borderColor
+                );
+
+            pdf.setDrawColor(
+                border.r,
+                border.g,
+                border.b
+            );
+
+            pdf.line(
+                x,
+                y + rowHeight,
+                x + width,
+                y + rowHeight
+            );
+
+        }
+
+        y += rowHeight;
+    }
+
+    return y;
+}
+
+
+/* =========================================================
+   GENERATE PDF
+========================================================= */
+
+async function generateTournamentPDF(
+    preview = false
+) {
+
+    getSettingsFromUI();
+
+    const filtered =
+        getFilteredRounds();
+
+
+    const { jsPDF } =
+        window.jspdf;
+
+
+    const pdf =
+        new jsPDF({
+
+            orientation:
+                settings.orientation,
+
+            unit:
+                "mm",
+
+            format:
+                settings.pageFormat
+
+        });
+
+
+    let pageWidth =
+        pdf.internal.pageSize.getWidth();
+
+    let pageHeight =
+        pdf.internal.pageSize.getHeight();
+
+
+    const contentWidth =
+        pageWidth -
+        settings.marginLeft -
+        settings.marginRight;
+
+
+    if (filtered.length === 0) {
+
+        pdfText(
+            pdf,
+            "Geen wedstrijden beschikbaar",
+            settings.marginLeft,
+            30,
+            16,
+            "bold"
+        );
+
+        if (preview) {
+
+            const blob =
+                pdf.output("blob");
+
+            const url =
+                URL.createObjectURL(blob);
+
+            window.open(
+                url,
+                "_blank"
+            );
+
+        }
+
+        else {
+
+            pdf.save(
+                "tournament-schema.pdf"
+            );
+
+        }
+
+        return;
+    }
+
+
+    let firstPage = true;
+
+
+    for (
+        const round of filtered
+    ) {
+
+        if (
+            !firstPage &&
+            settings.newPageRound
+        ) {
+
+            pdf.addPage();
+
+            pageWidth =
+                pdf.internal.pageSize.getWidth();
+
+            pageHeight =
+                pdf.internal.pageSize.getHeight();
+        }
+
+
+        firstPage = false;
+
+
+        let y =
+            settings.marginTop;
+
+
+        /*
+         * HEADER
+         */
+
+        y =
+            drawPDFHeader(
+                pdf,
+                round,
+                pageWidth,
+                y
+            );
+
+
+        /*
+         * CARDS
+         */
+
+        if (
+            settings.layout ===
+            "cards"
+        ) {
+
+            for (
+                const game of round.games
+            ) {
+
+                const cardHeight =
+                    Math.max(
+                        25,
+                        settings.cardHeight * .55
+                    );
+
+
+                if (
+                    y +
+                    cardHeight >
+                    pageHeight -
+                    settings.marginBottom
+                ) {
+
+                    pdf.addPage();
+
+                    y =
+                        settings.marginTop;
+
+                }
+
+
+                drawPDFCard(
+                    pdf,
+                    game,
+                    settings.marginLeft,
+                    y,
+                    contentWidth
+                );
+
+
+                y +=
+                    cardHeight +
+                    settings.gameSpacing;
+            }
+
+        }
+
+
+        /*
+         * TWO COLUMNS
+         */
+
+        else if (
+            settings.layout ===
+            "two-columns"
+        ) {
+
+            const gap = 6;
+
+            const columnWidth =
+                (contentWidth - gap) / 2;
+
+            let column = 0;
+
+            let leftY = y;
+
+            let rightY = y;
+
+
+            for (
+                const game of round.games
+            ) {
+
+                const cardHeight =
+                    Math.max(
+                        25,
+                        settings.cardHeight * .55
+                    );
+
+
+                let x;
+
+                let currentY;
+
+
+                if (column === 0) {
+
+                    x =
+                        settings.marginLeft;
+
+                    currentY =
+                        leftY;
+
+                }
+
+                else {
+
+                    x =
+                        settings.marginLeft +
+                        columnWidth +
+                        gap;
+
+                    currentY =
+                        rightY;
+
+                }
+
+
+                if (
+                    currentY +
+                    cardHeight >
+                    pageHeight -
+                    settings.marginBottom
+                ) {
+
+                    pdf.addPage();
+
+                    leftY =
+                        settings.marginTop;
+
+                    rightY =
+                        settings.marginTop;
+
+                    column = 0;
+
+                    x =
+                        settings.marginLeft;
+
+                    currentY =
+                        settings.marginTop;
+                }
+
+
+                drawPDFCard(
+                    pdf,
+                    game,
+                    x,
+                    currentY,
+                    columnWidth
+                );
+
+
+                if (column === 0) {
+
+                    leftY +=
+                        cardHeight +
+                        settings.gameSpacing;
+
+                    column = 1;
+
+                }
+
+                else {
+
+                    rightY +=
+                        cardHeight +
+                        settings.gameSpacing;
+
+                    column = 0;
+                }
+
+            }
+
+        }
+
+
+        /*
+         * COMPACT
+         */
+
+        else if (
+            settings.layout ===
+            "compact"
+        ) {
+
+            const rowHeight = 9;
+
+
+            for (
+                const game of round.games
+            ) {
+
+                if (
+                    y + rowHeight >
+                    pageHeight -
+                    settings.marginBottom
+                ) {
+
+                    pdf.addPage();
+
+                    y =
+                        settings.marginTop;
+                }
+
+
+                const home =
+                    game.teams[0];
+
+                const away =
+                    game.teams[1];
+
+
+                let left = "";
+
+                if (settings.showDate) {
+
+                    left +=
+                        formatDate(
+                            game.start_time
+                        );
+
+                }
+
+                if (settings.showTime) {
+
+                    if (left) {
+                        left += " ";
+                    }
+
+                    left +=
+                        formatTime(
+                            game.start_time
+                        );
+                }
+
+
+                pdfText(
+                    pdf,
+                    left,
+                    settings.marginLeft,
+                    y + 6,
+                    6
+                );
+
+
+                pdfText(
+                    pdf,
+                    `${home.name} - ${away.name}`,
+                    settings.marginLeft + 30,
+                    y + 6,
+                    8,
+                    "bold"
+                );
+
+
+                if (
+                    settings.showScores &&
+                    game.status ===
+                    "completed"
+                ) {
+
+                    pdfText(
+                        pdf,
+                        `${home.score ?? 0} - ${away.score ?? 0}`,
+                        pageWidth -
+                        settings.marginRight -
+                        20,
+                        y + 6,
+                        8,
+                        "bold"
+                    );
+
+                }
+
+
+                if (settings.tableLines) {
+
+                    const border =
+                        hexToRgb(
+                            settings.borderColor
+                        );
+
+                    pdf.setDrawColor(
+                        border.r,
+                        border.g,
+                        border.b
+                    );
+
+                    pdf.line(
+                        settings.marginLeft,
+                        y + rowHeight,
+                        pageWidth -
+                        settings.marginRight,
+                        y + rowHeight
+                    );
+
+                }
+
+
+                y +=
+                    rowHeight +
+                    settings.gameSpacing / 2;
+            }
+
+        }
+
+
+        /*
+         * TABLE
+         */
+
+        else if (
+            settings.layout ===
+            "table"
+        ) {
+
+            y =
+                drawPDFTable(
+                    pdf,
+                    round.games,
+                    settings.marginLeft,
+                    y,
+                    contentWidth,
+                    pageHeight
+                );
+
+        }
+
+    }
+
+
+    /*
+     * FOOTERS
+     */
+
+    const pageCount =
+        pdf.internal.getNumberOfPages();
+
+
+    if (
+        settings.showPageNumbers ||
+        settings.showFooter
+    ) {
+
+        for (
+            let page = 1;
+            page <= pageCount;
+            page++
+        ) {
+
+            pdf.setPage(page);
+
+
+            const footerY =
+                pageHeight -
+                8;
+
+
+            const footerColor =
+                hexToRgb(
+                    settings.secondaryColor
+                );
+
+
+            pdf.setTextColor(
+                footerColor.r,
+                footerColor.g,
+                footerColor.b
+            );
+
+            pdf.setFont(
+                settings.fontFamily,
+                "normal"
+            );
+
+            pdf.setFontSize(6);
+
+
+            if (settings.showFooter) {
+
+                pdf.text(
+                    settings.footerText,
+                    settings.marginLeft,
+                    footerY
+                );
+
+            }
+
+
+            if (settings.showPageNumbers) {
+
+                let pageText =
+                    `Pagina ${page}`;
+
+                if (
+                    settings.showTotalPages
+                ) {
+
+                    pageText +=
+                        ` van ${pageCount}`;
+
+                }
+
+
+                pdf.text(
+                    pageText,
+                    pageWidth -
+                    settings.marginRight,
+                    footerY,
+                    {
+                        align: "right"
+                    }
+                );
+
+            }
+
+        }
+
+    }
+
+
+    /*
+     * PREVIEW
+     */
+
+    if (preview) {
+
+        const blob =
+            pdf.output("blob");
+
+        const url =
+            URL.createObjectURL(blob);
+
+        window.open(
+            url,
+            "_blank"
+        );
+
+        return;
+    }
+
+
+    /*
+     * BESTANDSNAAM
+     */
+
+    const filename =
+        (
+            prompt(
+                "Bestandsnaam:",
+                "tournament-schema"
+            ) ||
+            "tournament-schema"
+        )
+        .replace(
+            /\.pdf$/i,
+            ""
+        );
+
+
+    pdf.save(
+        filename + ".pdf"
+    );
+
+}
+
+
+/* =========================================================
+   INITIALISATIE
+========================================================= */
+
+applySettingsToUI();
+
+renderPreview();
+
+</script>
+
+{% endblock %}

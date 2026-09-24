@@ -1,0 +1,267 @@
+<!-- =====================================================
+     STEP 4 — SETTINGS
+     ===================================================== -->
+
+<div class="page" data-page="4">
+
+    <div class="card">
+
+        <h2>More settings</h2>
+
+        <p class="card-description">
+            Most tournaments can use the default settings.
+        </p>
+
+
+        <div class="setting">
+
+            <div class="setting-info">
+                <div class="setting-title">
+                    Randomize teams
+                </div>
+
+                <div class="setting-description">
+                    Randomly determine the starting order.
+                </div>
+            </div>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    name="randomize"
+                    checked
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+
+        <div class="setting">
+
+            <div class="setting-info">
+                <div class="setting-title">
+                    Automatic byes
+                </div>
+
+                <div class="setting-description">
+                    Automatically give a team a free pass when required.
+                </div>
+            </div>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    name="allow_byes"
+                    checked
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+
+        <div class="setting">
+
+            <div class="setting-info">
+                <div class="setting-title">
+                    Third-place match
+                </div>
+
+                <div class="setting-description">
+                    Create a match to determine third place.
+                </div>
+            </div>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    name="third_place_match"
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+
+        <div class="setting">
+
+            <div class="setting-info">
+                <div class="setting-title">
+                    Grand final
+                </div>
+
+                <div class="setting-description">
+                    Add an extra final match when supported.
+                </div>
+            </div>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    name="grand_final"
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+
+        <div class="setting">
+
+            <div class="setting-info">
+                <div class="setting-title">
+                    Allow draws
+                </div>
+
+                <div class="setting-description">
+                    Allow a match to end without a winner.
+                </div>
+            </div>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    name="allow_draws"
+                    id="allowDraws"
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Optional match settings</h2>
+
+        <p class="card-description">
+            These settings normally do not need to be changed.
+        </p>
+
+
+        <div class="setting">
+
+            <div class="setting-info">
+
+                <div class="setting-title">
+                    Allow match rescheduling
+                </div>
+
+                <div class="setting-description">
+                    Matches can be moved to another available time.
+                </div>
+
+            </div>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    name="allow_reschedule"
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+
+        <div class="setting">
+
+            <div class="setting-info">
+
+                <div class="setting-title">
+                    Allow walkovers
+                </div>
+
+                <div class="setting-description">
+                    A team can win when the opponent does not show.
+                </div>
+
+            </div>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    name="allow_walkovers"
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+
+        <div class="setting">
+
+            <div class="setting-info">
+
+                <div class="setting-title">
+                    Lock teams after tournament starts
+                </div>
+
+                <div class="setting-description">
+                    Prevent changes after the first match.
+                </div>
+
+            </div>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    name="lock_teams"
+                    checked
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+    </div>
+
+
+    <div class="navigation">
+
+        <button
+            type="button"
+            class="button back"
+            onclick="previousStep()"
+        >
+            ← Back
+        </button>
+
+        <button
+            type="button"
+            class="button next"
+            onclick="nextStep()"
+        >
+            Next →
+        </button>
+
+    </div>
+
+</div>

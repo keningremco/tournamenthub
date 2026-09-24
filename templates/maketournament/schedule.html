@@ -1,0 +1,255 @@
+<!-- =====================================================
+     STEP 6 — SCHEDULE
+     ===================================================== -->
+
+<div class="page" data-page="6">
+
+    <div class="card">
+
+        <h2>Schedule</h2>
+
+        <p class="card-description">
+            Scheduling is optional. Turn it on if you want
+            automatic match times.
+        </p>
+
+
+        <div class="setting">
+
+            <div class="setting-info">
+
+                <div class="setting-title">
+                    Automatic scheduling
+                </div>
+
+                <div class="setting-description">
+                    Automatically create match times based on your settings.
+                </div>
+
+            </div>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    name="schedule_enabled"
+                    id="scheduleEnabled"
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+
+        <div
+            class="schedule-settings"
+            id="scheduleSettings"
+        >
+
+            <div class="grid-2">
+
+                <div class="field">
+
+                    <label>
+                        Tournament start
+                    </label>
+
+                    <input
+                        type="datetime-local"
+                        name="start_time"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Tournament end
+                    </label>
+
+                    <input
+                        type="datetime-local"
+                        name="end_time"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Match duration
+                    </label>
+
+                    <input
+                        type="number"
+                        name="match_duration"
+                        value="30"
+                        min="1"
+                    >
+
+                    <div class="field-help">
+                        Minutes per match.
+                    </div>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Break between matches
+                    </label>
+
+                    <input
+                        type="number"
+                        name="match_break"
+                        value="5"
+                        min="0"
+                    >
+
+                    <div class="field-help">
+                        Minutes between matches.
+                    </div>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Break between rounds
+                    </label>
+
+                    <input
+                        type="number"
+                        name="round_break"
+                        value="10"
+                        min="0"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Simultaneous matches
+                    </label>
+
+                    <input
+                        type="number"
+                        name="simultaneous_matches"
+                        value="1"
+                        min="1"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Referees</h2>
+
+        <p class="card-description">
+            Optional. Add referees if matches need someone assigned.
+        </p>
+
+
+        <div class="setting">
+
+            <div class="setting-info">
+
+                <div class="setting-title">
+                    Use referees
+                </div>
+
+                <div class="setting-description">
+                    The scheduler will assign available referees.
+                </div>
+
+            </div>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    name="use_referees"
+                    id="refereesEnabled"
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+
+        <div
+            class="conditional"
+            id="refereeSettings"
+        >
+
+            <div class="conditional-title">
+                Referees
+            </div>
+
+
+            <div
+                id="refereeList"
+                class="dynamic-list"
+            >
+
+                <div
+                    class="empty-list"
+                    id="refereeEmpty"
+                >
+                    No referees added yet.
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="add-team"
+                id="addReferee"
+            >
+                + Add referee
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="navigation">
+
+        <button
+            type="button"
+            class="button back"
+            onclick="previousStep()"
+        >
+            ← Back
+        </button>
+
+        <button
+            type="button"
+            class="button next"
+            onclick="nextStep()"
+        >
+            Review →
+        </button>
+
+    </div>
+
+</div>

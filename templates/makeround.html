@@ -1,0 +1,90 @@
+```html
+{% extends 'template.html' %}
+
+{% block style %}
+<style>
+
+    .round-form {
+        max-width: 500px;
+        background: white;
+        padding: 25px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+    }
+
+    .round-form label {
+        display: block;
+        margin-bottom: 7px;
+        font-weight: 600;
+    }
+
+    .round-form input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+
+        border: 1px solid var(--border);
+        border-radius: 8px;
+
+        font-size: 15px;
+    }
+
+    .round-form button {
+        width: 100%;
+        padding: 12px;
+
+        border: none;
+        border-radius: 8px;
+
+        background: var(--primary);
+        color: white;
+
+        font-size: 15px;
+        font-weight: 600;
+
+        cursor: pointer;
+    }
+
+    .round-form button:hover {
+        background: var(--primary-hover);
+    }
+
+</style>
+{% endblock %}
+
+{% block header %}
+    Make Round
+{% endblock %}
+
+{% block main %}
+
+<form class="round-form" method="POST">
+
+    <label for="name">Round name</label>
+    <input
+        type="text"
+        id="name"
+        name="name"
+        placeholder="e.g. Quarter Final"
+        required
+    >
+
+    <label for="round_number">Round number</label>
+    <input
+        type="number"
+        id="round_number"
+        name="roundNumber"
+        min="1"
+        placeholder="e.g. 1"
+        required
+    >
+
+    <button type="submit">
+        Create Round
+    </button>
+
+</form>
+
+{% endblock %}
+```

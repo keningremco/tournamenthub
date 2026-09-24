@@ -1,0 +1,148 @@
+<!-- =====================================================
+     STEP 5 — LOCATIONS
+     ===================================================== -->
+
+<div class="page" data-page="5">
+
+    <div class="card">
+
+        <h2>Locations</h2>
+
+        <p class="card-description">
+            Add the locations where matches or participants can take place.
+        </p>
+
+
+        <div class="setting">
+
+            <div class="setting-info">
+
+                <div class="setting-title">
+                    Use locations
+                </div>
+
+                <div class="setting-description">
+                    Enable this if matches or participants need
+                    specific locations.
+                </div>
+
+            </div>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    name="use_locations"
+                    id="locationsEnabled"
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+
+        <div
+            class="conditional"
+            id="locationSettings"
+        >
+
+            <div class="conditional-title">
+                Locations
+            </div>
+
+
+            <div
+                id="locationList"
+                class="dynamic-list"
+            >
+
+                <div
+                    class="empty-list"
+                    id="locationEmpty"
+                >
+                    No locations added yet.
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="add-team"
+                id="addLocation"
+            >
+                + Add location
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div
+        class="card hidden"
+        id="soloLocationInfo"
+    >
+
+        <h2>Solo locations</h2>
+
+        <p class="card-description">
+            All locations will be used for every solo participant.
+        </p>
+
+
+        <div class="setting">
+
+            <div class="setting-info">
+
+                <div class="setting-title">
+                    All locations for every participant
+                </div>
+
+                <div class="setting-description">
+                    Each participant will be assigned to every
+                    location you add.
+                </div>
+
+            </div>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    id="soloAllLocationsDisplay"
+                    disabled
+                >
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+    </div>
+
+
+    <div class="navigation">
+
+        <button
+            type="button"
+            class="button back"
+            onclick="previousStep()"
+        >
+            ← Back
+        </button>
+
+        <button
+            type="button"
+            class="button next"
+            onclick="nextStep()"
+        >
+            Next →
+        </button>
+
+    </div>
+
+</div>

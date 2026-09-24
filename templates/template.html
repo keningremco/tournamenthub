@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#EAF3FF">
+    <title>{% block title %}TournamentHub{% endblock %}</title>
+    <link rel="icon" href="{{ url_for('static', filename='logo.png' ) }}">
+
+    <style>
+        :root {
+            /* Layout */
+            --sidebar-width: 240px;
+            --header-height: 70px;
+            --footer-height: 70px;
+            --content-width: 1400px;
+
+            /* Kleuren */
+            --nav-bg: #EAF3FF;
+            --nav-text: #334155;
+            --header-bg: #F8FBFF;
+            --main-bg: #F6F8FB;
+            --footer-bg: #EEF4F8;
+            --card-bg: #FFFFFF;
+            --border: #DCE5EE;
+            --primary: #4F7DF3;
+            --primary-hover: #3B6AE6;
+            --text: #1F2937;
+            --text-light: #64748B;
+            --shadow: 0 5px 20px rgba(0, 0, 0, .05);
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+            background: var(--main-bg);
+            color: var(--text);
+            font-family: Inter, "Segoe UI", sans-serif;
+        }
+
+        button, input, textarea, select {
+            font: inherit;
+        }
+
+        a {
+            color: inherit;
+        }
+
+        :focus-visible {
+            outline: 3px solid rgba(79, 125, 243, .45);
+            outline-offset: 3px;
+        }
+
+        /* Sidebar */
+        nav {
+            position: fixed;
+            z-index: 30;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            width: var(--sidebar-width);
+            flex-direction: column;
+            overflow-y: auto;
+            background: var(--nav-bg);
+            border-right: 1px solid var(--border);
+        }
+        
+        .flash-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            background-color: red;
+            border-radius: 8px;
+        }
+
+        .flash {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+
+            padding: 12px 16px;
+            border-radius: 8px;
+
+            opacity: 1;
+            transform: translateY(0);
+
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .flash-close {
+            border: none;
+            background: transparent;
+            color: inherit;
+
+            font-size: 22px;
+            line-height: 1;
+
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .flash-close:hover {
+            opacity: 0.7;
+        }
+
+
+        .logo {
+            display: flex;
+            min-height: 80px;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+            color: var(--text);
+            font-size: 24px;
+            font-weight: 750;
+            letter-spacing: -.04em;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            padding: 20px;
+        }
+
+        .menu a {
+            display: flex;
+            min-height: 48px;
+            align-items: center;
+            padding: 12px 17px;
+            color: var(--nav-text);
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 1.35;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: background-color .2s ease, color .2s ease, box-shadow .2s ease, transform .2s ease;
+        }
+
+        .menu a:hover {
+            background: rgba(255, 255, 255, .72);
+            color: var(--text);
+        }
+
+        .menu a:active {
+            transform: scale(.98);
+        }
+
+        .menu .active {
+            background: var(--card-bg);
+            color: var(--text);
+            font-weight: 650;
+            box-shadow: 0 2px 8px rgba(79, 125, 243, .08);
+        }
+
+        .bottom-menu {
+            min-height: 20px;
+            margin-top: auto;
+            padding: 20px;
+        }
+
+        .menu-toggle,
+        .nav-backdrop {
+            display: none;
+        }
+
+        /* Pagina-indeling */
+        #wrapper {
+            display: flex;
+            width: calc(100% - var(--sidebar-width));
+            min-height: 100vh;
+            min-width: 0;
+            margin-left: var(--sidebar-width);
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            z-index: 20;
+            top: 0;
+            display: flex;
+            min-height: var(--header-height);
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 12px 35px;
+            background: rgba(248, 251, 255, .94);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+        }
+
+        .header-leading {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .page-title {
+            overflow: hidden;
+            font-size: 22px;
+            font-weight: 750;
+            letter-spacing: -.025em;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .header-actions {
+            display: flex;
+            flex-shrink: 0;
+            align-items: center;
+        }
+
+        /* Main */
+        main {
+            flex: 1 0 auto;
+            padding: 40px;
+        }
+
+        .container {
+            width: min(100%, var(--content-width));
+            margin: 0 auto;
+        }
+
+        .card {
+            padding: 25px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        /* Footer */
+        footer {
+            display: flex;
+            min-height: var(--footer-height);
+            align-items: center;
+            justify-content: center;
+            padding: 16px 24px;
+            color: var(--text-light);
+            font-size: 14px;
+            text-align: center;
+            background: var(--footer-bg);
+            border-top: 1px solid var(--border);
+        }
+
+        /* Mobiel */
+        @media (max-width: 760px) {
+            body.nav-open {
+                overflow: hidden;
+            }
+
+            nav {
+                width: min(86vw, 330px);
+                box-shadow: 16px 0 35px rgba(31, 41, 55, .16);
+                transform: translateX(-105%);
+                transition: transform .25s ease;
+                will-change: transform;
+            }
+
+            nav.is-open {
+                transform: translateX(0);
+            }
+
+            .logo {
+                min-height: 72px;
+                justify-content: flex-start;
+                padding-left: 24px;
+                font-size: 22px;
+                text-align: left;
+            }
+
+            .menu {
+                gap: 5px;
+                padding: 16px;
+            }
+
+            .menu a {
+                min-height: 52px;
+                padding: 13px 16px;
+                font-size: 16px;
+            }
+
+            .bottom-menu {
+                padding: 16px;
+            }
+
+            .nav-backdrop {
+                position: fixed;
+                z-index: 25;
+                inset: 0;
+                display: block;
+                visibility: hidden;
+                background: rgba(31, 41, 55, .32);
+                opacity: 0;
+                transition: opacity .25s ease, visibility .25s ease;
+            }
+
+            .nav-backdrop.is-visible {
+                visibility: visible;
+                opacity: 1;
+            }
+
+            #wrapper {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            header {
+                min-height: 64px;
+                gap: 12px;
+                padding: 9px 16px;
+            }
+
+            .menu-toggle {
+                display: inline-grid;
+                width: 42px;
+                height: 42px;
+                flex: 0 0 42px;
+                place-items: center;
+                padding: 0;
+                color: var(--nav-text);
+                cursor: pointer;
+                background: var(--card-bg);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                box-shadow: 0 2px 7px rgba(31, 41, 55, .04);
+            }
+
+            .menu-toggle svg {
+                width: 21px;
+                height: 21px;
+            }
+
+            .page-title {
+                font-size: 18px;
+            }
+
+            .header-actions {
+                max-width: 42%;
+                overflow: hidden;
+            }
+
+            main {
+                padding: 20px 16px 28px;
+            }
+
+            .card {
+                padding: 20px;
+                border-radius: 14px;
+            }
+
+            footer {
+                min-height: 64px;
+                padding: 14px 20px;
+            }
+        }
+
+        @media (max-width: 390px) {
+            .header-actions {
+                max-width: 34%;
+            }
+
+            main {
+                padding-right: 12px;
+                padding-left: 12px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                transition-duration: .01ms !important;
+            }
+        }
+    </style>
+
+    {% block style %}{% endblock %}
+</head>
+
+<body>
+    <nav id="site-navigation" aria-label="Hoofdnavigatie">
+        <div class="logo">TournamentHub</div>
+
+        <div class="menu">
+            <a href="/" class="{% block homeActive %}{% endblock %}">Home</a>
+            <a href="{{ url_for('tournaments') }}">Tournaments</a>
+            <a href="{{ url_for('findTournament') }}">Find tournament</a>
+
+            {% if userid %}
+                <a href="/lobbies">Lobbies</a>
+                <a href="{{ url_for('myTournaments') }}">My Tournaments</a>
+                <a href="{{ url_for('make') }}">Make tournament</a>
+            {% endif %}
+
+            <a href="#">Leaderboards</a>
+
+            {% if userid %}
+                <a href="{{ url_for('profile' ) }}">Profile</a>
+                <a href="/logout">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+            {% endif %}
+        </div>
+
+        <div class="bottom-menu"></div>
+    </nav>
+
+    <div class="nav-backdrop" aria-hidden="true"></div>
+
+    <div id="wrapper">
+        <header>
+            <div class="header-leading">
+                <button class="menu-toggle" type="button" aria-controls="site-navigation" aria-expanded="false" aria-label="Open navigatiemenu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                        <path d="M4 7h16M4 12h16M4 17h16" />
+                    </svg>
+                </button>
+
+                <div class="page-title">
+                    {% block header %}Dashboard{% endblock %}
+                </div>
+            </div>
+
+            <div class="header-actions">
+                {% block right_header %}{% endblock %}
+            </div>
+        </header>
+
+        <main>
+            <div class="container">
+                {% block main %}{% endblock %}
+            </div>
+        </main>
+
+        <footer>
+            &copy; 2026 TournamentHub
+        </footer>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-container">
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">
+                        <span>{{ message }}</span>
+
+                        <button type="button"
+                                class="flash-close"
+                                onclick="closeFlash(this)">
+                            &times;
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <script>
+                function closeFlash(button) {
+                    const el = button.closest('.flash');
+
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(-10px)';
+
+                    setTimeout(() => {
+                        el.remove();
+                    }, 300);
+                }
+
+                setTimeout(() => {
+                    document.querySelectorAll('.flash').forEach(el => {
+                        el.style.opacity = '0';
+                        el.style.transform = 'translateY(-10px)';
+
+                        setTimeout(() => el.remove(), 300);
+                    });
+                }, 3000);
+            </script>
+        {% endif %}
+    {% endwith %}
+
+
+
+
+    <script>
+        (() => {
+            const navigation = document.querySelector('#site-navigation');
+            const toggle = document.querySelector('.menu-toggle');
+            const backdrop = document.querySelector('.nav-backdrop');
+            const mobile = window.matchMedia('(max-width: 760px)');
+
+            function closeNavigation() {
+                navigation.classList.remove('is-open');
+                backdrop.classList.remove('is-visible');
+                document.body.classList.remove('nav-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+
+            function openNavigation() {
+                navigation.classList.add('is-open');
+                backdrop.classList.add('is-visible');
+                document.body.classList.add('nav-open');
+                toggle.setAttribute('aria-expanded', 'true');
+            }
+
+            toggle.addEventListener('click', () => {
+                navigation.classList.contains('is-open')
+                    ? closeNavigation()
+                    : openNavigation();
+            });
+
+            backdrop.addEventListener('click', closeNavigation);
+
+            navigation.querySelectorAll('a').forEach((link) => {
+                link.addEventListener('click', () => {
+                    if (mobile.matches) {
+                        closeNavigation();
+                    }
+                });
+            });
+
+            window.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && navigation.classList.contains('is-open')) {
+                    closeNavigation();
+                }
+            });
+
+            mobile.addEventListener('change', (event) => {
+                if (!event.matches) {
+                    closeNavigation();
+                }
+            });
+        })();
+    </script>
+    {% block script %}
+        
+    {% endblock %}
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6784101204913368"
+     crossorigin="anonymous"></script>
+</body>
+</html>

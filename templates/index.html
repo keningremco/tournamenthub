@@ -1,0 +1,245 @@
+{% extends 'template.html' %}
+
+{% block header %}
+    Home
+{% endblock %}
+
+{% block style %}
+<style>
+    .home-page {
+        max-width: 1000px;
+    }
+
+    .hero {
+        margin-bottom: 40px;
+        padding: 35px;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    .hero h1 {
+        margin-bottom: 12px;
+        font-size: 32px;
+    }
+
+    .hero p {
+        max-width: 650px;
+        margin-bottom: 25px;
+        color: #64748B;
+        font-size: 17px;
+        line-height: 1.6;
+    }
+
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .button-link {
+        display: inline-block;
+        padding: 10px;
+        color: inherit;
+        font-size: 16px;
+        text-decoration: none;
+        background: #eee;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        transition: background .2s;
+    }
+
+    .button-link:hover {
+        background: #e2e2e2;
+    }
+
+    .button-link.primary {
+        color: white;
+        background: #334155;
+        border-color: #334155;
+    }
+
+    .button-link.primary:hover {
+        background: #1F2937;
+    }
+
+    .section-title {
+        margin-bottom: 18px;
+        font-size: 26px;
+        font-weight: 700;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .feature-card {
+        padding: 20px;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    .feature-icon {
+        display: grid;
+        width: 42px;
+        height: 42px;
+        margin-bottom: 15px;
+        place-items: center;
+        font-size: 22px;
+        background: #eee;
+        border-radius: 6px;
+    }
+
+    .feature-card h3 {
+        margin-bottom: 8px;
+        font-size: 18px;
+    }
+
+    .feature-card p {
+        color: #64748B;
+        line-height: 1.5;
+    }
+
+    .start-section {
+        padding: 25px;
+        background: #eee;
+        border-radius: 6px;
+    }
+
+    .start-section h2 {
+        margin-bottom: 10px;
+        font-size: 22px;
+    }
+
+    .start-section p {
+        margin-bottom: 18px;
+        color: #64748B;
+    }
+
+    @media (max-width: 700px) {
+        .hero {
+            padding: 25px 20px;
+        }
+
+        .hero h1 {
+            font-size: 27px;
+        }
+
+        .feature-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-actions {
+            flex-direction: column;
+        }
+
+        .button-link {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+<div class="home-page">
+
+    <section class="hero">
+        <h1>Welcome to TournamentHub</h1>
+
+        <p>
+            Create tournaments, manage rounds and games, and play prediction
+            games together with your friends in a lobby.
+        </p>
+
+        <div class="hero-actions">
+            <a class="button-link primary" href="{{ url_for('tournaments') }}">
+                Explore tournaments
+            </a>
+
+            {% if userid %}
+                <a class="button-link" href="/lobbies">
+                    My lobbies
+                </a>
+
+                <a class="button-link" href="{{ url_for('make') }}">
+                    Create tournament
+                </a>
+            {% else %}
+                <a class="button-link" href="{{ url_for('login') }}">
+                    Login
+                </a>
+
+                <a class="button-link" href="{{ url_for('signup') }}">
+                    Create account
+                </a>
+            {% endif %}
+        </div>
+    </section>
+
+    <section>
+        <h2 class="section-title">What can you do?</h2>
+
+        <div class="feature-grid">
+            <article class="feature-card">
+                <div class="feature-icon">🏆</div>
+
+                <h3>Create tournaments</h3>
+
+                <p>
+                    Make your own tournament and add rounds, teams and games.
+                </p>
+            </article>
+
+            <article class="feature-card">
+                <div class="feature-icon">📅</div>
+
+                <h3>Manage games</h3>
+
+                <p>
+                    Set game times, locations, scores and results for every round.
+                </p>
+            </article>
+
+            <article class="feature-card">
+                <div class="feature-icon">🎯</div>
+
+                <h3>Join lobbies</h3>
+
+                <p>
+                    Predict game scores with friends and compete on the leaderboard.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <section class="start-section">
+        {% if userid %}
+            <h2>Ready to start?</h2>
+
+            <p>
+                Browse a tournament, create your own tournament or join a lobby.
+            </p>
+
+            <a class="button-link primary" href="{{ url_for('tournaments') }}">
+                Go to tournaments
+            </a>
+        {% else %}
+            <h2>Start your first tournament</h2>
+
+            <p>
+                Create a free account to manage tournaments and join prediction lobbies.
+            </p>
+
+            <a class="button-link primary" href="{{ url_for('signup') }}">
+                Create account
+            </a>
+        {% endif %}
+    </section>
+
+</div>
+{% endblock %}

@@ -1,0 +1,1336 @@
+{% extends 'template.html' %}
+
+{% block header %}
+Edit game
+{% endblock %}
+
+{% block style %}
+
+<style>
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        max-width: 700px;
+    }
+
+    input, select, button, .delete {
+        padding: 10px;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+    button {
+        cursor: pointer;
+    }
+
+    .teams {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .team {
+        flex: 1;
+        position: relative;
+    }
+
+    .team label {
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    .search-row {
+        display: flex;
+        gap: 8px;
+    }
+
+    .team-search {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .make-team {
+        white-space: nowrap;
+        cursor: pointer;
+    }
+
+    .vs {
+        font-weight: bold;
+        font-size: 20px;
+        margin-top: 35px;
+    }
+
+    .results {
+        position: absolute;
+        top: 66px;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        overflow: hidden;
+        z-index: 10;
+    }
+
+    .result {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    .result:hover {
+        background: #eee;
+    }
+
+    .selected-team,
+    .score-row {
+        margin-top: 8px;
+        padding: 10px;
+        background: #eee;
+        border-radius: 6px;
+    }
+
+    .score-row {
+        display: grid;
+        grid-template-columns: 1fr 100px 160px;
+        align-items: center;
+        gap: 10px;
+        margin-top: 0;
+    }
+
+    /* =========================
+       LOCATION
+       ========================= */
+
+    .location-search {
+        position: relative;
+    }
+
+    .location-search .team-search {
+        flex: 1;
+    }
+
+    .recommended-locations {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .recommended-location {
+        padding: 10px;
+        background: #eee;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .recommended-location:hover {
+        background: #ddd;
+    }
+
+    .error {
+        color: red;
+    }
+
+    .delete {
+        display: block;
+        text-align: center;
+        text-decoration: none;
+        color: #8f2929;
+        background: #fff1f1;
+        border: 1px solid #e4aaaa;
+        border-radius: 6px;
+    }
+
+    .delete:hover {
+        background: #fde2e2;
+    }
+
+    @media (max-width: 600px) {
+        .teams {
+            flex-direction: column;
+        }
+
+        .vs {
+            margin: 0 auto;
+        }
+
+        .score-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+{% endblock %}
+
+{% block main %}
+
+<form method="POST">
+
+{% if error %}
+    <p class="error">{{ error }}</p>
+{% endif %}
+
+
+<!-- =========================
+     ROUND
+     ========================= -->
+
+<label for="roundId">Round</label>
+
+<select id="roundId" name="roundId" required>
+    {% for round in rounds %}
+        <option value="{{ round.id }}"
+            {% if round.id == game.roundId %}selected{% endif %}>
+            Round {{ round.roundNumber }} — {{ round.name }}
+        </option>
+    {% endfor %}
+</select>
+
+
+<!-- =========================
+     START TIME
+     ========================= -->
+
+<label for="start_time">
+    Start time
+</label>
+
+<input
+    type="datetime-local"
+    name="start_time"
+    id="start_time"
+    value="{% if game.start_time %}{{ game.start_time.strftime('%Y-%m-%dT%H:%M') }}{% endif %}"
+>
+
+
+<!-- =========================
+     LOCATION
+     ========================= -->
+
+<div class="location-search">
+
+    <label for="location">
+        Location
+    </label>
+
+    <div class="search-row">
+
+        <!--
+            Dit is de echte location input.
+
+            Bestaand stadium:
+                location = stadium naam
+                stadiumId = bestaand ID
+
+            Nieuwe/vrije locatie:
+                location = zelf ingevoerde tekst
+                stadiumId = leeg
+        -->
+
+        <input
+            type="text"
+            name="location"
+            id="location"
+            class="team-search"
+            value="{{ game.stadiumName or '' }}"
+            placeholder="Search or enter location..."
+            autocomplete="off"
+        >
+
+        <button
+            type="button"
+            id="makeLocation"
+        >
+            Make Location
+        </button>
+
+    </div>
+
+
+    <!--
+        Bestaand stadium ID.
+    -->
+
+    <input
+        type="hidden"
+        name="stadiumId"
+        id="stadiumId"
+        value="{{ game.stadiumId or '' }}"
+    >
+
+
+    <div
+        id="locationResults"
+        class="results"
+    ></div>
+
+</div>
+
+
+<!-- =========================
+     RECOMMENDED LOCATIONS
+     ========================= -->
+
+<div class="recommended-locations">
+
+    <label>
+        Recommended locations
+    </label>
+
+    <div id="recommendedLocations">
+        {% if team1 %}
+            Loading...
+        {% else %}
+            Select a home team first
+        {% endif %}
+    </div>
+
+</div>
+
+
+<!-- =========================
+     STATUS
+     ========================= -->
+
+<label for="status">
+    Status
+</label>
+
+<select name="status" id="status" required>
+
+    <option
+        value="scheduled"
+        {% if game.status == 'scheduled' %}selected{% endif %}
+    >
+        Scheduled
+    </option>
+
+    <option
+        value="in_progress"
+        {% if game.status == 'in_progress' %}selected{% endif %}
+    >
+        In progress
+    </option>
+
+    <option
+        value="awaiting_scores"
+        {% if game.status == 'awaiting_scores' %}selected{% endif %}
+    >
+        Awaiting scores
+    </option>
+
+    <option
+        value="completed"
+        {% if game.status == 'completed' %}selected{% endif %}
+    >
+        Completed
+    </option>
+
+    <option
+        value="cancelled"
+        {% if game.status == 'cancelled' %}selected{% endif %}
+    >
+        Cancelled
+    </option>
+
+</select>
+
+
+<!-- =========================
+     TEAMS
+     ========================= -->
+
+<label>
+    Teams
+</label>
+
+<div class="teams">
+
+
+    <!-- =========================
+         TEAM 1
+         ========================= -->
+
+    <div class="team">
+
+        <label for="team1Search">
+            Team 1
+        </label>
+
+        <div class="search-row">
+
+            <input
+                type="text"
+                id="team1Search"
+                class="team-search"
+                value="{{ team1.name if team1 else '' }}"
+                placeholder="Search team..."
+                autocomplete="off"
+            >
+
+            <button
+                type="button"
+                class="make-team"
+                id="makeTeam1"
+            >
+                Make Team
+            </button>
+
+        </div>
+
+        <div
+            id="team1Results"
+            class="results"
+        ></div>
+
+        <div
+            id="team1Selected"
+            class="selected-team"
+        >
+            {{ team1.name if team1 else 'No team selected' }}
+        </div>
+
+        <input
+            type="hidden"
+            name="team1"
+            id="team1"
+            value="{{ team1.id if team1 else '' }}"
+        >
+
+    </div>
+
+
+    <div class="vs">
+        VS
+    </div>
+
+
+    <!-- =========================
+         TEAM 2
+         ========================= -->
+
+    <div class="team">
+
+        <label for="team2Search">
+            Team 2
+        </label>
+
+        <div class="search-row">
+
+            <input
+                type="text"
+                id="team2Search"
+                class="team-search"
+                value="{{ team2.name if team2 else '' }}"
+                placeholder="Search team..."
+                autocomplete="off"
+            >
+
+            <button
+                type="button"
+                class="make-team"
+                id="makeTeam2"
+            >
+                Make Team
+            </button>
+
+        </div>
+
+        <div
+            id="team2Results"
+            class="results"
+        ></div>
+
+        <div
+            id="team2Selected"
+            class="selected-team"
+        >
+            {{ team2.name if team2 else 'No team selected' }}
+        </div>
+
+        <input
+            type="hidden"
+            name="team2"
+            id="team2"
+            value="{{ team2.id if team2 else '' }}"
+        >
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     SCORES
+     ========================= -->
+
+<h3>
+    Scores
+</h3>
+
+{% for score in scores %}
+
+    <div class="score-row">
+
+        <strong>
+            {{ score.team_name }}
+        </strong>
+
+        <input
+            type="number"
+            name="score_{{ score.id }}"
+            min="0"
+            value="{{ score.score }}"
+        >
+
+    </div>
+
+{% endfor %}
+
+
+<!-- =========================
+     DELETE
+     ========================= -->
+
+<a
+    href="{{ url_for('deleteGame', gameId=game.id) }}"
+    class="delete"
+    onclick="return confirmDelete(event, this.href)"
+>
+    Delete game
+</a>
+
+
+<!-- =========================
+     SAVE
+     ========================= -->
+
+<button type="submit">
+    Save game
+</button>
+
+
+<a href="{{ url_for('tournament', code=tournament.code) }}">
+    Cancel
+</a>
+
+</form>
+
+<script>
+
+/* =========================================================
+   DELETE CONFIRMATION
+   ========================================================= */
+
+function confirmDelete(event, deleteUrl) {
+
+    event.preventDefault();
+
+    const characters =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    let code = '';
+
+    for (let i = 0; i < 3; i++) {
+
+        code += characters.charAt(
+            Math.floor(
+                Math.random() * characters.length
+            )
+        );
+
+    }
+
+    const input = prompt(
+        `WARNING!\n\n` +
+        `This will permanently delete this game and ALL predictions associated with it.\n\n` +
+        `This action cannot be undone.\n\n` +
+        `Type "${code}" to confirm the deletion:`
+    );
+
+    if (input === code) {
+
+        window.location.href =
+            deleteUrl;
+
+    } else if (input !== null) {
+
+        alert(
+            'The confirmation code was incorrect. The game was not deleted.'
+        );
+
+    }
+
+    return false;
+}
+
+
+/* =========================================================
+   TEAM SEARCH
+   ========================================================= */
+
+function setupTeamSearch(
+    searchId,
+    resultsId,
+    selectedId,
+    hiddenId
+) {
+
+    const search =
+        document.getElementById(searchId);
+
+    const results =
+        document.getElementById(resultsId);
+
+    const selected =
+        document.getElementById(selectedId);
+
+    const hidden =
+        document.getElementById(hiddenId);
+
+    let timeout = null;
+
+
+    search.addEventListener(
+        "input",
+        function () {
+
+            const query =
+                search.value.trim();
+
+
+            /*
+                Zodra de gebruiker typt,
+                is het vorige team niet meer
+                geselecteerd.
+            */
+
+            hidden.value = "";
+
+            selected.textContent =
+                "No team selected";
+
+            results.innerHTML =
+                "";
+
+
+            clearTimeout(timeout);
+
+
+            if (query.length < 1) {
+                return;
+            }
+
+
+            timeout = setTimeout(
+                async function () {
+
+                    try {
+
+                        const response =
+                            await fetch(
+                                `/api/teams/search?q=${encodeURIComponent(query)}`
+                            );
+
+
+                        if (!response.ok) {
+                            return;
+                        }
+
+
+                        const teams =
+                            await response.json();
+
+
+                        results.innerHTML =
+                            "";
+
+
+                        teams.forEach(
+                            function (team) {
+
+                                const result =
+                                    document.createElement(
+                                        "div"
+                                    );
+
+
+                                result.className =
+                                    "result";
+
+
+                                result.textContent =
+                                    team.name;
+
+
+                                result.addEventListener(
+                                    "click",
+                                    function () {
+
+                                        hidden.value =
+                                            team.id;
+
+                                        search.value =
+                                            team.name;
+
+                                        selected.textContent =
+                                            team.name;
+
+                                        results.innerHTML =
+                                            "";
+
+                                    }
+                                );
+
+
+                                results.appendChild(
+                                    result
+                                );
+
+                            }
+                        );
+
+                    }
+                    catch (error) {
+
+                        console.error(
+                            "Could not search teams:",
+                            error
+                        );
+
+                    }
+
+                },
+                100
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CREATE TEAM
+   ========================================================= */
+
+async function makeTeam(
+    searchId,
+    selectedId,
+    hiddenId,
+    resultsId
+) {
+
+    const search =
+        document.getElementById(searchId);
+
+    const selected =
+        document.getElementById(selectedId);
+
+    const hidden =
+        document.getElementById(hiddenId);
+
+    const results =
+        document.getElementById(resultsId);
+
+
+    const name =
+        search.value.trim();
+
+
+    if (!name) {
+
+        alert(
+            "Enter a team name first."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/teams/create",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        name: name
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            alert(
+                data.error ||
+                "Could not create team."
+            );
+
+            return;
+        }
+
+
+        hidden.value =
+            data.id;
+
+        search.value =
+            data.name;
+
+        selected.textContent =
+            data.name;
+
+        results.innerHTML =
+            "";
+
+    }
+    catch (error) {
+
+        console.error(
+            "Could not create team:",
+            error
+        );
+
+        alert(
+            "Something went wrong."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   TEAM SEARCH INITIALISEREN
+   ========================================================= */
+
+setupTeamSearch(
+    "team1Search",
+    "team1Results",
+    "team1Selected",
+    "team1"
+);
+
+setupTeamSearch(
+    "team2Search",
+    "team2Results",
+    "team2Selected",
+    "team2"
+);
+
+
+document.getElementById(
+    "makeTeam1"
+).addEventListener(
+    "click",
+    function () {
+
+        makeTeam(
+            "team1Search",
+            "team1Selected",
+            "team1",
+            "team1Results"
+        );
+
+    }
+);
+
+
+document.getElementById(
+    "makeTeam2"
+).addEventListener(
+    "click",
+    function () {
+
+        makeTeam(
+            "team2Search",
+            "team2Selected",
+            "team2",
+            "team2Results"
+        );
+
+    }
+);
+
+
+/* =========================================================
+   LOCATION ELEMENTS
+   ========================================================= */
+
+const locationInput =
+    document.getElementById("location");
+
+const stadiumIdInput =
+    document.getElementById("stadiumId");
+
+const locationResults =
+    document.getElementById("locationResults");
+
+const recommendedLocations =
+    document.getElementById(
+        "recommendedLocations"
+    );
+
+
+/* =========================================================
+   SELECT LOCATION
+   ========================================================= */
+
+function selectLocation(location) {
+
+    locationInput.value =
+        location.name;
+
+    stadiumIdInput.value =
+        location.id;
+
+    locationResults.innerHTML =
+        "";
+
+}
+
+
+/* =========================================================
+   SEARCH LOCATIONS
+   ========================================================= */
+
+async function searchLocations(query) {
+
+    if (!query) {
+
+        locationResults.innerHTML =
+            "";
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/stadiums/search?q=${encodeURIComponent(query)}`
+            );
+
+
+        if (!response.ok) {
+            return;
+        }
+
+
+        const locations =
+            await response.json();
+
+
+        locationResults.innerHTML =
+            "";
+
+
+        locations.forEach(
+            function (location) {
+
+                const result =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                result.className =
+                    "result";
+
+
+                result.textContent =
+                    location.name;
+
+
+                result.addEventListener(
+                    "click",
+                    function () {
+
+                        selectLocation(
+                            location
+                        );
+
+                    }
+                );
+
+
+                locationResults.appendChild(
+                    result
+                );
+
+            }
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Could not search locations:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   LOCATION INPUT
+   ========================================================= */
+
+let locationSearchTimeout =
+    null;
+
+
+locationInput.addEventListener(
+    "input",
+    function () {
+
+        /*
+            Zelf typen betekent dat we niet meer
+            uitgaan van een geselecteerd stadium.
+        */
+
+        stadiumIdInput.value =
+            "";
+
+
+        const query =
+            locationInput.value.trim();
+
+
+        clearTimeout(
+            locationSearchTimeout
+        );
+
+
+        locationResults.innerHTML =
+            "";
+
+
+        if (!query) {
+            return;
+        }
+
+
+        locationSearchTimeout =
+            setTimeout(
+                function () {
+
+                    searchLocations(
+                        query
+                    );
+
+                },
+                150
+            );
+
+    }
+);
+
+
+/* =========================================================
+   RECOMMENDED LOCATIONS
+   ========================================================= */
+
+async function loadRecommendedLocations(
+    teamId
+) {
+
+    recommendedLocations.innerHTML =
+        "Loading...";
+
+
+    if (!teamId) {
+
+        recommendedLocations.innerHTML =
+            "Select a home team first";
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/stadiums/recommended?teamId=${encodeURIComponent(teamId)}`
+            );
+
+
+        if (!response.ok) {
+
+            recommendedLocations.innerHTML =
+                "Could not load locations.";
+
+            return;
+        }
+
+
+        const locations =
+            await response.json();
+
+
+        recommendedLocations.innerHTML =
+            "";
+
+
+        if (
+            locations.length === 0
+        ) {
+
+            recommendedLocations.textContent =
+                "No recommended locations.";
+
+            return;
+        }
+
+
+        locations.forEach(
+            function (location) {
+
+                const element =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                element.className =
+                    "recommended-location";
+
+
+                element.textContent =
+                    location.name;
+
+
+                element.addEventListener(
+                    "click",
+                    function () {
+
+                        selectLocation(
+                            location
+                        );
+
+                    }
+                );
+
+
+                recommendedLocations.appendChild(
+                    element
+                );
+
+            }
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Could not load locations:",
+            error
+        );
+
+        recommendedLocations.textContent =
+            "Could not load locations.";
+
+    }
+
+}
+
+
+/* =========================================================
+   LOAD RECOMMENDED LOCATIONS FOR CURRENT HOME TEAM
+   ========================================================= */
+
+const currentHomeTeam =
+    document.getElementById("team1").value;
+
+
+if (currentHomeTeam) {
+
+    loadRecommendedLocations(
+        currentHomeTeam
+    );
+
+}
+
+
+/* =========================================================
+   CREATE LOCATION
+   ========================================================= */
+
+document.getElementById(
+    "makeLocation"
+).addEventListener(
+    "click",
+    async function () {
+
+        const name =
+            locationInput.value.trim();
+
+
+        const homeTeamId =
+            document.getElementById(
+                "team1"
+            ).value;
+
+
+        if (!name) {
+
+            alert(
+                "Enter a location name first."
+            );
+
+            locationInput.focus();
+
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/stadiums/create",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            name: name,
+
+                            teamId:
+                                homeTeamId
+                                    ? homeTeamId
+                                    : null
+
+                        })
+
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                alert(
+                    data.error ||
+                    "Could not create location."
+                );
+
+                return;
+            }
+
+
+            /*
+                Nieuw stadium selecteren.
+            */
+
+            selectLocation(
+                data
+            );
+
+
+            if (homeTeamId) {
+
+                loadRecommendedLocations(
+                    homeTeamId
+                );
+
+            }
+
+        }
+        catch (error) {
+
+            console.error(
+                "Could not create location:",
+                error
+            );
+
+            alert(
+                "Something went wrong."
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   FORM VALIDATION
+   ========================================================= */
+
+document.querySelector("form")
+.addEventListener(
+    "submit",
+    function (event) {
+
+        const team1 =
+            document.getElementById(
+                "team1"
+            ).value;
+
+
+        const team2 =
+            document.getElementById(
+                "team2"
+            ).value;
+
+
+        if (
+            !team1 ||
+            !team2
+        ) {
+
+            event.preventDefault();
+
+            alert(
+                "Select or create two teams."
+            );
+
+            return;
+        }
+
+
+        if (
+            team1 ===
+            team2
+        ) {
+
+            event.preventDefault();
+
+            alert(
+                "A team cannot play against itself."
+            );
+
+            return;
+        }
+
+    }
+);
+
+</script>
+
+{% endblock %}

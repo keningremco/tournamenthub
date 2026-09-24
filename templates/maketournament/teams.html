@@ -1,0 +1,65 @@
+<!-- =====================================================
+     STEP 3 — TEAMS
+     ===================================================== -->
+
+<div class="page" data-page="3">
+
+    <div class="card">
+
+        <h2>Teams / Participants</h2>
+
+        <p class="card-description" id="teamDescription">
+            Add the teams that will participate in the tournament.
+        </p>
+
+
+        <div
+            id="teamList"
+            class="dynamic-list"
+        >
+
+            <div class="empty-list" id="teamEmpty">
+                No teams added yet.
+            </div>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="add-team"
+            id="addTeam"
+        >
+            + Add team
+        </button>
+
+
+        <div class="team-count">
+            Participants:
+            <strong id="teamCount">0</strong>
+        </div>
+
+    </div>
+
+
+    <div class="navigation">
+
+        <button
+            type="button"
+            class="button back"
+            onclick="previousStep()"
+        >
+            ← Back
+        </button>
+
+        <button
+            type="button"
+            class="button next"
+            onclick="nextStep()"
+        >
+            Next →
+        </button>
+
+    </div>
+
+</div>

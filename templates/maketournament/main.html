@@ -1,0 +1,126 @@
+{% extends 'template.html' %}
+
+{% block style %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/maketournament.css') }}"
+>
+{% endblock %}
+
+
+{% block header %}
+    Create tournament
+{% endblock %}
+
+
+{% block main %}
+
+<form action="/make" method="post" id="tournamentForm">
+
+    <div class="builder">
+
+        <!-- =====================================================
+             PROGRESS
+             ===================================================== -->
+
+        <div class="progress-wrapper">
+
+            <div class="progress-top">
+
+                <div class="progress-title" id="progressTitle">
+                    Basic information
+                </div>
+
+                <div class="progress-counter">
+                    Step <span id="currentStepNumber">1</span> of 7
+                </div>
+
+            </div>
+
+            <div class="progress-track">
+
+                <div
+                    class="progress-bar"
+                    id="progressBar"
+                ></div>
+
+            </div>
+
+            <div class="progress-steps">
+
+                <div class="progress-step active" data-step="1">
+                    Basic
+                </div>
+
+                <div class="progress-step" data-step="2">
+                    Event
+                </div>
+
+                <div class="progress-step" data-step="3">
+                    Teams
+                </div>
+
+                <div class="progress-step" data-step="4">
+                    Settings
+                </div>
+
+                <div class="progress-step" data-step="5">
+                    Locations
+                </div>
+
+                <div class="progress-step" data-step="6">
+                    Schedule
+                </div>
+
+                <div class="progress-step" data-step="7">
+                    Review
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {% include 'maketournament/basic.html' %}
+        {% include 'maketournament/event.html' %}
+        {% include 'maketournament/teams.html' %}
+        {% include 'maketournament/settings.html' %}
+        {% include 'maketournament/locations.html' %}
+        {% include 'maketournament/schedule.html' %}
+        {% include 'maketournament/review.html' %}
+
+
+        <!-- =====================================================
+             HIDDEN JSON DATA
+             ===================================================== -->
+
+        <input
+            type="hidden"
+            name="teams"
+            id="teams"
+            value="[]"
+        >
+
+        <input
+            type="hidden"
+            name="locations"
+            id="locations"
+            value="[]"
+        >
+
+        <input
+            type="hidden"
+            name="referees"
+            id="referees"
+            value="[]"
+        >
+
+    </div>
+
+</form>
+
+<script
+    src="{{ url_for('static', filename='js/maketournament.js') }}"
+></script>
+
+{% endblock %}

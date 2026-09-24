@@ -1,0 +1,6 @@
+Flask
+mysql-connector-python
+Flask-Mail
+python-dotenv
+Werkzeug
+Flask-Migrate

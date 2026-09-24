@@ -1,0 +1,561 @@
+<!-- =====================================================
+     STEP 2 — EVENT
+     ===================================================== -->
+
+<div class="page" data-page="2">
+
+    <div class="card">
+
+        <h2>Event type</h2>
+
+        <p class="card-description">
+            Choose what kind of event you are creating.
+        </p>
+
+
+        <div class="event-types">
+
+            <label class="event-option">
+
+                <input
+                    type="radio"
+                    name="event_type"
+                    value="team"
+                    checked
+                >
+
+                <span class="event-card">
+
+                    <div class="event-title">
+                        Teams
+                    </div>
+
+                    <div class="event-description">
+                        Teams compete against each other.
+                    </div>
+
+                </span>
+
+            </label>
+
+
+            <label class="event-option">
+
+                <input
+                    type="radio"
+                    name="event_type"
+                    value="1v1"
+                >
+
+                <span class="event-card">
+
+                    <div class="event-title">
+                        1 vs 1
+                    </div>
+
+                    <div class="event-description">
+                        One participant competes against another.
+                    </div>
+
+                </span>
+
+            </label>
+
+
+            <label class="event-option">
+
+                <input
+                    type="radio"
+                    name="event_type"
+                    value="solo"
+                >
+
+                <span class="event-card">
+
+                    <div class="event-title">
+                        Solo
+                    </div>
+
+                    <div class="event-description">
+                        Participants perform individually.
+                    </div>
+
+                </span>
+
+            </label>
+
+        </div>
+
+
+        <div
+            class="conditional"
+            id="soloSettings"
+        >
+
+            <div class="conditional-title">
+                Solo settings
+            </div>
+
+
+            <div class="setting">
+
+                <div class="setting-info">
+
+                    <div class="setting-title">
+                        Alle locaties gebruiken
+                    </div>
+
+                    <div class="setting-description">
+                        Iedere deelnemer wordt op alle beschikbare
+                        locaties ingepland.
+                    </div>
+
+                </div>
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        name="solo_all_locations"
+                        id="soloAllLocations"
+                    >
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card" id="formatCard">
+
+        <h2>Format</h2>
+
+        <p class="card-description">
+            Choose how the tournament should work.
+        </p>
+
+
+        <div class="format-list">
+
+            <label class="format-option">
+
+                <input
+                    type="radio"
+                    name="format"
+                    value="round_robin"
+                    checked
+                >
+
+                <span class="format-card">
+
+                    <div>
+
+                        <div class="format-name">
+                            Everyone vs everyone
+                        </div>
+
+                        <div class="format-info">
+                            Every team plays against every other team.
+                        </div>
+
+                    </div>
+
+                    <div class="format-check"></div>
+
+                </span>
+
+            </label>
+
+
+            <label class="format-option">
+
+                <input
+                    type="radio"
+                    name="format"
+                    value="single_elimination"
+                >
+
+                <span class="format-card">
+
+                    <div>
+
+                        <div class="format-name">
+                            Knockout
+                        </div>
+
+                        <div class="format-info">
+                            Lose a match and you are eliminated.
+                        </div>
+
+                    </div>
+
+                    <div class="format-check"></div>
+
+                </span>
+
+            </label>
+
+
+            <label class="format-option">
+
+                <input
+                    type="radio"
+                    name="format"
+                    value="double_elimination"
+                >
+
+                <span class="format-card">
+
+                    <div>
+
+                        <div class="format-name">
+                            Double knockout
+                        </div>
+
+                        <div class="format-info">
+                            Teams get a second chance after one loss.
+                        </div>
+
+                    </div>
+
+                    <div class="format-check"></div>
+
+                </span>
+
+            </label>
+
+
+            <label class="format-option">
+
+                <input
+                    type="radio"
+                    name="format"
+                    value="groups"
+                >
+
+                <span class="format-card">
+
+                    <div>
+
+                        <div class="format-name">
+                            Groups + knockout
+                        </div>
+
+                        <div class="format-info">
+                            Teams first play in groups, then the best continue.
+                        </div>
+
+                    </div>
+
+                    <div class="format-check"></div>
+
+                </span>
+
+            </label>
+
+        </div>
+
+
+        <div
+            class="conditional"
+            id="groupSettings"
+        >
+
+            <div class="conditional-title">
+                Group settings
+            </div>
+
+            <div class="grid-2">
+
+                <div class="field">
+
+                    <label>
+                        Number of groups
+                    </label>
+
+                    <select name="group_count">
+
+                        <option value="2">2</option>
+                        <option value="4">4</option>
+                        <option value="6">6</option>
+                        <option value="8">8</option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Teams advancing
+                    </label>
+
+                    <select name="qualifiers_per_group">
+
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         POINTS & LEADERBOARD
+         ===================================================== -->
+
+    <div class="card">
+
+        <h2>Points & leaderboard</h2>
+
+        <p class="card-description">
+            Configure how points and the leaderboard should work.
+        </p>
+
+
+        <!-- NORMAL -->
+
+        <div id="normalPointsSettings">
+
+            <div class="points-grid">
+
+                <div class="field">
+
+                    <label>
+                        Win
+                    </label>
+
+                    <input
+                        type="number"
+                        name="win_points"
+                        value="3"
+                        min="0"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Draw
+                    </label>
+
+                    <input
+                        type="number"
+                        name="draw_points"
+                        value="1"
+                        min="0"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Loss
+                    </label>
+
+                    <input
+                        type="number"
+                        name="loss_points"
+                        value="0"
+                        min="0"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Leaderboard sorting
+                </label>
+
+                <select name="leaderboard_sort">
+
+                    <option value="points">
+                        Points
+                    </option>
+
+                    <option value="goal_difference">
+                        Goal difference
+                    </option>
+
+                    <option value="goals_scored">
+                        Goals scored
+                    </option>
+
+                    <option value="wins">
+                        Wins
+                    </option>
+
+                    <option value="head_to_head">
+                        Head-to-head
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="setting">
+
+                <div class="setting-info">
+
+                    <div class="setting-title">
+                        Show leaderboard
+                    </div>
+
+                    <div class="setting-description">
+                        Display standings while the tournament is running.
+                    </div>
+
+                </div>
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        name="show_leaderboard"
+                        checked
+                    >
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- SOLO -->
+
+        <div
+            id="soloPointsSettings"
+            class="hidden"
+        >
+
+            <div class="setting">
+
+                <div class="setting-info">
+
+                    <div class="setting-title">
+                        Live leaderboard
+                    </div>
+
+                    <div class="setting-description">
+                        Show the current ranking of participants
+                        while the solo tournament is running.
+                    </div>
+
+                </div>
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        name="solo_live_leaderboard"
+                        id="soloLiveLeaderboard"
+                        checked
+                    >
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+
+            <div class="setting">
+
+                <div class="setting-info">
+
+                    <div class="setting-title">
+                        Zelf punten per game geven
+                    </div>
+
+                    <div class="setting-description">
+                        Geef na iedere game zelf aan hoeveel punten
+                        een deelnemer heeft behaald.
+                    </div>
+
+                </div>
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        name="solo_manual_points"
+                        id="soloManualPoints"
+                    >
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+
+            <div
+                class="conditional"
+                id="soloManualPointsInfo"
+            >
+
+                <div class="conditional-title">
+                    Handmatige punten
+                </div>
+
+                <p class="field-help">
+                    Wanneer een game is afgelopen kun je per
+                    deelnemer zelf het aantal behaalde punten
+                    invoeren. Deze punten worden gebruikt voor
+                    de live leaderboard.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="navigation">
+
+        <button
+            type="button"
+            class="button back"
+            onclick="previousStep()"
+        >
+            ← Back
+        </button>
+
+        <button
+            type="button"
+            class="button next"
+            onclick="nextStep()"
+        >
+            Next →
+        </button>
+
+    </div>
+
+</div>

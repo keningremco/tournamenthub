@@ -1,0 +1,306 @@
+{% extends 'template.html' %}
+
+
+{% block style %}
+<style>
+
+    .category-section{
+        margin-bottom:45px;
+    }
+
+
+    .category-title{
+        font-size:26px;
+        font-weight:700;
+        margin-bottom:18px;
+    }
+
+
+    .tournament-row{
+
+        display:flex;
+        gap:20px;
+
+        overflow-x:auto;
+
+        padding-bottom:15px;
+
+        scrollbar-width:thin;
+        scrollbar-color:var(--primary) #e8eef5;
+    }
+
+
+    .tournament-row::-webkit-scrollbar{
+        height:8px;
+    }
+
+
+    .tournament-row::-webkit-scrollbar-track{
+        background:#e8eef5;
+        border-radius:20px;
+    }
+
+
+    .tournament-row::-webkit-scrollbar-thumb{
+        background:var(--primary);
+        border-radius:20px;
+    }
+
+
+
+    .tournament-card{
+
+        flex:0 0 300px;
+
+        background:var(--card-bg);
+
+        border:1px solid var(--border);
+
+        border-radius:18px;
+
+        padding:22px;
+
+        transition:.2s;
+
+        cursor:pointer;
+
+    }
+
+
+    .tournament-card:hover{
+
+        transform:translateY(-4px);
+
+        box-shadow:0 12px 25px rgba(0,0,0,.08);
+
+    }
+
+
+
+    .tournament-header{
+
+        display:flex;
+
+        justify-content:space-between;
+
+        align-items:center;
+
+        margin-bottom:18px;
+
+    }
+
+
+
+    .tournament-name{
+
+        font-size:20px;
+
+        font-weight:700;
+
+    }
+
+
+    .official{
+
+        color:#EAB308;
+
+        font-size:22px;
+
+    }
+
+
+    .community{
+
+        color:#64748B;
+
+        font-size:14px;
+
+    }
+
+
+
+    .info{
+
+        display:flex;
+
+        flex-direction:column;
+
+        gap:9px;
+
+        color:#64748B;
+
+        font-size:15px;
+
+    }
+
+
+
+    .status{
+
+        display:inline-block;
+
+        margin-top:18px;
+
+        padding:6px 12px;
+
+        border-radius:20px;
+
+        background:#E8F2FF;
+
+        color:var(--primary);
+
+        font-size:13px;
+
+        font-weight:600;
+
+    }
+
+
+
+    .empty{
+
+        padding:50px;
+
+        text-align:center;
+
+        background:white;
+
+        border-radius:16px;
+
+        color:#64748B;
+
+    }
+
+
+</style>
+{% endblock %}
+
+
+
+{% block header %}
+Toernooien
+{% endblock %}
+
+
+
+{% block main %}
+
+
+{% if categories %}
+
+
+{% for category in categories %}
+
+
+<section class="category-section">
+
+
+    <h2 class="category-title">
+        {{ category.icon }} {{ category.name }}
+    </h2>
+
+
+
+    <div class="tournament-row">
+
+
+        {% for tournament in category.tournaments %}
+
+
+        <div class="tournament-card">
+
+
+            <div class="tournament-header">
+
+
+                <div class="tournament-name">
+                    {{ tournament.name }}
+                </div>
+
+
+                {% if tournament.is_official %}
+
+                    <span class="official">
+                        ⭐
+                    </span>
+
+                {% endif %}
+
+
+            </div>
+
+            <div class="info">
+
+                {% if tournament.is_official %}
+
+                    <span>
+                        ⭐ Officieel
+                    </span>
+
+                {% else %}
+
+                    <span class="community">
+                        👤 Community made
+                    </span>
+
+                {% endif %}
+
+
+                <span>
+                    👥 {{ tournament.participant_count }} players
+                </span>
+
+
+                <span>
+                    🌍 {{ tournament.country }}
+                </span>
+
+
+                <span>
+                    📅 {{ tournament.season }}
+                </span>
+                <a href="{{ url_for('tournament', code=tournament.code ) }}">{{tournament.code}}</a>
+
+            </div>
+
+            <div class="status">
+
+                {{ tournament.status }}
+
+            </div>
+
+
+        </div>
+
+
+        {% endfor %}
+
+
+    </div>
+
+
+</section>
+
+
+{% endfor %}
+
+
+
+{% else %}
+
+
+<div class="empty">
+
+    <h2>No tournaments found</h2>
+
+    <p>
+        There are no public tournaments available yet.
+    </p>
+
+</div>
+
+
+{% endif %}
+
+
+{% endblock %}

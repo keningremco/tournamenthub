@@ -1,0 +1,1269 @@
+{% extends 'template.html' %}
+
+{% block style %}
+
+<style>
+
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        max-width: 700px;
+    }
+
+    input,
+    button {
+        padding: 10px;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+    button {
+        cursor: pointer;
+    }
+
+    /* =========================
+       TEAMS
+       ========================= */
+
+    .teams {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .team {
+        flex: 1;
+        position: relative;
+    }
+
+    .team label {
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    .search-row {
+        display: flex;
+        gap: 8px;
+    }
+
+    .team-search {
+        width: 100%;
+    }
+
+    .make-team {
+        white-space: nowrap;
+    }
+
+    .vs {
+        font-weight: bold;
+        font-size: 20px;
+        margin-top: 35px;
+    }
+
+    .results {
+        position: absolute;
+        top: 66px;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        overflow: hidden;
+        z-index: 100;
+    }
+
+    .result {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    .result:hover {
+        background: #eee;
+    }
+
+    .selected-team {
+        margin-top: 8px;
+        padding: 10px;
+        background: #eee;
+        border-radius: 6px;
+    }
+
+    /* =========================
+       LOCATION
+       ========================= */
+
+    .location-search {
+        position: relative;
+    }
+
+    .location-search .team-search {
+        flex: 1;
+    }
+
+    .location-options {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .location-options input {
+        width: auto;
+        padding: 0;
+    }
+
+    .location-options label {
+        margin: 0;
+        cursor: pointer;
+    }
+
+    .recommended-locations {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .recommended-location {
+        padding: 10px;
+        background: #eee;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .recommended-location:hover {
+        background: #ddd;
+    }
+
+    .error {
+        color: red;
+    }
+
+    .success {
+        color: green;
+    }
+
+    @media (max-width: 600px) {
+
+        .teams {
+            flex-direction: column;
+        }
+
+        .vs {
+            margin: 0 auto;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+{% block header %}
+Make new game
+{% endblock %}
+
+{% block main %}
+
+<form action="/makegame/{{ roundId }}" method="post">
+
+
+{% if error %}
+    <p class="error">
+        {{ error }}
+    </p>
+{% endif %}
+
+
+<!-- =========================
+     START TIME
+     ========================= -->
+
+<label for="start_time">
+    Start time
+</label>
+
+<input
+    type="datetime-local"
+    name="start_time"
+    id="start_time"
+    required
+>
+
+
+<!-- =========================
+     LOCATION
+     ========================= -->
+
+<div class="location-search">
+
+    <label for="location">
+        Location
+    </label>
+
+    <div class="search-row">
+
+        <!--
+            Dit is nu de echte location input.
+
+            Als de gebruiker een bestaande locatie
+            selecteert, wordt stadiumId gevuld.
+
+            Als de gebruiker zelf tekst invoert,
+            wordt stadiumId leeggemaakt en kan de
+            backend de locatie als nieuw stadium
+            opslaan.
+        -->
+
+        <input
+            type="text"
+            name="location"
+            id="location"
+            class="team-search"
+            placeholder="Search or enter location..."
+            autocomplete="off"
+        >
+
+        <button
+            type="button"
+            id="makeLocation"
+        >
+            Make Location
+        </button>
+
+    </div>
+
+
+    <!--
+        ID van een bestaand geselecteerd stadium.
+
+        Bij een handmatig ingevoerde locatie
+        blijft deze leeg.
+    -->
+
+    <input
+        type="hidden"
+        name="stadiumId"
+        id="stadiumId"
+    >
+
+
+    <div
+        id="locationResults"
+        class="results"
+    ></div>
+
+</div>
+
+<input type="hidden" name="" id="tournamentId" value="{{tournamentId}}">
+<!-- =========================
+     RECOMMENDED LOCATIONS
+     ========================= -->
+
+<div class="recommended-locations">
+
+    <label>
+        Recommended locations
+    </label>
+
+    <div id="recommendedLocations">
+        Select a home team first
+    </div>
+
+</div>
+
+
+<!-- =========================
+     TEAMS
+     ========================= -->
+
+<label>
+    Teams
+</label>
+
+<div class="teams">
+
+
+    <!-- =========================
+         HOME TEAM
+         ========================= -->
+
+    <div class="team">
+
+        <label for="team1Search">
+            Home team
+        </label>
+
+        <div class="search-row">
+
+            <input
+                type="text"
+                id="team1Search"
+                class="team-search"
+                placeholder="Search team..."
+                autocomplete="off"
+            >
+
+            <button
+                type="button"
+                class="make-team"
+                id="makeTeam1"
+            >
+                Make Team
+            </button>
+
+        </div>
+
+
+        <div
+            id="team1Results"
+            class="results"
+        ></div>
+
+
+        <div
+            id="team1Selected"
+            class="selected-team"
+        >
+            No team selected
+        </div>
+
+
+        <input
+            type="hidden"
+            name="team1"
+            id="team1"
+        >
+
+    </div>
+
+
+    <div class="vs">
+        VS
+    </div>
+
+
+    <!-- =========================
+         AWAY TEAM
+         ========================= -->
+
+    <div class="team">
+
+        <label for="team2Search">
+            Away team
+        </label>
+
+        <div class="search-row">
+
+            <input
+                type="text"
+                id="team2Search"
+                class="team-search"
+                placeholder="Search team..."
+                autocomplete="off"
+            >
+
+            <button
+                type="button"
+                class="make-team"
+                id="makeTeam2"
+            >
+                Make Team
+            </button>
+
+        </div>
+
+
+        <div
+            id="team2Results"
+            class="results"
+        ></div>
+
+
+        <div
+            id="team2Selected"
+            class="selected-team"
+        >
+            No team selected
+        </div>
+
+
+        <input
+            type="hidden"
+            name="team2"
+            id="team2"
+        >
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     CREATE GAME
+     ========================= -->
+
+<button type="submit">
+    Create Game
+</button>
+
+</form>
+
+<script>
+
+/* =========================================================
+   TEAM SEARCH
+   ========================================================= */
+
+function setupTeamSearch(
+    searchId,
+    resultsId,
+    selectedId,
+    hiddenId
+) {
+
+    const search =
+        document.getElementById(searchId);
+
+    const results =
+        document.getElementById(resultsId);
+
+    const selected =
+        document.getElementById(selectedId);
+
+    const hidden =
+        document.getElementById(hiddenId);
+
+    let searchTimeout = null;
+    let searchRequest = 0;
+
+
+    search.addEventListener(
+        "input",
+        function () {
+
+            const query =
+                search.value.trim();
+
+
+            /*
+                Zodra de gebruiker opnieuw typt,
+                is het vorige team niet meer
+                geselecteerd.
+            */
+
+            hidden.value = "";
+
+            selected.textContent =
+                "No team selected";
+
+            results.innerHTML = "";
+
+
+            clearTimeout(searchTimeout);
+
+
+            if (query.length < 1) {
+                return;
+            }
+
+
+            searchTimeout = setTimeout(
+                async function () {
+
+                    const requestId =
+                        ++searchRequest;
+
+                    try {
+
+                        /*
+                            Bestaande team search endpoint.
+                        */
+
+                        const response =
+                            await fetch(
+                                `/api/teams/search?q=${encodeURIComponent(query)}&tournamentId=${tournamentId}`
+                            );
+
+
+                        if (!response.ok) {
+                            return;
+                        }
+
+
+                        const teams =
+                            await response.json();
+
+
+                        /*
+                            Oude requests negeren.
+                        */
+
+                        if (
+                            requestId !==
+                            searchRequest
+                        ) {
+                            return;
+                        }
+
+
+                        results.innerHTML =
+                            "";
+
+
+                        teams.forEach(
+                            function (team) {
+
+                                const result =
+                                    document.createElement(
+                                        "div"
+                                    );
+
+
+                                result.className =
+                                    "result";
+
+
+                                result.textContent =
+                                    team.name;
+
+
+                                result.addEventListener(
+                                    "click",
+                                    function () {
+
+                                        hidden.value =
+                                            team.id;
+
+                                        search.value =
+                                            team.name;
+
+                                        selected.textContent =
+                                            team.name;
+
+                                        results.innerHTML =
+                                            "";
+
+
+                                        /*
+                                            Alleen Home team
+                                            triggert location
+                                            recommendations.
+                                        */
+
+                                        if (
+                                            hiddenId ===
+                                            "team1"
+                                        ) {
+
+                                            loadRecommendedLocations(
+                                                team.id
+                                            );
+
+                                        }
+
+                                    }
+                                );
+
+
+                                results.appendChild(
+                                    result
+                                );
+
+                            }
+                        );
+
+                    }
+                    catch (error) {
+
+                        console.error(
+                            "Could not search teams:",
+                            error
+                        );
+
+                    }
+
+                },
+                150
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CREATE TEAM
+   ========================================================= */
+
+async function makeTeam(
+    searchId,
+    selectedId,
+    hiddenId,
+    resultsId
+) {
+
+    const search =
+        document.getElementById(searchId);
+
+    const selected =
+        document.getElementById(selectedId);
+
+    const hidden =
+        document.getElementById(hiddenId);
+
+    const results =
+        document.getElementById(resultsId);
+
+
+    const name =
+        search.value.trim();
+
+
+    if (!name) {
+
+        alert(
+            "Enter a team name first."
+        );
+
+        search.focus();
+
+        return;
+    }
+
+
+    try {
+
+        /*
+            Team API krijgt ALLEEN name.
+
+            Geen stadiumId.
+            Geen teamId.
+            Geen makerId.
+
+            makerId wordt door Flask bepaald
+            via session.get("userid").
+        */
+
+        const response =
+            await fetch(
+                "/api/teams/create",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        name: name,
+                        tournamentId:tournamentId
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            alert(
+                data.error ||
+                "Could not create team."
+            );
+
+            return;
+        }
+
+
+        /*
+            Team selecteren.
+        */
+
+        hidden.value =
+            data.id;
+
+        search.value =
+            data.name;
+
+        selected.textContent =
+            data.name;
+
+        results.innerHTML =
+            "";
+
+
+        /*
+            Home team gekozen:
+            location recommendations laden.
+        */
+
+        if (
+            hiddenId ===
+            "team1"
+        ) {
+
+            loadRecommendedLocations(
+                data.id
+            );
+
+        }
+
+    }
+    catch (error) {
+
+        console.error(
+            "Could not create team:",
+            error
+        );
+
+        alert(
+            "Something went wrong."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   TEAM BUTTONS
+   ========================================================= */
+
+document.getElementById(
+    "makeTeam1"
+).addEventListener(
+    "click",
+    function () {
+
+        makeTeam(
+            "team1Search",
+            "team1Selected",
+            "team1",
+            "team1Results"
+        );
+
+    }
+);
+
+
+document.getElementById(
+    "makeTeam2"
+).addEventListener(
+    "click",
+    function () {
+
+        makeTeam(
+            "team2Search",
+            "team2Selected",
+            "team2",
+            "team2Results"
+        );
+
+    }
+);
+
+
+/*
+    TEAM SEARCH INITIALISEREN
+
+    Dit gebruikt uitsluitend de bestaande
+    teams endpoints.
+*/
+
+setupTeamSearch(
+    "team1Search",
+    "team1Results",
+    "team1Selected",
+    "team1"
+);
+
+setupTeamSearch(
+    "team2Search",
+    "team2Results",
+    "team2Selected",
+    "team2"
+);
+
+
+/* =========================================================
+   LOCATION ELEMENTS
+   ========================================================= */
+const tournamentId = document.getElementById('tournamentId').value
+const locationInput =
+    document.getElementById("location");
+
+const stadiumIdInput =
+    document.getElementById("stadiumId");
+
+const locationResults =
+    document.getElementById("locationResults");
+
+const recommendedLocations =
+    document.getElementById(
+        "recommendedLocations"
+    );
+
+
+/* =========================================================
+   SELECT LOCATION
+   ========================================================= */
+
+function selectLocation(location) {
+
+    locationInput.value =
+        location.name;
+
+    stadiumIdInput.value =
+        location.id;
+
+    locationResults.innerHTML =
+        "";
+
+}
+
+
+/* =========================================================
+   LOCATION SEARCH
+   ========================================================= */
+
+async function searchLocations(query) {
+
+    if (!query) {
+
+        locationResults.innerHTML =
+            "";
+
+        return;
+    }
+
+
+    try {
+
+        /*
+            De bestaande stadium API blijft
+            gebruikt worden.
+
+            De UI noemt het alleen Location.
+        */
+
+        const response =
+            await fetch(
+                `/api/stadiums/search?q=${encodeURIComponent(query)}&tournamentId=${tournamentId}`
+            );
+
+
+        if (!response.ok) {
+            return;
+        }
+
+
+        const locations =
+            await response.json();
+
+
+        locationResults.innerHTML =
+            "";
+
+
+        locations.forEach(
+            function (location) {
+
+                const result =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                result.className =
+                    "result";
+
+
+                result.textContent =
+                    location.name;
+
+
+                result.addEventListener(
+                    "click",
+                    function () {
+
+                        selectLocation(
+                            location
+                        );
+
+                    }
+                );
+
+
+                locationResults.appendChild(
+                    result
+                );
+
+            }
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Could not search locations:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   LOCATION INPUT
+   ========================================================= */
+
+let locationSearchTimeout =
+    null;
+
+
+locationInput.addEventListener(
+    "input",
+    function () {
+
+        /*
+            Zodra de gebruiker zelf iets typt,
+            is een eventueel eerder geselecteerd
+            stadium niet meer geselecteerd.
+
+            De backend kan de ingevoerde location
+            vervolgens als nieuwe locatie verwerken.
+        */
+
+        stadiumIdInput.value =
+            "";
+
+
+        const query =
+            locationInput.value.trim();
+
+
+        clearTimeout(
+            locationSearchTimeout
+        );
+
+
+        locationResults.innerHTML =
+            "";
+
+
+        if (!query) {
+            return;
+        }
+
+
+        locationSearchTimeout =
+            setTimeout(
+                function () {
+
+                    searchLocations(
+                        query
+                    );
+
+                },
+                150
+            );
+
+    }
+);
+
+
+/* =========================================================
+   RECOMMENDED LOCATIONS
+   ========================================================= */
+
+async function loadRecommendedLocations(
+    teamId
+) {
+
+    recommendedLocations.innerHTML =
+        "Loading...";
+
+
+    if (!teamId) {
+
+        recommendedLocations.innerHTML =
+            "Select a home team first";
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/stadiums/recommended?teamId=${encodeURIComponent(teamId)}`
+            );
+
+
+        if (!response.ok) {
+
+            recommendedLocations.innerHTML =
+                "Could not load locations.";
+
+            return;
+        }
+
+
+        const locations =
+            await response.json();
+
+
+        recommendedLocations.innerHTML =
+            "";
+
+
+        if (
+            locations.length === 0
+        ) {
+
+            recommendedLocations.textContent =
+                "No recommended locations.";
+
+            return;
+        }
+
+
+        locations.forEach(
+            function (location) {
+
+                const element =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                element.className =
+                    "recommended-location";
+
+
+                element.textContent =
+                    location.name;
+
+
+                element.addEventListener(
+                    "click",
+                    function () {
+
+                        selectLocation(
+                            location
+                        );
+
+                    }
+                );
+
+
+                recommendedLocations.appendChild(
+                    element
+                );
+
+            }
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Could not load locations:",
+            error
+        );
+
+        recommendedLocations.textContent =
+            "Could not load locations.";
+
+    }
+
+}
+
+
+/* =========================================================
+   CREATE LOCATION
+   ========================================================= */
+
+document.getElementById(
+    "makeLocation"
+).addEventListener(
+    "click",
+    async function () {
+
+        const name =
+            locationInput.value.trim();
+
+
+        const homeTeamId =
+            document.getElementById(
+                "team1"
+            ).value;
+
+
+        if (!name) {
+
+            alert(
+                "Enter a location name first."
+            );
+
+            locationInput.focus();
+
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/stadiums/create",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            name: name,
+
+                            teamId:
+                                homeTeamId
+                                    ? homeTeamId
+                                    : null,
+                            tournamentId: tournamentId
+                        })
+
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                alert(
+                    data.error ||
+                    "Could not create location."
+                );
+
+                return;
+            }
+
+
+            /*
+                Nieuwe locatie selecteren.
+            */
+
+            selectLocation(
+                data
+            );
+
+
+            /*
+                Recommendations opnieuw laden
+                wanneer er een home team is.
+            */
+
+            if (homeTeamId) {
+
+                loadRecommendedLocations(
+                    homeTeamId
+                );
+
+            }
+
+        }
+        catch (error) {
+
+            console.error(
+                "Could not create location:",
+                error
+            );
+
+            alert(
+                "Something went wrong."
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   FORM VALIDATION
+   ========================================================= */
+
+document.querySelector("form")
+.addEventListener(
+    "submit",
+    function (event) {
+
+        const team1 =
+            document.getElementById(
+                "team1"
+            ).value;
+
+
+        const team2 =
+            document.getElementById(
+                "team2"
+            ).value;
+
+
+        /*
+            Beide teams verplicht.
+        */
+
+        if (
+            !team1 ||
+            !team2
+        ) {
+
+            event.preventDefault();
+
+            alert(
+                "Select or create two teams."
+            );
+
+            return;
+        }
+
+
+        /*
+            Een team mag niet tegen zichzelf
+            spelen.
+        */
+
+        if (
+            team1 ===
+            team2
+        ) {
+
+            event.preventDefault();
+
+            alert(
+                "A team cannot play against itself."
+            );
+
+            return;
+        }
+
+    }
+);
+
+</script>
+
+{% endblock %}

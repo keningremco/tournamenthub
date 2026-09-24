@@ -1,0 +1,277 @@
+{% extends "template.html" %}
+
+{% block header %}
+    My Profile
+{% endblock %}
+
+{% block style %}
+<style>
+
+.profile-page{
+    max-width:1000px;
+}
+
+.profile-grid{
+    display:grid;
+    grid-template-columns:320px 1fr;
+    gap:20px;
+    margin-bottom:20px;
+}
+
+.card{
+    padding:20px;
+    background:white;
+    border:1px solid #ccc;
+    border-radius:6px;
+}
+
+.card h2{
+    margin-bottom:18px;
+    font-size:22px;
+}
+
+.profile-info p{
+    margin:12px 0;
+}
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+}
+
+.stat{
+    padding:18px;
+    text-align:center;
+    background:#eee;
+    border-radius:6px;
+}
+
+.stat h3{
+    margin-bottom:5px;
+    font-size:30px;
+}
+
+.form-group{
+    margin-bottom:15px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:5px;
+    font-weight:600;
+}
+
+.form-group input{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:6px;
+}
+
+.button{
+    padding:10px 18px;
+    color:white;
+    background:#334155;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.button:hover{
+    background:#1f2937;
+}
+
+.activity ul{
+    margin-left:20px;
+}
+
+.activity li{
+    margin-bottom:8px;
+}
+
+@media(max-width:800px){
+
+.profile-grid{
+    grid-template-columns:1fr;
+}
+
+.stats-grid{
+    grid-template-columns:1fr;
+}
+
+}
+
+</style>
+{% endblock %}
+
+{% block main %}
+
+<div class="profile-page">
+
+    <div class="profile-grid">
+
+        <div class="card profile-info">
+
+            <h2>Profile</h2>
+
+            {% if user %}
+
+                {% if user.username %}
+                    <p>
+                        <strong>Username</strong><br>
+                        {{ user.username }}
+                    </p>
+                {% endif %}
+
+                {% if user.email %}
+                    <p>
+                        <strong>Email</strong><br>
+                        {{ user.email }}
+                    </p>
+                {% endif %}
+
+                {% if user.created_at %}
+                    <p>
+                        <strong>Member since</strong><br>
+                        {{ user.created_at }}
+                    </p>
+                {% endif %}
+
+            {% else %}
+
+                <p>No profile information available.</p>
+
+            {% endif %}
+
+        </div>
+
+        <div class="card">
+
+            <h2>Statistics</h2>
+
+            {% if stats %}
+
+                <div class="stats-grid">
+
+                    <div class="stat">
+                        <h3>{{ stats.tournaments|default(0, true) }}</h3>
+                        <p>Tournaments</p>
+                    </div>
+
+                    <div class="stat">
+                        <h3>{{ stats.lobbies|default(0, true) }}</h3>
+                        <p>Lobbies</p>
+                    </div>
+
+                    <div class="stat">
+                        <h3>{{ stats.predictions|default(0, true) }}</h3>
+                        <p>Predictions</p>
+                    </div>
+
+                    <div class="stat">
+                        <h3>{{ stats.points|default(0, true) }}</h3>
+                        <p>Total Points</p>
+                    </div>
+
+                </div>
+
+            {% else %}
+
+                <p>No statistics available.</p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+
+        <h2>Change Password</h2>
+
+        <form method="POST" action="{{ url_for('changePassword' ) }}">
+
+            <div class="form-group">
+                <label>Current Password</label>
+                <input
+                    type="password"
+                    name="currentPassword"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>New Password</label>
+                <input
+                    type="password"
+                    name="newPassword"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Repeat New Password</label>
+                <input
+                    type="password"
+                    name="repeatPassword"
+                    required
+                >
+            </div>
+
+            <button class="button">
+                Save Password
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="card activity" style="margin-bottom:20px;">
+
+        <h2>Prediction Statistics</h2>
+
+        {% if prediction_stats %}
+
+            <ul>
+                <li>Exact predictions: {{ prediction_stats.exact|default(0, true) }}</li>
+                <li>Correct winner: {{ prediction_stats.correct|default(0, true) }}</li>
+                <li>Average points: {{ prediction_stats.average|default(0, true) }}</li>
+                <li>Best leaderboard position: {{ prediction_stats.best_position|default("-", true) }}</li>
+            </ul>
+
+        {% else %}
+
+            <p>No prediction statistics available.</p>
+
+        {% endif %}
+
+    </div>
+
+    <div class="card">
+
+        <h2>Recent Activity</h2>
+
+        {% if activities %}
+
+            <ul>
+
+                {% for activity in activities %}
+
+                    <li>{{ activity }}</li>
+
+                {% endfor %}
+
+            </ul>
+
+        {% else %}
+
+            <p>No recent activity.</p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

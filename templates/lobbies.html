@@ -1,0 +1,578 @@
+{% extends 'template.html' %}
+
+{% block header %}
+    Lobbies
+{% endblock %}
+
+{% block style %}
+<style>
+    .lobby-page {
+        max-width: 1000px;
+    }
+
+    .lobby-intro {
+        margin-bottom: 25px;
+        color: #64748B;
+    }
+
+    .lobby-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .lobby-box {
+        padding: 20px;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    .public-lobbies-box {
+        grid-column: 1 / -1;
+    }
+
+    .lobby-box h2 {
+        margin-bottom: 10px;
+        font-size: 21px;
+    }
+
+    .lobby-box > p {
+        margin-bottom: 20px;
+        color: #64748B;
+        line-height: 1.5;
+    }
+
+    .lobby-box form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .lobby-box label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+    }
+
+    .lobby-box input,
+    .lobby-box button {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    .lobby-box button {
+        cursor: pointer;
+    }
+
+    .checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .checkbox-row input {
+        width: auto;
+    }
+
+    .checkbox-row label {
+        margin: 0;
+        font-weight: normal;
+    }
+
+    .password-field {
+        display: none;
+    }
+
+    .password-field.show {
+        display: block;
+    }
+
+    .public-search-row {
+        display: flex;
+        gap: 8px;
+    }
+
+    .public-search-row input {
+        width: 100%;
+    }
+
+    .public-search-row button {
+        width: auto;
+        white-space: nowrap;
+    }
+
+    .public-results {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .public-lobby-result {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 12px;
+        background: #eee;
+        border-radius: 6px;
+    }
+
+    .public-lobby-name {
+        margin-bottom: 4px;
+        font-weight: 700;
+    }
+
+    .public-lobby-meta {
+        color: #64748B;
+        font-size: 14px;
+    }
+
+    .public-lobby-result form {
+        flex-shrink: 0;
+    }
+
+    .public-lobby-result button {
+        width: auto;
+        white-space: nowrap;
+    }
+
+    .result-message {
+        padding: 12px;
+        color: #64748B;
+        text-align: center;
+        background: #eee;
+        border-radius: 6px;
+    }
+
+    .error {
+        padding: 10px;
+        color: #8f2929;
+        background: #fff1f1;
+        border: 1px solid #e4aaaa;
+        border-radius: 6px;
+    }
+
+    .section-title {
+        margin-bottom: 18px;
+        font-size: 26px;
+        font-weight: 700;
+    }
+
+    .lobby-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .lobby-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 15px;
+        color: inherit;
+        text-decoration: none;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        transition: background .2s;
+    }
+
+    .lobby-row:hover {
+        background: #f9f9f9;
+    }
+
+    .lobby-name {
+        margin-bottom: 5px;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .lobby-tournament {
+        color: #64748B;
+        font-size: 14px;
+    }
+
+    .lobby-status {
+        flex-shrink: 0;
+        padding: 8px 10px;
+        color: #334155;
+        font-size: 14px;
+        font-weight: 600;
+        background: #eee;
+        border-radius: 6px;
+    }
+
+    .lobby-status.locked {
+        color: #8f2929;
+        background: #fff1f1;
+        border: 1px solid #e4aaaa;
+    }
+
+    .empty {
+        padding: 30px;
+        color: #64748B;
+        text-align: center;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    @media (max-width: 700px) {
+        .lobby-actions {
+            grid-template-columns: 1fr;
+        }
+
+        .public-lobbies-box {
+            grid-column: auto;
+        }
+
+        .lobby-row,
+        .public-lobby-result {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .lobby-status {
+            align-self: flex-start;
+        }
+
+        .public-search-row {
+            flex-direction: column;
+        }
+
+        .public-search-row button,
+        .public-lobby-result button {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+<div class="lobby-page">
+
+    <p class="lobby-intro">
+        Maak een lobby voor een toernooi, nodig vrienden uit en voorspel samen alle wedstrijden.
+    </p>
+
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <div class="lobby-actions">
+
+        <section class="lobby-box">
+            <h2>Join a lobby</h2>
+
+            <p>
+                Vul de lobbycode in die je van de maker hebt ontvangen.
+            </p>
+
+            <form action="/joinlobby" method="post">
+                <div>
+                    <label for="joinCode">Lobby code</label>
+
+                    <input
+                        type="text"
+                        id="joinCode"
+                        name="code"
+                        placeholder="Enter lobby code..."
+                        autocomplete="off"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label for="joinPassword">Password</label>
+
+                    <input
+                        type="password"
+                        id="joinPassword"
+                        name="password"
+                        placeholder="Only needed for private lobbies"
+                    >
+                </div>
+
+                <button type="submit">Join lobby</button>
+            </form>
+        </section>
+
+        <section class="lobby-box">
+            <h2>Create a lobby</h2>
+
+            <p>
+                Link your lobby to a tournament. Everyone predicts the matches from that tournament.
+            </p>
+
+            <form action="/createlobby" method="post">
+                <div>
+                    <label for="name">Lobby name</label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="For example: Friends prediction league"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label for="tournamentCode">Tournament code</label>
+
+                    <input
+                        type="text"
+                        id="tournamentCode"
+                        name="tournament_code"
+                        value="{{ tournament_code or '' }}"
+                        placeholder="Enter tournament code..."
+                        autocomplete="off"
+                        required
+                    >
+                </div>
+
+                <div class="checkbox-row">
+                    <input
+                        type="checkbox"
+                        id="isPrivate"
+                        name="isPrivate"
+                    >
+
+                    <label for="isPrivate">
+                        Private lobby with password
+                    </label>
+                </div>
+
+                <div class="password-field" id="passwordField">
+                    <label for="lobbyPassword">Lobby password</label>
+
+                    <input
+                        type="password"
+                        id="lobbyPassword"
+                        name="password"
+                        placeholder="Enter a password"
+                    >
+                </div>
+
+                <button type="submit">Create lobby</button>
+            </form>
+        </section>
+
+        <section class="lobby-box public-lobbies-box">
+            <h2>Find public lobbies</h2>
+
+            <p>
+                Enter a tournament code to find public lobbies that you can join.
+            </p>
+
+            <div class="public-search-row">
+                <input
+                    type="text"
+                    id="publicTournamentCode"
+                    value="{{ tournament_code or '' }}"
+                    placeholder="Enter tournament code..."
+                    autocomplete="off"
+                >
+
+                <button type="button" id="findPublicLobbies">
+                    Find lobbies
+                </button>
+            </div>
+
+            <div class="public-results" id="publicLobbyResults">
+                <div class="result-message">
+                    Enter a tournament code to search for public lobbies.
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <section>
+        <h2 class="section-title">My lobbies</h2>
+
+        {% if lobbies %}
+            <div class="lobby-list">
+                {% for lobby in lobbies %}
+                    <a class="lobby-row" href="/lobby/{{ lobby.code }}">
+                        <div>
+                            <div class="lobby-name">
+                                {{ lobby.name }}
+                            </div>
+
+                            <div class="lobby-tournament">
+                                {{ lobby.tournament_name }}
+                                · Tournament code: {{ lobby.tournament_code }}
+                            </div>
+                        </div>
+
+                        {% if lobby.isLocked %}
+                            <span class="lobby-status locked">
+                                🔒 Locked
+                            </span>
+                        {% else %}
+                            <span class="lobby-status">
+                                {% if lobby.isPrivate %}
+                                    🔐 Private
+                                {% else %}
+                                    🌍 Public
+                                {% endif %}
+                            </span>
+                        {% endif %}
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty">
+                <h3>Nog geen lobbies</h3>
+
+                <p>
+                    Maak hierboven je eerste lobby of join een lobby met een code.
+                </p>
+            </div>
+        {% endif %}
+    </section>
+
+</div>
+
+<script>
+    const privateCheckbox = document.getElementById("isPrivate");
+    const passwordField = document.getElementById("passwordField");
+    const lobbyPassword = document.getElementById("lobbyPassword");
+
+    privateCheckbox.addEventListener("change", function () {
+        passwordField.classList.toggle("show", privateCheckbox.checked);
+        lobbyPassword.required = privateCheckbox.checked;
+
+        if (!privateCheckbox.checked) {
+            lobbyPassword.value = "";
+        }
+    });
+
+    const publicTournamentCode = document.getElementById("publicTournamentCode");
+    const findPublicLobbiesButton = document.getElementById("findPublicLobbies");
+    const publicLobbyResults = document.getElementById("publicLobbyResults");
+
+    function showPublicLobbyMessage(message) {
+        publicLobbyResults.innerHTML = "";
+
+        const resultMessage = document.createElement("div");
+        resultMessage.className = "result-message";
+        resultMessage.textContent = message;
+
+        publicLobbyResults.appendChild(resultMessage);
+    }
+
+    function createPublicLobbyResult(lobby) {
+        const result = document.createElement("div");
+        result.className = "public-lobby-result";
+
+        const lobbyInformation = document.createElement("div");
+
+        const lobbyName = document.createElement("div");
+        lobbyName.className = "public-lobby-name";
+        lobbyName.textContent = lobby.name;
+
+        const lobbyMeta = document.createElement("div");
+        lobbyMeta.className = "public-lobby-meta";
+        lobbyMeta.textContent =
+            `${lobby.tournament_name} · ${lobby.member_count} player(s)`;
+
+        lobbyInformation.appendChild(lobbyName);
+        lobbyInformation.appendChild(lobbyMeta);
+
+        const joinForm = document.createElement("form");
+        joinForm.action = "/joinlobby";
+        joinForm.method = "post";
+
+        const passwordInput = document.createElement("input");
+        passwordInput.type = "hidden";
+        passwordInput.name = "password";
+        passwordInput.value = "";
+
+        const codeInput = document.createElement("input");
+        codeInput.type = "hidden";
+        codeInput.name = "code";
+        codeInput.value = lobby.code;
+
+        const joinButton = document.createElement("button");
+        joinButton.type = "submit";
+        joinButton.textContent = "Join lobby";
+
+        joinForm.appendChild(codeInput);
+        joinForm.appendChild(joinButton);
+
+        result.appendChild(lobbyInformation);
+        result.appendChild(joinForm);
+
+        return result;
+    }
+
+    async function findPublicLobbies() {
+        const tournamentCode = publicTournamentCode.value.trim().toUpperCase();
+
+        if (!tournamentCode) {
+            showPublicLobbyMessage("Enter a tournament code first.");
+            return;
+        }
+
+        findPublicLobbiesButton.disabled = true;
+        findPublicLobbiesButton.textContent = "Searching...";
+
+        try {
+            const response = await fetch(
+                `/api/lobbies/public?tournament_code=${encodeURIComponent(tournamentCode)}`
+            );
+
+            if (!response.ok) {
+                throw new Error("Could not load public lobbies.");
+            }
+
+            const lobbies = await response.json();
+
+            publicLobbyResults.innerHTML = "";
+
+            if (!lobbies.length) {
+                showPublicLobbyMessage(
+                    "No public lobbies were found for this tournament."
+                );
+                return;
+            }
+
+            lobbies.forEach(lobby => {
+                publicLobbyResults.appendChild(
+                    createPublicLobbyResult(lobby)
+                );
+            });
+
+        } catch (error) {
+            showPublicLobbyMessage(
+                "Something went wrong while searching for public lobbies."
+            );
+        } finally {
+            findPublicLobbiesButton.disabled = false;
+            findPublicLobbiesButton.textContent = "Find lobbies";
+        }
+    }
+
+    findPublicLobbiesButton.addEventListener("click", findPublicLobbies);
+
+    publicTournamentCode.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            findPublicLobbies();
+        }
+    });
+
+    if (publicTournamentCode.value.trim()) {
+        findPublicLobbies();
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,210 @@
+<!-- =====================================================
+     STEP 1 — BASIC
+     ===================================================== -->
+
+<div class="page active" data-page="1">
+
+    <div class="card">
+
+        <h2>Basic information</h2>
+
+        <p class="card-description">
+            Give your tournament a name and choose how you want
+            it to be created.
+        </p>
+
+
+        <div class="field">
+
+            <label for="name">
+                Tournament name
+            </label>
+
+            <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Summer Championship"
+                required
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label for="description">
+                Description
+                <span class="optional">(optional)</span>
+            </label>
+
+            <textarea
+                id="description"
+                name="description"
+                placeholder="Tell people what this tournament is about..."
+            ></textarea>
+
+        </div>
+
+
+        <div class="field">
+
+            <label for="rules">
+                Rules
+                <span class="optional">(optional)</span>
+            </label>
+
+            <textarea
+                id="rules"
+                name="rules"
+                placeholder="Tournament rules, special rules, scoring rules..."
+            ></textarea>
+
+        </div>
+
+
+        <div class="grid-2">
+
+            <div class="field">
+
+                <label for="visibility">
+                    Visibility
+                </label>
+
+                <select
+                    id="visibility"
+                    name="visibility"
+                >
+
+                    <option value="public">
+                        Public
+                    </option>
+
+                    <option value="private" selected>
+                        Private
+                    </option>
+
+                    <option value="unlisted">
+                        Unlisted
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="matchType">
+                    Match type
+                </label>
+
+                <select
+                    id="matchType"
+                    name="match_type"
+                >
+
+                    <option value="single">
+                        Single match
+                    </option>
+
+                    <option value="best_of_3">
+                        Best of 3
+                    </option>
+
+                    <option value="best_of_5">
+                        Best of 5
+                    </option>
+
+                    <option value="best_of_7">
+                        Best of 7
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>How do you want to create it?</h2>
+
+        <p class="card-description">
+            Choose whether you want the system to generate the
+            tournament or manage the matches yourself.
+        </p>
+
+
+        <div class="creation-options">
+
+            <label class="creation-option">
+
+                <input
+                    type="radio"
+                    name="creation_mode"
+                    value="manual"
+                >
+
+                <span class="creation-card">
+
+                    <div class="creation-title">
+                        I want to do it myself
+                    </div>
+
+                    <div class="creation-description">
+                        Create the tournament without automatically
+                        generating matches. You can manage everything
+                        yourself afterwards.
+                    </div>
+
+                </span>
+
+            </label>
+
+
+            <label class="creation-option">
+
+                <input
+                    type="radio"
+                    name="creation_mode"
+                    value="generate"
+                    checked
+                >
+
+                <span class="creation-card">
+
+                    <div class="creation-title">
+                        Generate automatically
+                    </div>
+
+                    <div class="creation-description">
+                        Let the tournament generator create the
+                        matches based on the settings you choose.
+                    </div>
+
+                </span>
+
+            </label>
+
+        </div>
+
+    </div>
+
+
+    <div class="navigation">
+
+        <button
+            type="button"
+            class="button next"
+            onclick="nextStep()"
+        >
+            Next →
+        </button>
+
+    </div>
+
+</div>

@@ -1,0 +1,197 @@
+{% extends "template.html" %}
+
+{% block style %}
+<style>
+
+    .make-container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 30px;
+    }
+
+    .make-card {
+        background: white;
+        border: 1px solid #e5e5e5;
+        border-radius: 14px;
+        padding: 30px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .make-card h1 {
+        margin-top: 0;
+        margin-bottom: 8px;
+        font-size: 28px;
+    }
+
+    .make-description {
+        color: #777;
+        margin-bottom: 30px;
+    }
+
+    .field {
+        margin-bottom: 20px;
+    }
+
+    .field label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .field input,
+    .field select {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 14px;
+        border: 1px solid #d8d8d8;
+        border-radius: 8px;
+        font-size: 15px;
+        background: white;
+    }
+
+    .field input:focus,
+    .field select:focus {
+        outline: none;
+        border-color: #2d7ff9;
+        box-shadow: 0 0 0 3px rgba(45, 127, 249, 0.1);
+    }
+
+    .help-text {
+        margin-top: 6px;
+        font-size: 13px;
+        color: #888;
+    }
+
+    .create-button {
+        width: 100%;
+        border: none;
+        border-radius: 8px;
+        padding: 14px;
+        background: #2d7ff9;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .create-button:hover {
+        background: #1f6fe5;
+    }
+
+    @media (max-width: 600px) {
+
+        .make-container {
+            margin: 20px auto;
+            padding: 15px;
+        }
+
+        .make-card {
+            padding: 20px;
+        }
+
+    }
+
+</style>
+{% endblock %}
+
+
+{% block header %}
+Create tournament
+{% endblock %}
+
+
+{% block main %}
+
+<div class="make-container">
+
+    <div class="make-card">
+
+        <h1>Create tournament</h1>
+
+        <p class="make-description">
+            Create a new tournament and configure the basic settings.
+        </p>
+
+        <form action="/make" method="POST">
+
+            <div class="field">
+
+                <label for="name">
+                    Tournament name
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="Summer Championship"
+                    required
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="visibility">
+                    Visibility
+                </label>
+
+                <select
+                    id="visibility"
+                    name="visibility"
+                >
+
+                    <option value="public">
+                        Public
+                    </option>
+
+                    <option value="private" selected>
+                        Private
+                    </option>
+
+                    <option value="unlisted">
+                        Unlisted
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="tags">
+                    Tags
+                </label>
+
+                <input
+                    type="text"
+                    id="tags"
+                    name="tags"
+                    placeholder="football, summer, youth"
+                >
+
+                <div class="help-text">
+                    Separate tags with commas.
+                </div>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="create-button"
+            >
+                Create tournament
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

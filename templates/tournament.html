@@ -1,0 +1,1490 @@
+{% extends 'template.html' %}
+
+{% block style %}
+<style>
+
+html {
+    scroll-behavior: smooth;
+}
+
+.lobby-page,
+.tournament-page {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* =========================
+   Tournament summary
+   ========================= */
+
+.tournament-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 25px;
+    padding: 18px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.tournament-summary-label {
+    color: #64748B;
+    font-weight: 600;
+}
+
+.tournament-code {
+    padding: 9px 14px;
+    color: #334155;
+    font-weight: 700;
+    background: #eee;
+    border-radius: 7px;
+}
+
+/* =========================
+   Round tabs
+   ========================= */
+
+.round-tabs {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 5px 0 12px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #ccc;
+}
+
+.round-tab {
+    flex: 0 0 auto;
+    padding: 11px 18px;
+    color: #334155;
+    text-decoration: none;
+    background: #f5f5f5;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.round-tab:hover {
+    background: #e5e5e5;
+}
+
+.round-tab.active {
+    color: white;
+    background: #2d7ff9;
+}
+
+/* =========================
+   Round content
+   ========================= */
+
+.round-content {
+    display: none;
+}
+
+.round-content.active {
+    display: block;
+    min-height: 100vh;
+}
+
+.round-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 18px;
+}
+
+.round-heading h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.round-refresh {
+    flex: 0 0 auto;
+    padding: 9px 13px;
+    color: #334155;
+    background: #f5f5f5;
+    border: 1px solid #d5d5d5;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.round-refresh:hover {
+    background: #e8e8e8;
+}
+
+.round-refresh:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.round-cache-status {
+    margin-top: -10px;
+    margin-bottom: 15px;
+    color: #64748B;
+    font-size: 13px;
+}
+
+/* =========================
+   Games
+   ========================= */
+
+.games {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.game {
+    padding: 18px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    scroll-margin-top: 30px;
+    transition:
+        box-shadow 0.3s ease,
+        transform 0.3s ease,
+        border-color 0.3s ease;
+}
+
+.game.highlighted {
+    border-color: #2d7ff9;
+    box-shadow: 0 0 0 3px rgba(45, 127, 249, 0.2);
+    transform: scale(1.01);
+}
+
+/* =========================
+   Teams
+   ========================= */
+
+.game-teams {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.team {
+    min-width: 0;
+    padding: 15px;
+    text-align: center;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.team > div {
+    overflow: hidden;
+    font-size: 17px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.team small {
+    display: block;
+    min-height: 17px;
+    margin-top: 8px;
+    color: #64748B;
+    font-size: 14px;
+}
+
+.vs {
+    color: #64748B;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* =========================
+   Game information
+   ========================= */
+
+.game-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    margin-bottom: 15px;
+    color: #64748B;
+    font-size: 14px;
+    background: #f8f8f8;
+    border-radius: 7px;
+}
+
+.game-info span {
+    min-width: 0;
+}
+
+.game-info strong {
+    color: #334155;
+}
+
+.game-info a {
+    color: #2d7ff9;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.game-info a:hover {
+    text-decoration: underline;
+}
+
+/* =========================
+   Buttons / links
+   ========================= */
+
+.edit-game,
+.make-game,
+.delete-round {
+    display: inline-block;
+    padding: 10px 14px;
+    margin-top: 5px;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.edit-game {
+    color: white;
+    background: #2d7ff9;
+}
+
+.edit-game:hover {
+    background: #1769d5;
+}
+
+.make-game {
+    color: white;
+    background: #2d7ff9;
+}
+
+.make-game:hover {
+    background: #1769d5;
+}
+
+.delete-round {
+    color: #8f2929;
+    background: #fff1f1;
+    border: 1px solid #e4aaaa;
+}
+
+.delete-round:hover {
+    background: #ffe0e0;
+}
+
+/* =========================
+   No games / loading / errors
+   ========================= */
+
+.no-games {
+    padding: 25px;
+    color: #64748B;
+    text-align: center;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.no-games.error {
+    color: #8f2929;
+    background: #fff5f5;
+    border-color: #e4aaaa;
+}
+
+/* =========================
+   Header
+   ========================= */
+
+.tournament-header-title {
+    display: inline-block;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* =========================
+   Responsive
+   ========================= */
+
+@media (min-width: 700px) {
+
+    .games {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .game-teams {
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    }
+
+    .game-info {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+}
+
+@media (max-width: 699px) {
+
+    .tournament-summary {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .round-tabs {
+        scrollbar-width: thin;
+    }
+
+    .game {
+        padding: 15px;
+    }
+
+    .round-heading {
+        align-items: flex-start;
+    }
+
+}
+
+@media (max-width: 420px) {
+
+    .round-tab {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .game {
+        padding: 12px;
+    }
+
+    .team {
+        padding: 12px;
+    }
+
+    .edit-game,
+    .make-game,
+    .delete-round {
+        width: 100%;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+    .round-heading {
+        flex-direction: column;
+    }
+
+    .round-refresh {
+        width: 100%;
+    }
+
+}
+
+</style>
+{% endblock %}
+
+
+{% block header %}
+    <span class="tournament-header-title" title="{{ tournament.name }}">
+        {{ tournament.name }}
+    </span>
+{% endblock %}
+
+
+{% block right_header %}
+
+    <a
+        class="lobbies-button"
+        href="{{ url_for('lobbies', code=tournament.code) }}"
+    >
+        Lobbies
+    </a>
+
+    <a
+        href="{{ url_for('generateSchedule', tournamentCode=tournament.code) }}"
+    >
+        Download Schedule
+    </a>
+
+    {% if 'tournament.edit' in permissions['tournaments'].get(tournament.id|string, []) %}
+        <a
+            href="{{ url_for('editTournament', tournamentId=tournament.id) }}"
+            class="round-tab active"
+        >
+            Edit tournament
+        </a>
+    {% endif %}
+
+{% endblock %}
+
+
+{% block main %}
+
+<div class="tournament-summary">
+
+    <span class="tournament-summary-label">
+        Tournament code
+    </span>
+
+    <span class="tournament-code">
+        {{ tournament.code }}
+    </span>
+
+</div>
+
+
+<div class="round-tabs">
+
+    {% if not rounds %}
+        <p class="round-tab">
+            No rounds found
+        </p>
+    {% endif %}
+
+    {% for round in rounds %}
+
+        <div
+            class="round-tab {% if loop.first %}active{% endif %}"
+            data-round="{{ round.id }}"
+        >
+            {{ round.name }}
+        </div>
+
+    {% endfor %}
+
+
+    {% if 'tournament.create_rounds' in permissions['tournaments'].get(tournament.id|string, []) %}
+
+        <a
+            href="{{ url_for('makeRound', id=tournament.id) }}"
+            class="round-tab active"
+        >
+            Make round
+        </a>
+
+    {% endif %}
+
+</div>
+
+
+<div class="round-contents">
+
+    {% for round in rounds %}
+
+        <div
+            class="round-content {% if loop.first %}active{% endif %}"
+            id="round-{{ round.id }}"
+            data-round-id="{{ round.id }}"
+        >
+
+            <div class="round-heading">
+
+                <h2>
+                    {{ round.name }}
+                </h2>
+
+                <button
+                    type="button"
+                    class="round-refresh"
+                    data-refresh-round="{{ round.id }}"
+                >
+                    ↻ Refresh
+                </button>
+
+            </div>
+
+            <div
+                class="round-cache-status"
+                id="round-status-{{ round.id }}"
+            >
+                Nog niet geladen
+            </div>
+
+
+            <div
+                class="games"
+                id="games-{{ round.id }}"
+                data-games-container="{{ round.id }}"
+            >
+                <div class="no-games">
+                    Ronde wordt geladen...
+                </div>
+            </div>
+
+
+            {% if 'tournament.create_games' in permissions['tournaments'].get(tournament.id|string, []) %}
+
+                <a
+                    href="{{ url_for('makeGame', roundId=round.id) }}"
+                    class="make-game"
+                >
+                    Make game
+                </a>
+
+            {% endif %}
+
+
+            {% if 'tournament.delete_rounds' in permissions['tournaments'].get(tournament.id|string, []) %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for('delete_round', round_id=round.id) }}"
+                    onsubmit="return confirm('Weet je zeker dat je deze ronde wilt verwijderen? Alle games in deze ronde worden ook verwijderd.');"
+                    style="display: inline;"
+                >
+
+                    <button
+                        type="submit"
+                        class="delete-round"
+                    >
+                        Delete round
+                    </button>
+
+                </form>
+
+            {% endif %}
+
+        </div>
+
+    {% endfor %}
+
+</div>
+
+
+<script>
+
+const API_BASE = "/api";
+const TOURNAMENT_CODE = {{ tournament.code|tojson }};
+
+/*
+ * Cache blijft 15 minuten geldig.
+ */
+const CACHE_TTL = 15 * 60 * 1000;
+
+/*
+ * Gebruikt om dynamisch een edit-game URL te maken.
+ *
+ * 999999999 moet een geldige waarde zijn voor je Flask route.
+ */
+const EDIT_GAME_TEMPLATE =
+    {{ url_for('edit_game', game_id=999999999)|tojson }};
+
+
+const tabs = document.querySelectorAll(".round-tab[data-round]");
+const contents = document.querySelectorAll(".round-content");
+
+
+/* =========================
+   Helpers
+   ========================= */
+
+function escapeHtml(value) {
+
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+
+function formatDate(value) {
+
+    if (!value) {
+        return "";
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return value;
+    }
+
+    return new Intl.DateTimeFormat("nl-NL", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    }).format(date);
+}
+
+
+function cacheKey(roundId) {
+
+    return (
+        "tournamenthub:" +
+        TOURNAMENT_CODE +
+        ":round:" +
+        roundId
+    );
+
+}
+
+
+function getRoundElement(roundId) {
+
+    return document.querySelector(
+        `.round-content[data-round-id="${CSS.escape(String(roundId))}"]`
+    );
+
+}
+
+
+function getGamesContainer(roundId) {
+
+    return document.querySelector(
+        `[data-games-container="${CSS.escape(String(roundId))}"]`
+    );
+
+}
+
+
+function setRoundStatus(roundId, text) {
+
+    const element = document.getElementById(
+        "round-status-" + roundId
+    );
+
+    if (element) {
+        element.textContent = text;
+    }
+
+}
+
+
+function setRefreshState(roundId, loading) {
+
+    const button = document.querySelector(
+        `.round-refresh[data-refresh-round="${CSS.escape(String(roundId))}"]`
+    );
+
+    if (!button) {
+        return;
+    }
+
+    button.disabled = loading;
+    button.textContent = loading
+        ? "Laden..."
+        : "↻ Refresh";
+
+}
+
+
+/* =========================
+   Cache
+   ========================= */
+
+function readRoundCache(roundId) {
+
+    const key = cacheKey(roundId);
+    const raw = localStorage.getItem(key);
+
+    if (!raw) {
+        return null;
+    }
+
+    try {
+
+        const cached = JSON.parse(raw);
+
+        if (
+            !cached ||
+            !cached.savedAt ||
+            !Array.isArray(cached.data)
+        ) {
+            localStorage.removeItem(key);
+            return null;
+        }
+
+        const age = Date.now() - cached.savedAt;
+
+        /*
+         * Na 15 minuten wordt de cache daadwerkelijk verwijderd.
+         */
+        if (age >= CACHE_TTL) {
+
+            localStorage.removeItem(key);
+
+            return null;
+        }
+
+        return cached;
+
+    } catch (error) {
+
+        localStorage.removeItem(key);
+
+        return null;
+    }
+
+}
+
+
+function writeRoundCache(roundId, data) {
+
+    const key = cacheKey(roundId);
+
+    localStorage.setItem(
+        key,
+        JSON.stringify({
+            savedAt: Date.now(),
+            data: data
+        })
+    );
+
+}
+
+
+function clearRoundCache(roundId) {
+
+    localStorage.removeItem(
+        cacheKey(roundId)
+    );
+
+}
+
+
+/* =========================
+   Game rendering
+   ========================= */
+
+function renderGames(roundId, games) {
+
+    const container = getGamesContainer(roundId);
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+    if (!Array.isArray(games) || games.length === 0) {
+
+        container.innerHTML = `
+            <div class="no-games">
+                No games in this round yet.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    games.forEach(game => {
+
+        const gameId = game.gameId;
+
+        const homeTeam = game.home_team || "Home team";
+        const awayTeam = game.away_team || "Away team";
+
+        const hasHomeScore =
+            game.home_score !== null &&
+            game.home_score !== undefined;
+
+        const hasAwayScore =
+            game.away_score !== null &&
+            game.away_score !== undefined;
+
+
+        const homeScoreHtml = hasHomeScore
+            ? `Score: ${escapeHtml(game.home_score)}`
+            : "";
+
+        const awayScoreHtml = hasAwayScore
+            ? `Score: ${escapeHtml(game.away_score)}`
+            : "";
+
+
+        let locationHtml = "";
+
+        if (game.name) {
+
+            const mapUrl =
+                "https://www.google.com/maps/search/?api=1&query=" +
+                encodeURIComponent(game.name);
+
+            locationHtml = `
+                <span>
+                    📍
+                    <a
+                        href="${mapUrl}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        ${escapeHtml(game.name)}
+                    </a>
+                </span>
+            `;
+
+        }
+
+
+        let editUrl = "";
+
+        {% if 'tournament.edit_games' in permissions['tournaments'].get(tournament.id|string, []) %}
+
+            editUrl = EDIT_GAME_TEMPLATE.replace(
+                "999999999",
+                String(gameId)
+            );
+
+        {% endif %}
+
+
+        const editButton = editUrl
+            ? `
+                <a
+                    href="${editUrl}"
+                    class="edit-game"
+                >
+                    Edit game
+                </a>
+            `
+            : "";
+
+
+        const gameElement = document.createElement("div");
+
+        gameElement.className = "game";
+
+        gameElement.id = "game-" + gameId;
+
+        gameElement.dataset.gameId = gameId;
+
+
+        gameElement.innerHTML = `
+
+            <div class="game-teams">
+
+                <div class="team">
+
+                    <div title="${escapeHtml(homeTeam)}">
+                        ${escapeHtml(homeTeam)}
+                    </div>
+
+                    <small>
+                        ${homeScoreHtml}
+                    </small>
+
+                </div>
+
+
+                <div class="vs">
+                    VS
+                </div>
+
+
+                <div class="team">
+
+                    <div title="${escapeHtml(awayTeam)}">
+                        ${escapeHtml(awayTeam)}
+                    </div>
+
+                    <small>
+                        ${awayScoreHtml}
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="game-info">
+
+                ${
+                    game.start_time
+                        ? `
+                            <span>
+                                ${escapeHtml(formatDate(game.start_time))}
+                            </span>
+                        `
+                        : ""
+                }
+
+
+                <span>
+                    Status:
+                    <strong>
+                        ${escapeHtml(game.status || "-")}
+                    </strong>
+                </span>
+
+
+                ${
+                    game.stadiumId !== null &&
+                    game.stadiumId !== undefined
+                        ? `
+                            <span>
+                                Stadium ID:
+                                <strong>
+                                    ${escapeHtml(game.stadiumId)}
+                                </strong>
+                            </span>
+                        `
+                        : ""
+                }
+
+
+                ${locationHtml}
+
+            </div>
+
+
+            ${editButton}
+
+        `;
+
+
+        container.appendChild(gameElement);
+
+    });
+
+}
+
+
+/* =========================
+   API
+   ========================= */
+
+async function fetchRound(roundId) {
+
+    const url =
+        API_BASE +
+        "/tournament/" +
+        encodeURIComponent(TOURNAMENT_CODE) +
+        "/round/" +
+        encodeURIComponent(roundId);
+
+
+    const response = await fetch(url, {
+        method: "GET",
+        cache: "no-store",
+        headers: {
+            "Accept": "application/json"
+        }
+    });
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            "API returned HTTP " + response.status
+        );
+
+    }
+
+
+    const data = await response.json();
+
+    if (!Array.isArray(data)) {
+
+        throw new Error(
+            "API returned geen array."
+        );
+
+    }
+
+
+    return data;
+
+}
+
+
+async function loadRound(roundId, forceRefresh = false) {
+
+    const container = getGamesContainer(roundId);
+
+    if (!container) {
+        return [];
+    }
+
+
+    setRefreshState(roundId, true);
+
+
+    try {
+
+        /*
+         * Zonder forceRefresh proberen we eerst de cache.
+         */
+        if (!forceRefresh) {
+
+            const cached = readRoundCache(roundId);
+
+            if (cached) {
+
+                renderGames(
+                    roundId,
+                    cached.data
+                );
+
+
+                const remaining =
+                    Math.max(
+                        0,
+                        CACHE_TTL -
+                        (Date.now() - cached.savedAt)
+                    );
+
+
+                const minutes =
+                    Math.ceil(
+                        remaining / 60000
+                    );
+
+
+                setRoundStatus(
+                    roundId,
+                    `Uit cache geladen — vernieuwt over ongeveer ${minutes} min.`
+                );
+
+
+                return cached.data;
+            }
+
+        }
+
+
+        /*
+         * Geen geldige cache meer:
+         * API opnieuw ophalen.
+         */
+        setRoundStatus(
+            roundId,
+            "Ronde ophalen..."
+        );
+
+
+        const data =
+            await fetchRound(roundId);
+
+
+        /*
+         * Nieuwe API-data 15 minuten opslaan.
+         */
+        writeRoundCache(
+            roundId,
+            data
+        );
+
+
+        renderGames(
+            roundId,
+            data
+        );
+
+
+        setRoundStatus(
+            roundId,
+            "Zojuist opgehaald — 15 minuten gecachet."
+        );
+
+
+        return data;
+
+    } catch (error) {
+
+        console.error(
+            "Fout bij laden ronde:",
+            roundId,
+            error
+        );
+
+
+        container.innerHTML = `
+            <div class="no-games error">
+                Kon deze ronde niet ophalen.<br>
+                ${escapeHtml(error.message)}
+            </div>
+        `;
+
+
+        setRoundStatus(
+            roundId,
+            "Ophalen mislukt."
+        );
+
+
+        return [];
+
+    } finally {
+
+        setRefreshState(
+            roundId,
+            false
+        );
+
+    }
+
+}
+
+
+/* =========================
+   Round tabs
+   ========================= */
+
+async function activateRound(roundId, loadData = true) {
+
+    if (!roundId) {
+        return;
+    }
+
+
+    tabs.forEach(tab => {
+
+        tab.classList.remove("active");
+
+    });
+
+
+    contents.forEach(content => {
+
+        content.classList.remove("active");
+
+    });
+
+
+    const selectedTab = document.querySelector(
+        `.round-tab[data-round="${CSS.escape(String(roundId))}"]`
+    );
+
+
+    const selectedContent = document.getElementById(
+        "round-" + roundId
+    );
+
+
+    if (selectedTab) {
+
+        selectedTab.classList.add("active");
+
+    }
+
+
+    if (selectedContent) {
+
+        selectedContent.classList.add("active");
+
+    }
+
+
+    if (loadData) {
+
+        await loadRound(
+            roundId,
+            false
+        );
+
+    }
+
+}
+
+
+tabs.forEach(tab => {
+
+    tab.addEventListener("click", async () => {
+
+        const roundId = tab.dataset.round;
+
+        if (!roundId) {
+            return;
+        }
+
+
+        document
+            .querySelectorAll(".game.highlighted")
+            .forEach(game => {
+                game.classList.remove("highlighted");
+            });
+
+
+        await activateRound(
+            roundId,
+            true
+        );
+
+    });
+
+});
+
+
+/* =========================
+   Refresh buttons
+   ========================= */
+
+document
+    .querySelectorAll(".round-refresh")
+    .forEach(button => {
+
+        button.addEventListener("click", async event => {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+
+            const roundId =
+                button.dataset.refreshRound;
+
+
+            if (!roundId) {
+                return;
+            }
+
+
+            /*
+             * Bij handmatige refresh wordt de
+             * bestaande cache direct verwijderd.
+             */
+            clearRoundCache(roundId);
+
+
+            await loadRound(
+                roundId,
+                true
+            );
+
+
+            /*
+             * Als er een game-hash is, probeer de
+             * highlight opnieuw toe te passen.
+             */
+            await openGameFromHash();
+
+        });
+
+    });
+
+
+/* =========================
+   Hash / game openen
+   ========================= */
+
+function getGameIdFromHash() {
+
+    const hash = window.location.hash;
+
+    if (!hash) {
+        return null;
+    }
+
+
+    const value =
+        decodeURIComponent(
+            hash.substring(1)
+        );
+
+
+    return value || null;
+
+}
+
+
+function findGame(gameId) {
+
+    if (!gameId) {
+        return null;
+    }
+
+
+    return document.querySelector(
+        `.game[data-game-id="${CSS.escape(String(gameId))}"]`
+    );
+
+}
+
+
+function getRoundIdForGame(game) {
+
+    if (!game) {
+        return null;
+    }
+
+
+    const roundContent =
+        game.closest(".round-content");
+
+
+    if (!roundContent) {
+        return null;
+    }
+
+
+    return roundContent.dataset.roundId;
+
+}
+
+
+async function highlightGame(game) {
+
+    if (!game) {
+        return;
+    }
+
+
+    const roundId =
+        getRoundIdForGame(game);
+
+
+    if (!roundId) {
+        return;
+    }
+
+
+    await activateRound(
+        roundId,
+        false
+    );
+
+
+    document
+        .querySelectorAll(".game.highlighted")
+        .forEach(item => {
+            item.classList.remove("highlighted");
+        });
+
+
+    game.classList.add("highlighted");
+
+
+    setTimeout(() => {
+
+        game.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+    }, 50);
+
+}
+
+
+async function openGameFromHash() {
+
+    const gameId =
+        getGameIdFromHash();
+
+
+    if (!gameId) {
+        return;
+    }
+
+
+    /*
+     * Eerst kijken of hij al geladen is.
+     */
+    let game =
+        findGame(gameId);
+
+
+    if (game) {
+
+        await highlightGame(game);
+
+        return;
+
+    }
+
+
+    /*
+     * Staat de game nog niet in de DOM?
+     * Dan laden we de rondes één voor één.
+     *
+     * Hierbij wordt nog steeds de 15-minuten-cache
+     * gebruikt.
+     */
+    for (const content of contents) {
+
+        const roundId =
+            content.dataset.roundId;
+
+
+        if (!roundId) {
+            continue;
+        }
+
+
+        await loadRound(
+            roundId,
+            false
+        );
+
+
+        game =
+            findGame(gameId);
+
+
+        if (game) {
+
+            await highlightGame(game);
+
+            return;
+
+        }
+
+    }
+
+}
+
+
+/* =========================
+   Initialiseren
+   ========================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
+
+        const firstRound =
+            contents[0]?.dataset.roundId;
+
+
+        if (firstRound) {
+
+            await activateRound(
+                firstRound,
+                true
+            );
+
+        }
+
+
+        await openGameFromHash();
+
+    }
+);
+
+
+/* =========================
+   Hash verandert
+   ========================= */
+
+window.addEventListener(
+    "hashchange",
+    async () => {
+
+        await openGameFromHash();
+
+    }
+);
+
+</script>
+
+{% endblock %}

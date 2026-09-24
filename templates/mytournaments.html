@@ -1,0 +1,121 @@
+
+{% extends 'template.html' %}
+
+{% block header %}
+    My Tournaments
+{% endblock %}
+
+{% block style %}
+<style>
+
+    .tournaments {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .tournament {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        box-shadow: var(--shadow);
+    }
+
+    .tournament h2 {
+        margin-bottom: 15px;
+    }
+
+    .tournament p {
+        margin: 7px 0;
+        color: var(--text-light);
+    }
+
+    .tournament strong {
+        color: var(--text);
+    }
+
+    .verified {
+        color: green;
+        font-weight: 600;
+    }
+
+    .not-verified {
+        color: orange;
+        font-weight: 600;
+    }
+
+    .delete-button {
+        margin-top: 15px;
+        padding: 10px 14px;
+        border: 0;
+        border-radius: 6px;
+        background: #dc3545;
+        color: white;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .delete-button:hover {
+        background: #bb2d3b;
+    }
+
+</style>
+{% endblock %}
+
+{% block main %}
+
+<div class="tournaments">
+
+    {% for tournament in tournaments %}
+
+        <div class="tournament">
+
+            <h2>{{ tournament.name }}</h2>
+
+            <p>
+                <strong>ID:</strong>
+                #{{ tournament.id }}
+            </p>
+
+            <p>
+                <strong>Code:</strong>
+                <a href="{{ url_for('tournament', code=tournament.code ) }}">{{ tournament.code }}</a>
+            </p>
+
+            <p>
+                <strong>Visibility:</strong>
+                {{ tournament.visibility }}
+            </p>
+
+            <p>
+                <strong>Created:</strong>
+                {{ tournament.created_at.strftime('%d-%m-%Y %H:%M') }}
+            </p>
+
+            <p>
+                <strong>Verified:</strong>
+
+                {% if tournament.verified %}
+                    <span class="verified">Yes ✓</span>
+                {% else %}
+                    <span class="not-verified">No</span>
+                {% endif %}
+
+            </p>
+            <a href="{{ url_for('editTournament', tournamentId= tournament.id ) }}">Edit Tournament</a>
+            <form
+                method="POST"
+                action="{{ url_for('delete_tournament', tournament_id=tournament.id) }}"
+                onsubmit="return confirm('Weet je zeker dat je dit toernooi wilt verwijderen?');"
+            >
+                <button type="submit" class="delete-button">Delete tournament</button>
+            </form>
+        </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}
+```
