@@ -20,6 +20,10 @@
     color: #1F2937;
 }
 
+.btn-secondary {
+    background-color: #e5e5e5;
+}
+
 .btn-danger{
     background-color: #0065fc;
     color: white;
