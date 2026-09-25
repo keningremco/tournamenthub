@@ -11,15 +11,6 @@ jobs:
       name: production
 
     steps:
-      - name: Check HOST
-        env:
-          DEPLOY_HOST: ${{ secrets.HOST }}
-        run: |
-          if [ -z "$DEPLOY_HOST" ]; then
-            echo "HOST is leeg"
-          else
-            echo "HOST is ingesteld"
-          fi
       - name: Deploy application
         uses: appleboy/ssh-action@v1
         with:
@@ -29,7 +20,8 @@ jobs:
 
           script: |
             cd "${{ secrets.APPLICATION_PATH }}"
-
+            source venv/bin/activate
+            python -m pip install -r requirements.txt
             # Update application
             git pull origin main
 
