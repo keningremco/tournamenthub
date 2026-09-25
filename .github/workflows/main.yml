@@ -20,10 +20,10 @@ jobs:
             cd "${{ secrets.APPLICATION_PATH }}"
 
             # Update application
-            git pull origin "${{ secrets.DEPLOY_BRANCH }}"
+            git pull origin main
 
             # Run database migrations
-            ./migrate.sh
+            python scripts/migrate.py
 
             # Restart application service
-            sudo systemctl restart application.service
+            sudo systemctl restart tournamenthub
