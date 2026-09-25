@@ -11,8 +11,10 @@ jobs:
 
     steps:
       - name: Check HOST
+        env:
+          DEPLOY_HOST: ${{ secrets.HOST }}
         run: |
-          if [ -z "${{ secrets.HOST }}" ]; then
+          if [ -z "$DEPLOY_HOST" ]; then
             echo "HOST is leeg"
             exit 1
           else
