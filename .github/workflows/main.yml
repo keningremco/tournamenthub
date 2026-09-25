@@ -1,9 +1,11 @@
+```yaml
 name: Application Deployment
 
 on:
   push:
     branches:
       - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -19,14 +21,45 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
 
           script: |
+            set -e
+
+            echo "======================================"
+            echo "Starting deployment"
+            echo "======================================"
+
+            echo "[1/7] Checking application directory..."
             cd "${{ secrets.APPLICATION_PATH }}"
-            source venv/bin/activate
-            python -m pip install -r requirements.txt
-            # Update application
+            echo "Application directory exists"
+
+            echo "[2/7] Checking Git status..."
+            git config --global --add safe.directory "${{ secrets.APPLICATION_PATH }}"
+            git status --short
+
+            echo "[3/7] Updating application..."
             git pull origin main
+            echo "Git update completed"
 
-            # Run database migrations
+            echo "[4/7] Activating Python virtual environment..."
+            source venv/bin/activate
+            echo "Python: $(which python)"
+            python --version
+
+            echo "[5/7] Installing Python dependencies..."
+            python -m pip install -r requirements.txt
+            echo "Dependencies installed"
+
+            echo "[6/7] Running database migrations..."
             python scripts/migrate.py
+            echo "Database migrations completed"
 
-            # Restart application service
-            sudo systemctl restart tournamenthub
+            echo "[7/7] Restarting application..."
+            sudo -n systemctl restart tournamenthub
+
+            echo "Checking service status..."
+            systemctl is-active --quiet tournamenthub
+            echo "Service is running"
+
+            echo "======================================"
+            echo "Deployment completed successfully"
+            echo "======================================"
+```
