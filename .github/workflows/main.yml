@@ -9,6 +9,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check HOST
+        run: |
+          if [ -z "${{ secrets.HOST }}" ]; then
+            echo "HOST is leeg"
+            exit 1
+          else
+            echo "HOST is ingesteld"
+          fi
       - name: Deploy application
         uses: appleboy/ssh-action@v1
         with:
