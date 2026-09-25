@@ -2,6 +2,7 @@
     border-radius: 8px;
     cursor: pointer;
     padding: 12px 20px;
+    white-space: nowrap;
 }
 
 .btn-primary {
