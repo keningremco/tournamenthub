@@ -1,11 +1,11 @@
-#!/usr/bin/env python3
-
 import sys
 from pathlib import Path
 
-from dotenv import load_dotenv
+BASE_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(BASE_DIR))
 
-load_dotenv()
+from dotenv import load_dotenv
+load_dotenv(BASE_DIR / ".env")
 
 from db.connection import get_db_connection
 
