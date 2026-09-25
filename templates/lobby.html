@@ -758,7 +758,7 @@ html {
         {% for round in rounds %}
 
             <div
-                class="round-tab {% if loop.first %}active{% endif %}"
+                class="btn {% if loop.first %}.btn-primary{% else %} btn-secondary {% endif %}"
                 data-round="{{ round.id }}"
             >
                 {{ round.name }}
