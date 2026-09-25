@@ -1,0 +1,29 @@
+name: Application Deployment
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy application
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+
+          script: |
+            cd "${{ secrets.APPLICATION_PATH }}"
+
+            # Update application
+            git pull origin "${{ secrets.DEPLOY_BRANCH }}"
+
+            # Run database migrations
+            ./migrate.sh
+
+            # Restart application service
+            sudo systemctl restart application.service
