@@ -758,7 +758,7 @@ html {
         {% for round in rounds %}
 
             <div
-                class="btn {% if loop.first %}.btn-primary{% else %} btn-secondary {% endif %}"
+                class="btn {% if loop.first %}btn-primary{% else %} btn-secondary {% endif %}"
                 data-round="{{ round.id }}"
             >
                 {{ round.name }}
@@ -1086,7 +1086,7 @@ html {
     </script>
     <script>
 
-        const tabs = document.querySelectorAll(".round-tab");
+        const tabs = document.querySelectorAll(".btn");
 
         const contents = document.querySelectorAll(
             ".round-content"
