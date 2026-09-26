@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block style %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/button.css') }}">
 <style>
     .lobby-page {
         max-width: 1000px;
@@ -56,17 +57,14 @@
         font-weight: 600;
     }
 
-    .lobby-box input,
-    .lobby-box button {
+    .lobby-box input{
         width: 100%;
         box-sizing: border-box;
         padding: 10px;
         font-size: 16px;
     }
 
-    .lobby-box button {
-        cursor: pointer;
-    }
+
 
     .checkbox-row {
         display: flex;
@@ -100,10 +98,7 @@
         width: 100%;
     }
 
-    .public-search-row button {
-        width: auto;
-        white-space: nowrap;
-    }
+
 
     .public-results {
         display: flex;
@@ -136,10 +131,6 @@
         flex-shrink: 0;
     }
 
-    .public-lobby-result button {
-        width: auto;
-        white-space: nowrap;
-    }
 
     .result-message {
         padding: 12px;
@@ -247,10 +238,7 @@
             flex-direction: column;
         }
 
-        .public-search-row button,
-        .public-lobby-result button {
-            width: 100%;
-        }
+
     }
 </style>
 {% endblock %}
@@ -300,7 +288,7 @@
                     >
                 </div>
 
-                <button type="submit">Join lobby</button>
+                <button type="submit" class="btn btn-primary">Join lobby</button>
             </form>
         </section>
 
@@ -361,7 +349,7 @@
                     >
                 </div>
 
-                <button type="submit">Create lobby</button>
+                <button type="submit" class="btn btn-primary">Create lobby</button>
             </form>
         </section>
 
@@ -381,7 +369,7 @@
                     autocomplete="off"
                 >
 
-                <button type="button" id="findPublicLobbies">
+                <button type="button" id="findPublicLobbies" class="'btn btn-primary">
                     Find lobbies
                 </button>
             </div>
