@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block style %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/button.css') }}">
 <style>
     .home-page {
         max-width: 1000px;
@@ -35,32 +36,6 @@
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
-    }
-
-    .button-link {
-        display: inline-block;
-        padding: 10px;
-        color: inherit;
-        font-size: 16px;
-        text-decoration: none;
-        background: #eee;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        transition: background .2s;
-    }
-
-    .button-link:hover {
-        background: #e2e2e2;
-    }
-
-    .button-link.primary {
-        color: white;
-        background: #334155;
-        border-color: #334155;
-    }
-
-    .button-link.primary:hover {
-        background: #1F2937;
     }
 
     .section-title {
@@ -137,10 +112,6 @@
             flex-direction: column;
         }
 
-        .button-link {
-            width: 100%;
-            text-align: center;
-        }
     }
 </style>
 {% endblock %}
@@ -157,24 +128,24 @@
         </p>
 
         <div class="hero-actions">
-            <a class="button-link primary" href="{{ url_for('tournaments') }}">
+            <a class="btn btn-primary" href="{{ url_for('tournaments') }}">
                 Explore tournaments
             </a>
 
             {% if userid %}
-                <a class="button-link" href="/lobbies">
+                <a class="btn btn-secondary" href="/lobbies">
                     My lobbies
                 </a>
 
-                <a class="button-link" href="{{ url_for('make') }}">
+                <a class="btn btn-secondary" href="{{ url_for('make') }}">
                     Create tournament
                 </a>
             {% else %}
-                <a class="button-link" href="{{ url_for('login') }}">
+                <a class="btn btn-secondary" href="{{ url_for('login') }}">
                     Login
                 </a>
 
-                <a class="button-link" href="{{ url_for('signup') }}">
+                <a class="btn btn-secondary" href="{{ url_for('signup') }}">
                     Create account
                 </a>
             {% endif %}
@@ -225,7 +196,7 @@
                 Browse a tournament, create your own tournament or join a lobby.
             </p>
 
-            <a class="button-link primary" href="{{ url_for('tournaments') }}">
+            <a class="btn btn-primary" href="{{ url_for('tournaments') }}">
                 Go to tournaments
             </a>
         {% else %}
@@ -235,7 +206,7 @@
                 Create a free account to manage tournaments and join prediction lobbies.
             </p>
 
-            <a class="button-link primary" href="{{ url_for('signup') }}">
+            <a class="btn btn-primary" href="{{ url_for('signup') }}">
                 Create account
             </a>
         {% endif %}
