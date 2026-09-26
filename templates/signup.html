@@ -5,7 +5,7 @@ Sign Up
 {% endblock %}
 
 {% block style %}
-
+<link rel="stylesheet" href="{{ url_for('static', filename='css/button.css') }}">
 <style>
     .signup-form {
         max-width: 450px;
@@ -44,15 +44,6 @@ Sign Up
     .form-group input:focus {
         outline: none;
         border-color: #555;
-    }
-
-    .signup-form button {
-        width: 100%;
-        padding: 10px 0;
-        border: none;
-        cursor: pointer;
-        font-size: 16px;
-        margin-top: 5px;
     }
 
     .signup-error {
@@ -124,7 +115,7 @@ Sign Up
         <p class="signup-error">{{ error }}</p>
     {% endif %}
 
-    <button class="button-link primary" type="submit">
+    <button class="btn btn-primary" type="submit">
         Create account
     </button>
 

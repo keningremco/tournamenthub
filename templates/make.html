@@ -1,6 +1,7 @@
 {% extends "template.html" %}
 
 {% block style %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/button.css') }}">
 <style>
 
     .make-container {
@@ -61,23 +62,6 @@
         margin-top: 6px;
         font-size: 13px;
         color: #888;
-    }
-
-    .create-button {
-        width: 100%;
-        border: none;
-        border-radius: 8px;
-        padding: 14px;
-        background: #2d7ff9;
-        color: white;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: 0.2s;
-    }
-
-    .create-button:hover {
-        background: #1f6fe5;
     }
 
     @media (max-width: 600px) {
@@ -183,7 +167,7 @@ Create tournament
 
             <button
                 type="submit"
-                class="create-button"
+                class="btn btn-primary"
             >
                 Create tournament
             </button>
