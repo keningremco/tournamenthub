@@ -1,9 +1,10 @@
 .btn {
     border-radius: 6px;
     cursor: pointer;
-    padding: 12px 20px;
+    padding: 10px;
     white-space: nowrap;
     border: 1px solid #ccc;
+    text-decoration: none;
 }
 
 .btn-primary {
