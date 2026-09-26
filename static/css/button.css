@@ -1,18 +1,19 @@
 .btn {
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
     padding: 12px 20px;
     white-space: nowrap;
+    border: 1px solid #ccc;
 }
 
 .btn-primary {
-    background-color: #2d7ff9;
+    background-color: #334155;
     color: white;
+    border-color: #334155;
 }
 
 .btn-primary:hover {
-    background-color: #0065fc;
-    color: white;
+    background-color: #eee;
 }
 
 .btn-secondary{
