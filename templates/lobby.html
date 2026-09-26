@@ -1094,32 +1094,19 @@ html {
 
 
         function openRound(roundId) {
-
             tabs.forEach(tab => {
+                const isActive = tab.dataset.round === String(roundId);
 
-                tab.classList.toggle(
-
-                    "active",
-
-                    tab.dataset.round === String(roundId)
-
-                );
-
+                tab.classList.toggle("btn-primary", isActive);
+                tab.classList.toggle("btn-secondary", !isActive);
             });
-
 
             contents.forEach(content => {
-
                 content.classList.toggle(
-
                     "active",
-
                     content.id === "round-" + roundId
-
                 );
-
             });
-
         }
 
 
