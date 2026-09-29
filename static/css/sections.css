@@ -1,5 +1,5 @@
 .main {
-    width: min(80vw, 1200px);
+    width: clamp(300px,80vw, 1200px);
     margin-inline: auto;
 
     display: flex;
@@ -10,35 +10,4 @@
 .section {
     width: 100%;
     padding: clamp(1rem, 2vw, 2rem);
-}
-
-.games {
-    width: min(100%, 1000px);
-
-    display: flex;
-    flex-wrap: wrap;
-
-    gap: clamp(12px, 2vw, 20px);
-}
-
-.card {
-    flex: 0 0 calc((100% - 40px) / 3);
-
-    padding: clamp(1rem, 2vw, 1.5rem);
-}
-
-@media (max-width: 800px) {
-
-    .card {
-        flex-basis: calc((100% - 20px) / 2);
-    }
-
-}
-
-@media (max-width: 550px) {
-
-    .card {
-        flex-basis: 100%;
-    }
-
 }

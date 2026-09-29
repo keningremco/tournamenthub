@@ -651,91 +651,7 @@ html {
 
 
     <section>
-
-        {% if leaderboard %}
-
-            <div class="scoreboard-container">
-
-
-                <div class="scoreboard-header">
-
-                    <h2>
-                        Leaderboard
-                    </h2>
-
-
-                    <button
-                        type="button"
-                        id="refreshLeaderboard"
-                        class="refresh-button"
-                        style="display: none;"
-                    >
-                        Refresh
-                    </button>
-
-                </div>
-
-
-                <div
-                    class="scoreboard"
-                    id="scoreboard"
-                >
-
-                    {% for player in leaderboard %}
-
-                        <div class="scoreboard-player">
-
-                            <div class="rank">
-                                {{ loop.index }}
-                            </div>
-
-
-                            <div class="player-name">
-                                {{ player.username }}
-                            </div>
-
-
-                            <div class="player-points normal-points">
-                                {{ player.points }} pts
-                            </div>
-
-                            <div class="player-points bonus-points">
-                                +{{ player.bonus_points }} bonus pts
-                            </div>
-
-                            <div class="player-points total-points">
-                                = {{ player.totaal_points }} totaal pts
-                            </div>
-
-                            <div class="player-points compact-points">
-                                {{ player.points }} + {{ player.bonus_points }} = {{ player.totaal_points }}
-                            </div>
-                        </div>
-
-                    {% endfor %}
-
-                </div>
-
-
-                <div
-                    id="leaderboard-loading"
-                    class="leaderboard-loading"
-                    style="display:none;"
-                >
-                    Loading...
-                </div>
-
-
-            </div>
-
-        {% else %}
-
-            <div class="no-games">
-                There are no players in this lobby yet.
-            </div>
-
-        {% endif %}
-
+        {% include 'components.leaderboard.html' %}
     </section>
 
 
@@ -1418,5 +1334,5 @@ html {
 
 
 </div>
-
+<script src="{{ url_for('static', filename='js/leaderboard.js' ) }}"></script>
 {% endblock %}
