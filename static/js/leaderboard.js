@@ -6,6 +6,6 @@ const data = await response.json();
 
 console.log(data)
 
-data.array.forEach(player => {
+data.forEach(player => {
     console.log(player)
 });
