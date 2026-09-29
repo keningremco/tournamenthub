@@ -1,12 +1,77 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+
+    background: #111827;
+    color: #ffffff;
+
+    font-family: Arial, sans-serif;
+}
+
 .main {
-    width: clamp(350px,80vw,1200px);
+    width: min(80vw, 1200px);
+    margin-inline: auto;
+
     display: flex;
-    justify-content: center;
     flex-direction: column;
+    gap: clamp(1rem, 3vw, 2rem);
 }
 
 .section {
     width: 100%;
-    box-sizing: border-box;
     padding: clamp(1rem, 2vw, 2rem);
+
+    border-radius: 8px;
+
+    background: #1f2937;
 }
+.games {
+    width: min(100%, 1000px);
+    margin-inline: auto;
+
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: clamp(12px, 2vw, 20px);
+}
+
+.card {
+    flex: 0 0 calc((100% - 40px) / 3);
+
+    padding: clamp(1rem, 2vw, 1.5rem);
+
+    background: #374151;
+
+    border-radius: 8px;
+}
+
+.card h2 {
+    margin: 0 0 0.5rem;
+}
+
+.card p {
+    margin: 0;
+
+    color: #9ca3af;
+}
+
+@media (max-width: 800px) {
+
+    .card {
+        flex-basis: calc((100% - 20px) / 2);
+    }
+
+}
+
+@media (max-width: 550px) {
+
+    .card {
+        flex-basis: 100%;
+    }
+
+}
+    
