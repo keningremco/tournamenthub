@@ -75,10 +75,15 @@
 @media (max-width: 700px) {
     .game-card {
         grid-template-areas:
-            "home score"
+            "home"
             "away"
             "info";
     }
+
+    .score{
+        display: none;
+    }
+
     .home,
     .away{
         display: grid;
