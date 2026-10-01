@@ -1,11 +1,10 @@
 .round {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-wrap: wrap;
     gap: 16px;
 }
 
-@media (min-width: 700px) {
-    .round {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+.round > * {
+    flex: 1 1 calc(33.333% - 16px);
+    min-width: 300px;
 }
