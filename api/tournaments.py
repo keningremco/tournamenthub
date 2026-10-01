@@ -59,7 +59,7 @@ def get_rounds(tournamentcode):
                                 ),
                     'location', stadiums.name,
                     'status', games.status,
-                    'start-date', game.start_time
+                    'start-date', games.start_time
 
                 )
             )
