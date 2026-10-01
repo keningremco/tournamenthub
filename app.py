@@ -1931,37 +1931,9 @@ def admin():
 
 @app.route("/test-round")
 def test_round():
-    games = [
-        {
-            "home_team": "Team A",
-            "away_team": "Team B",
-            "home_score": 2,
-            "away_score": 1,
-            "start-date": "19:00",
-            "status": "Finished",
-            "location": "Veld 1",
-        },
-        {
-            "home_team": "Team C",
-            "away_team": "Team D",
-            "home_score": 0,
-            "away_score": 0,
-            "start-date": "20:00",
-            "status": "Live",
-            "location": "Veld 2",
-        },
-        {
-            "home_team": "Team E",
-            "away_team": "Team F",
-            "home_score": 3,
-            "away_score": 2,
-            "start-date": "21:00",
-            "status": "Scheduled",
-            "location": "Veld 3",
-        },
-    ]
+    rounds = get_rounds('1RG5CRKF')
 
-    return render_template("components/round.html", games=games)
+    return render_template("components/rounds.html", rounds=rounds)
 
 if __name__ == "__main__":
     build_style_css()

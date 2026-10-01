@@ -1,5 +1,5 @@
 {% from 'components/round.html' import round %}
 
-{% for round in rounds %}
-    {{ round(games) }}
+{% for round_var in rounds %}
+    {{ round(round_var.games) }}
 {% endfor %}
