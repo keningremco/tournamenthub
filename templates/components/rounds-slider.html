@@ -1,0 +1,14 @@
+
+{% macro draw_rounds_slider(rounds) %}
+    {% for round in rounds %}
+
+        <button
+            type="button"
+            class="btn {% if loop.first %}btn-primary{% else %}btn-secondary{% endif %}"
+            data-round="{{ round.id }}"
+        >
+            {{ round.name }}
+        </button>
+
+    {% endfor %}
+{% endmacro %}
