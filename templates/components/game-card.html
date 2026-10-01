@@ -14,18 +14,20 @@
     </div>
 
     <div class="game-info">
-        {% if game.start-date %}
+        {% if game["start-date"] %}
             <div class="start-date">
-                {{ game.start-date }}
+                {{ game["start-date"] }}
             </div>
         {% endif %}
+
         {% if game.status %}
-            <div class="start-date">
+            <div class="status">
                 {{ game.status }}
             </div>
         {% endif %}
+
         {% if game.location %}
-            <div class="start-date">
+            <div class="location">
                 {{ game.location }}
             </div>
         {% endif %}
