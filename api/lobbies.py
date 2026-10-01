@@ -496,7 +496,6 @@ def api_get_lobby_leaderboard(code=None, id=None):
     db, cursor = get_db_connection()
     
     leaderboard, status, error_code = get_lobby_leaderboard(lobbyId=id, lobbyCode=code, cursor=cursor)
-    print(code)
 
     cursor.close()
     db.close()

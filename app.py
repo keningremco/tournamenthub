@@ -226,7 +226,6 @@ def togglefeatured(tag):
     if not can_user(userid, 'site.manage_tags', site=True):
         flash("Je hebt geen toestemming om een tag featured te maken.", "error")
         return redirect(request.referrer or abort(403))
-    print('hoi')
     db, cursor = get_db_connection()
     try:
         
