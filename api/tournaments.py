@@ -13,7 +13,7 @@ def get_round(tournamentcode, roundnumber):
     return games
 
 @api.route('/tournament/<tournamentcode>/rounds')
-def get_round(tournamentcode, roundnumber):
+def get_rounds(tournamentcode, roundnumber):
     db, cursor = get_db_connection()
 
     cursor.execute("""
