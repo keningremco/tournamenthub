@@ -1,115 +1,162 @@
+```css
 .round {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: var(--section-gap);
 }
+
+
+/* =========================
+   Game card
+   ========================= */
 
 .game-card {
     min-width: 0;
-    padding: 18px;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+    padding: var(--card-padding);
+
+    background: var(--card-background-color);
+    border: var(--card-border);
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--card-shadow);
 
     transition:
-        box-shadow .2s ease,
-        transform .2s ease,
-        border-color .2s ease;
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal),
+        border-color var(--transition-normal);
 }
 
 .game-card:hover {
-    border-color: #c9d8ea;
-    box-shadow: 0 8px 25px rgba(31, 41, 55, .08);
+    border-color: var(--border-color-hover);
+    box-shadow: var(--card-shadow-hover);
     transform: translateY(-1px);
 }
 
 
-/* Teams + score */
+/* =========================
+   Teams
+   ========================= */
 
 .game-teams {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    gap: 12px;
+
+    gap: var(--spacing-medium);
     align-items: center;
 }
 
 .game-team {
     display: flex;
     min-width: 0;
+
     align-items: center;
-    gap: 10px;
+    gap: var(--spacing-small);
 }
 
 .game-team:last-child {
     justify-content: flex-end;
 }
 
+
+/* =========================
+   Team name
+   ========================= */
+
 .team-name {
     min-width: 0;
+
     overflow: hidden;
 
-    font-size: 16px;
-    font-weight: 650;
+    color: var(--color-text);
+    font-size: var(--font-size-normal);
+    font-weight: var(--font-weight-semibold);
+
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+
+/* =========================
+   Team score
+   ========================= */
 
 .team-score {
     flex: 0 0 auto;
 
     min-width: 30px;
-    padding: 5px 8px;
+    padding: 5px var(--spacing-small);
 
-    color: var(--text);
-    font-size: 17px;
-    font-weight: 750;
+    color: var(--color-text);
+    font-size: var(--font-size-large);
+    font-weight: var(--font-weight-bold);
     text-align: center;
 
-    background: #f1f5f9;
-    border-radius: 7px;
+    background: var(--color-surface-hover);
+    border-radius: var(--border-radius);
 }
+
+
+/* =========================
+   Score separator
+   ========================= */
 
 .game-score {
-    color: var(--text-light);
-    font-size: 16px;
-    font-weight: 700;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-normal);
+    font-weight: var(--font-weight-bold);
 }
 
 
-/* Game informatie */
+/* =========================
+   Game info
+   ========================= */
 
 .game-info {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px 16px;
 
-    margin-top: 16px;
-    padding-top: 12px;
+    gap: var(--spacing-small) var(--spacing-large);
 
-    color: var(--text-light);
-    font-size: 13px;
+    margin-top: var(--spacing-large);
+    padding-top: var(--spacing-medium);
 
-    border-top: 1px solid var(--border);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-small);
+
+    border-top: var(--card-border);
 }
 
 .game-info span {
     min-width: 0;
 }
 
+
+/* =========================
+   Status
+   ========================= */
+
 .game-status {
-    font-weight: 650;
-    color: var(--primary);
+    color: var(--color-primary);
+    font-weight: var(--font-weight-semibold);
 }
 
+
+/* =========================
+   Location
+   ========================= */
+
 .game-location {
+    min-width: 0;
+
     overflow: hidden;
+
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 
-/* 2 kolommen */
+/* =========================
+   Tablet
+   ========================= */
 
 @media (min-width: 700px) {
     .round {
@@ -118,7 +165,9 @@
 }
 
 
-/* 3 kolommen */
+/* =========================
+   Desktop
+   ========================= */
 
 @media (min-width: 1100px) {
     .round {
@@ -127,15 +176,17 @@
 }
 
 
-/* Klein scherm */
+/* =========================
+   Mobile
+   ========================= */
 
 @media (max-width: 500px) {
     .game-card {
-        padding: 15px;
+        padding: var(--spacing-medium);
     }
 
     .game-teams {
-        gap: 8px;
+        gap: var(--spacing-small);
     }
 
     .team-name {
@@ -145,6 +196,7 @@
     .team-score {
         min-width: 27px;
         padding: 4px 6px;
-        font-size: 16px;
+        font-size: var(--font-size-normal);
     }
 }
+```
