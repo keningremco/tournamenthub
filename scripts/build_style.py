@@ -23,7 +23,7 @@ def build_style_css():
     2. Alle overige .css bestanden
     3. style.css wordt nooit als bron gebruikt
     """
-
+    print('doet iets')
     CSS_DIR.mkdir(parents=True, exist_ok=True)
 
     # Alle CSS-bestanden ophalen behalve style.css
