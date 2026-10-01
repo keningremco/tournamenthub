@@ -1,4 +1,6 @@
-{% do register_script("Leaderboard", type='module') %}
+{% set ns.scripts = ns.scripts + [
+    {"name": "Leaderboard", "type": "module"}
+] %}
 
 <div class="scoreboard-container">
     <h2>Leaderboard</h2>

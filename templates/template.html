@@ -1,3 +1,4 @@
+{% set ns = namespace(scripts=[]) %}
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -555,12 +556,12 @@
     {% block script %}
         
     {% endblock %}
-    {% for script in registered_scripts %}
-    <script
-        {% if script.type %}type="{{ script.type }}"{% endif %}
-        src="{{ url_for('static', filename=script.src) }}"
-    ></script>
-    <!-- hoi -->
+    {% for script in ns.scripts %}
+        <script
+            {% if script.type %}type="{{ script.type }}"{% endif %}
+            src="{{ url_for('static', filename='js/' ~ script.name ~ '.js') }}"
+        ></script>
+        <!-- hoi -->
     {% endfor %}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6784101204913368"
      crossorigin="anonymous"></script>
