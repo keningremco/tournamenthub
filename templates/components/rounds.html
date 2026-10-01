@@ -1,0 +1,5 @@
+{% from 'components/round.html' import round %}
+
+{% for round in rounds %}
+    {{ round(games) }}
+{% endfor %}
