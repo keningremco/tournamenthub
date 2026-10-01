@@ -7,6 +7,9 @@
     margin-bottom: 25px;
     overflow-x: auto;
     scrollbar-width: thin;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .slider-tabs-list {
