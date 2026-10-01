@@ -4,7 +4,9 @@
     gap: 16px;
 }
 
-
+.section-round{
+    scroll-margin-top: 120px;
+}
 
 @media (min-width: 1200px) {
     .round {
