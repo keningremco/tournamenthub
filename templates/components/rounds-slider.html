@@ -10,6 +10,16 @@
                     {{ round.name }}
                 </a>
             {% endfor %}
+            {% if 'tournament.create_rounds' in permissions['tournaments'].get(tournament.id|string, []) %}
+
+                <a
+                    href="{{ url_for('makeRound', id=tournament.id) }}"
+                    class="btn btn-primary"
+                >
+                    Make round
+                </a>
+
+            {% endif %}
         </div>
     </div>
 {% endmacro %}
