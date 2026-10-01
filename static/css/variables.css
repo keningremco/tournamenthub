@@ -17,4 +17,20 @@
     --spacing-small: 8px;
     --spacing-medium: 12px;
     --spacing-large: 20px;
+
+    /* cards */
+    --card-padding: 16px;
+    --card-border: 1px solid #ccc;
+    --card-border-radius: 8px;
+    --card-background-color: white;
+
+    /* section */
+    --section-width: 100%;
+    --section-padding: clamp(1rem, 2vw, 2rem);
+
+    /*  */
+
+    /*  */
+
+    /*  */
 }
