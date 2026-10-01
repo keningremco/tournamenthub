@@ -57,7 +57,10 @@ def get_rounds(tournamentcode):
                                     AND game_teams.gameId = games.id
                                     AND game_teams.home_away = 'away'
                                 ),
-                    'location', stadiums.name
+                    'location', stadiums.name,
+                    'status', games.status,
+                    'start-date', game.start_time
+
                 )
             )
             FROM games
