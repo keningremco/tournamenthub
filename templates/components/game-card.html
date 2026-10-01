@@ -45,9 +45,9 @@
             {% endif %}
 
             {% if game.location %}
-                <span class="game-location">
+                <a href="https://www.google.com/maps/search/?api=1&query={{game.location|urlencode}}" class="game-location">
                     📍 {{ game.location }}
-                </span>
+                </a>
             {% endif %}
 
         </div>
