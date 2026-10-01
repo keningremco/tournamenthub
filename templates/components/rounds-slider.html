@@ -1,13 +1,15 @@
 
 {% macro draw_rounds_slider(rounds) %}
-    {% for round in rounds %}
-
-        <a
-            class="btn {% if loop.first %}btn-primary{% else %}btn-secondary{% endif %}"
-            href="#roundId-{{ round.id}}"
-        >
-            {{ round.name }}
-        </a>
-
-    {% endfor %}
+    <div class="slider-tabs">
+        <div class="slider-tabs-list">
+            {% for round in rounds %}
+                <a
+                    href="#round-{{ round.id }}"
+                    class="btn {% if loop.first %}btn-primary{% else %}btn-secondary{% endif %}"
+                >
+                    {{ round.name }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
 {% endmacro %}

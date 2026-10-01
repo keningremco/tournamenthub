@@ -1,0 +1,36 @@
+/* =========================
+   Round slider
+   ========================= */
+
+.slider-tabs {
+    width: 100%;
+    margin-bottom: 25px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+
+.slider-tabs-list {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    width: max-content;
+    min-width: 100%;
+    padding: 5px 0 12px;
+
+    border-bottom: 1px solid #ccc;
+}
+
+.slider-tabs-list .btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+
+/* Mobiel */
+
+@media (max-width: 699px) {
+    .slider-tabs {
+        scrollbar-width: thin;
+    }
+}
