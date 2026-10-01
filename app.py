@@ -15,6 +15,7 @@ from auth.decorators import login_required
 from permissions.permission import can_user
 from services.lobbies import get_lobby_rounds_points, calc_prediction_points_game, get_lobby_leaderboard
 from scripts.build_style import build_style_css
+from api.tournaments import get_rounds
 
 
 load_dotenv()
@@ -573,86 +574,10 @@ def tournament(code='', id=''):
         if not tournament:
             abort(404)
 
-        cursor.execute("""
-            SELECT *
-            FROM rounds
-            WHERE tournamentId = %s
-            ORDER BY roundNumber ASC
-        """, (tournament["id"],))
+        
 
-        rounds = cursor.fetchall()
+        rounds = get_rounds(tournament['code'])
 
-        cursor.execute("""
-            SELECT
-                games.id AS gameId,
-                games.start_time,
-                stadiums.name AS location,
-                games.roundId,
-                games.status,
-
-                teams.id AS teamId,
-                teams.name AS teamName,
-
-                scores.score,
-                scores.result
-
-            FROM games
-
-            JOIN game_teams
-                ON game_teams.gameId = games.id
-
-            JOIN teams
-                ON teams.id = game_teams.teamId
-
-            LEFT JOIN scores
-                ON scores.gameId = games.id
-                AND scores.teamId = teams.id
-
-            LEFT JOIN stadiums
-                ON stadiums.id = games.stadiumId
-                
-            WHERE games.roundId IN (
-                SELECT id
-                FROM rounds
-                WHERE tournamentId = %s
-            )
-
-            ORDER BY
-                games.start_time ASC,
-                games.id ASC,
-                game_teams.id ASC
-        """, (tournament["id"],))
-
-        game_rows = cursor.fetchall()
-
-        games_by_round = {}
-
-        for row in game_rows:
-            game_id = row["gameId"]
-
-            if game_id not in games_by_round:
-                games_by_round[game_id] = {
-                    "id": game_id,
-                    "start_time": row["start_time"],
-                    "location": row["location"],
-                    "roundId": row["roundId"],
-                    "status": row["status"],
-                    "teams": []
-                }
-
-            games_by_round[game_id]["teams"].append({
-                "id": row["teamId"],
-                "name": row["teamName"],
-                "score": row["score"],
-                "result": row["result"]
-            })
-
-        for round in rounds:
-            round["games"] = []
-
-            for game in games_by_round.values():
-                if game["roundId"] == round["id"]:
-                    round["games"].append(game)
         permissions = can_user(userid)
         return render_template(
             "tournament.html",
