@@ -8,7 +8,7 @@
     overflow-x: auto;
     scrollbar-width: thin;
     position: sticky;
-    top: 0;
+    top: 70px;
     z-index: 100;
 }
 
