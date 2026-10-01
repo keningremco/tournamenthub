@@ -13,6 +13,18 @@
 
 }
 
+.home{
+    display: grid;
+    grid-template-areas:
+    "team-name team-score";
+}
+
+.away{
+    display: grid;
+    grid-template-areas:
+    "team-score team-name";
+}
+
 .game .team:first-child {
     grid-area: home;
 }
@@ -31,11 +43,46 @@
     text-align: center;
 }
 
+.game-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+
+    margin-top: 16px;
+    padding-top: 12px;
+
+    color: var(--text-light);
+    font-size: 13px;
+
+    border-top: 1px solid var(--border);
+}
+
+.game-info span {
+    min-width: 0;
+}
+
+.game-status {
+    font-weight: 650;
+    color: var(--primary);
+}
+
+.game-location {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 @media (max-width: 700px) {
     .game-card {
         grid-template-areas:
             "home score"
             "away"
             "info";
+    }
+    .home,
+    .away{
+        display: grid;
+        grid-template-areas:
+        "team-name team-score";
     }
 }
