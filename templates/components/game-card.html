@@ -1,19 +1,21 @@
+{% macro game_card(game) %}
 <div class="game">
 
     <div class="team">
-        {% block home_team %}{% endblock %}
+        {{ game.home_team }}
     </div>
 
     <div class="game-score">
-        {% block score %}{% endblock %}
+        {{ game.home_score }} - {{ game.away_score }}
     </div>
 
     <div class="team">
-        {% block away_team %}{% endblock %}
+        {{ game.away_team }}
     </div>
 
     <div class="game-info">
-        {% block game_info %}{% endblock %}
+        {{ game.info }}
     </div>
 
 </div>
+{% endmacro %}

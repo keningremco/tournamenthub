@@ -2004,6 +2004,31 @@ def admin():
 
     return render_template('admin.html')
 
+@app.route("/test-round")
+def test_round():
+    games = [
+        {
+            "home_team": "Team A",
+            "away_team": "Team B",
+            "home_score": 2,
+            "away_score": 1,
+        },
+        {
+            "home_team": "Team C",
+            "away_team": "Team D",
+            "home_score": 0,
+            "away_score": 0,
+        },
+        {
+            "home_team": "Team E",
+            "away_team": "Team F",
+            "home_score": 3,
+            "away_score": 2,
+        },
+    ]
+
+    return render_template("components/round.html", games=games)
+
 if __name__ == "__main__":
     build_style_css()
     app.run(port=os.getenv("PORT"))
