@@ -1,37 +1,57 @@
 {% macro game_card(game) %}
-<div class="game">
+<div class="game-card">
 
-    <div class="team">
-        {{ game.home_team }}
+    <div class="game-teams">
+
+        <div class="game-team">
+            <span class="team-name">
+                {{ game.home_team }}
+            </span>
+
+            <span class="team-score">
+                {{ game.home_score }}
+            </span>
+        </div>
+
+        <div class="game-score">
+            -
+        </div>
+
+        <div class="game-team">
+            <span class="team-score">
+                {{ game.away_score }}
+            </span>
+
+            <span class="team-name">
+                {{ game.away_team }}
+            </span>
+        </div>
+
     </div>
 
-    <div class="game-score">
-        {{ game.home_score }} - {{ game.away_score }}
-    </div>
+    {% if game["start-date"] or game.status or game.location %}
+        <div class="game-info">
 
-    <div class="team">
-        {{ game.away_team }}
-    </div>
+            {% if game["start-date"] %}
+                <span class="game-date">
+                    {{ game["start-date"] }}
+                </span>
+            {% endif %}
 
-    <div class="game-info">
-        {% if game["start-date"] %}
-            <div class="start-date">
-                {{ game["start-date"] }}
-            </div>
-        {% endif %}
+            {% if game.status %}
+                <span class="game-status">
+                    {{ game.status }}
+                </span>
+            {% endif %}
 
-        {% if game.status %}
-            <div class="status">
-                {{ game.status }}
-            </div>
-        {% endif %}
+            {% if game.location %}
+                <span class="game-location">
+                    📍 {{ game.location }}
+                </span>
+            {% endif %}
 
-        {% if game.location %}
-            <div class="location">
-                {{ game.location }}
-            </div>
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
 
 </div>
 {% endmacro %}

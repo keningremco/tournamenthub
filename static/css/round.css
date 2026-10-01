@@ -4,16 +4,147 @@
     gap: 16px;
 }
 
-/* 2 naast elkaar */
+.game-card {
+    min-width: 0;
+    padding: 18px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+
+    transition:
+        box-shadow .2s ease,
+        transform .2s ease,
+        border-color .2s ease;
+}
+
+.game-card:hover {
+    border-color: #c9d8ea;
+    box-shadow: 0 8px 25px rgba(31, 41, 55, .08);
+    transform: translateY(-1px);
+}
+
+
+/* Teams + score */
+
+.game-teams {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+}
+
+.game-team {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 10px;
+}
+
+.game-team:last-child {
+    justify-content: flex-end;
+}
+
+.team-name {
+    min-width: 0;
+    overflow: hidden;
+
+    font-size: 16px;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.team-score {
+    flex: 0 0 auto;
+
+    min-width: 30px;
+    padding: 5px 8px;
+
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 750;
+    text-align: center;
+
+    background: #f1f5f9;
+    border-radius: 7px;
+}
+
+.game-score {
+    color: var(--text-light);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+
+/* Game informatie */
+
+.game-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+
+    margin-top: 16px;
+    padding-top: 12px;
+
+    color: var(--text-light);
+    font-size: 13px;
+
+    border-top: 1px solid var(--border);
+}
+
+.game-info span {
+    min-width: 0;
+}
+
+.game-status {
+    font-weight: 650;
+    color: var(--primary);
+}
+
+.game-location {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* 2 kolommen */
+
 @media (min-width: 700px) {
     .round {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
-/* 3 naast elkaar */
+
+/* 3 kolommen */
+
 @media (min-width: 1100px) {
     .round {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+
+/* Klein scherm */
+
+@media (max-width: 500px) {
+    .game-card {
+        padding: 15px;
+    }
+
+    .game-teams {
+        gap: 8px;
+    }
+
+    .team-name {
+        font-size: 15px;
+    }
+
+    .team-score {
+        min-width: 27px;
+        padding: 4px 6px;
+        font-size: 16px;
     }
 }
