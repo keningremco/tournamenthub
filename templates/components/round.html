@@ -1,7 +1,10 @@
 <link rel="stylesheet" href="/static/css/style.css">
 {% from 'components/game-card.html' import game_card %}
-<div class="round section">
+<div class="main">
+    <div class="round section">
     {% for game in games %}
         {{ game_card(game) }}
     {% endfor %}
 </div>
+</div>
+
