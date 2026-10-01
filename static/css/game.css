@@ -30,3 +30,12 @@
     grid-area: info;
     text-align: center;
 }
+
+@media (max-width: 700px) {
+    .game-card {
+        grid-template-areas:
+            "home score"
+            "away"
+            "info";
+    }
+}

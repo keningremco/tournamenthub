@@ -1,0 +1,138 @@
+
+{% macro prediction(game) %}
+    <div class="prediction-box">
+
+
+        <div class="prediction-title">
+            Your prediction
+        </div>
+
+
+        {% if game.status == 'scheduled' %}
+
+
+            <form
+                class="prediction-form"
+                action="{{ url_for('savePrediction', lobbyCode=lobby.code) }}"
+                method="post"
+            >
+
+
+                <input
+                    type="hidden"
+                    name="game_id"
+                    value="{{ game.id }}"
+                >
+
+
+                <div class="prediction-team">
+                    {{ game.homeTeam }}
+                </div>
+
+
+                <input
+                    type="number"
+                    name="team1_score"
+                    min="0"
+                    value="{{ game.teams[0].predictedScore if game.teams[0].predictedScore != None else '' }}"
+                    required
+                    aria-label="Score {{ game.homeTeam }}"
+                >
+
+
+                <div class="prediction-separator">
+                    -
+                </div>
+
+
+                <input
+                    type="number"
+                    name="team2_score"
+                    min="0"
+                    value="{{ game.teams[1].predictedScore if game.teams[1].predictedScore != None else '' }}"
+                    required
+                    aria-label="Score {{ game.teams[1].name }}"
+                >
+
+
+                <input
+                    type="hidden"
+                    name="game_ids"
+                    value='{{ {"team1Id": game.teams[0].id, "team2Id": game.teams[1].id } | tojson }}'
+                >
+
+
+                <div class="prediction-team">
+                    {{ game.teams[1].name }}
+                </div>
+
+
+                <button type="submit" id="error">
+                    Save prediction
+                </button>
+
+
+            </form>
+
+
+        {% else %}
+
+
+            <div class="prediction-locked">
+
+
+                {% if game.teams[0].predictedScore != None %}
+
+                    Your prediction:
+
+                    <strong>
+
+                        {{ game.teams[0].predictedScore }}
+
+                        -
+
+                        {{ game.teams[1].predictedScore }}
+
+                    </strong>
+
+
+                {% else %}
+
+                    Predictions can no longer be changed.
+
+                {% endif %}
+
+
+            </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+    {% if game.status == 'completed' %}
+
+        <div class="game-evaluation">
+
+
+            <button
+                type="button"
+                class="evaluation-toggle"
+                data-game-id="{{ game.id }}"
+            >
+                View predictions
+            </button>
+
+
+            <div
+                class="evaluation-dropdown"
+                id="evaluation-dropdown-{{ game.id }}"
+            ></div>
+
+
+        </div>
+
+    {% endif %}
+{% endmacro %}
