@@ -555,6 +555,13 @@
     {% block script %}
         
     {% endblock %}
+    {% for script in registered_scripts %}
+    <script
+        {% if script.type %}type="{{ script.type }}"{% endif %}
+        src="{{ url_for('static', filename=script.src) }}"
+    ></script>
+    <!-- hoi -->
+    {% endfor %}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6784101204913368"
      crossorigin="anonymous"></script>
 </body>
