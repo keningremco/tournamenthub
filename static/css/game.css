@@ -142,6 +142,7 @@
 
     .away {
         grid-template-columns: auto 1fr;
+        grid-template-areas: "team-name team-score";
     }
 }
 
