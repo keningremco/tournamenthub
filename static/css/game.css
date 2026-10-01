@@ -60,7 +60,7 @@
 
 .team-name {
     min-width: 0;
-
+    grid-area: team-name;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -73,6 +73,7 @@
 /* Scores */
 
 .team-score {
+    grid-area: team-score;
     min-width: 30px;
     padding: 5px 8px;
 
