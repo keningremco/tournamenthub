@@ -1,96 +1,68 @@
-.game-card {
-    min-width: 0;
-    padding: var(--card-padding);
-
-    background: var(--card-background-color);
-    border: var(--card-border);
-    border-radius: var(--card-border-radius);
-
-    transition:
-        background-color 0.2s ease,
-        border-color 0.2s ease,
-        border-radius 0.2s ease,
-        box-shadow 0.2s ease,
-        transform 0.2s ease;
-}
-
-.game-card:hover {
-    background-color: var(--card-background-color-hover);
-    border-radius: var(--card-border-radius-hover);
-}
-
-
-/* ========================================
-   Teams & Score
-   ======================================== */
+/* Teams */
 
 .game-teams {
     display: grid;
-    grid-template:
-        "home score away"
-        / minmax(0, 1fr) auto minmax(0, 1fr);
-
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas: "home score away";
     gap: 12px;
     align-items: center;
 }
 
 
-/* ----------------------------------------
-   Home Team
-   ---------------------------------------- */
+/* Home */
 
 .home {
     grid-area: home;
 
     display: grid;
-    grid-template:
-        "name score"
-        / minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "home-name home-score";
 
     gap: 8px;
     align-items: center;
 }
 
+.home .team-name {
+    grid-area: home-name;
+}
 
-/* ----------------------------------------
-   Away Team
-   ---------------------------------------- */
+.home .team-score {
+    grid-area: home-score;
+}
+
+
+/* Centrale score */
+
+.game-teams > .score {
+    grid-area: score;
+}
+
+
+/* Away */
 
 .away {
     grid-area: away;
 
     display: grid;
-    grid-template:
-        "score name"
-        / auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "away-score away-name";
 
     gap: 8px;
     align-items: center;
 }
 
+.away .team-score {
+    grid-area: away-score;
+}
 
-/* ----------------------------------------
-   Middle Score
-   ---------------------------------------- */
-
-.score {
-    grid-area: score;
-
-    color: var(--text-light);
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 1;
-    text-align: center;
+.away .team-name {
+    grid-area: away-name;
 }
 
 
-/* ========================================
-   Team Information
-   ======================================== */
+/* Team naam */
 
 .team-name {
-    grid-area: name;
-
     min-width: 0;
 
     overflow: hidden;
@@ -99,12 +71,12 @@
 
     font-size: 16px;
     font-weight: 650;
-    line-height: 1.25;
 }
 
-.team-score {
-    grid-area: score;
 
+/* Team score */
+
+.team-score {
     min-width: 30px;
     padding: 5px 8px;
 
@@ -119,77 +91,17 @@
 }
 
 
-/* ========================================
-   Game Information
-   ======================================== */
-
-.game-info {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-
-    gap: 8px 16px;
-    margin-top: 16px;
-    padding-top: 12px;
-
-    color: var(--text-light);
-    font-size: 13px;
-    line-height: 1.4;
-
-    border-top: 1px solid var(--border);
-}
-
-.game-info span {
-    min-width: 0;
-}
-
-.game-status {
-    color: var(--primary);
-    font-weight: 650;
-}
-
-.game-location {
-    min-width: 0;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-
-/* ========================================
-   Responsive
-   ======================================== */
+/* Mobiel */
 
 @media (max-width: 700px) {
     .game-teams {
-        grid-template:
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
             "home"
-            "away"
-            / minmax(0, 1fr);
-
-        gap: 8px;
+            "away";
     }
 
     .score {
         display: none;
-    }
-}
-
-
-@media (max-width: 500px) {
-    .game-card {
-        padding: 15px;
-    }
-
-    .team-name {
-        font-size: 15px;
-    }
-
-    .team-score {
-        min-width: 27px;
-        padding: 4px 6px;
-        font-size: 16px;
     }
 }
