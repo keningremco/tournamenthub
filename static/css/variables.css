@@ -53,6 +53,11 @@
     --card-shadow: 0 5px 20px rgba(0, 0, 0, .05);
     --card-shadow-hover: 0 8px 25px rgba(31, 41, 55, .08);
 
+    /* =========================
+       Cards Hover
+       ========================= */
+    --card-background-color-hover: rgb(212, 212, 212);
+    --card-border-radius-hover: 0px;
 
     /* =========================
        Sections
