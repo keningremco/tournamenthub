@@ -1,50 +1,96 @@
-.game {
+.game-card {
+    min-width: 0;
     padding: var(--card-padding);
+    background: var(--card-background-color);
     border: var(--card-border);
     border-radius: var(--card-border-radius);
-    background-color: var(--card-background-color);
+
+    transition:
+        box-shadow .2s ease,
+        transform .2s ease,
+        border-color .2s ease;
+}
+
+.game-card:hover {
+    background-color: var(--card-background-color-hover);
+    border-radius: var(--card-border-radius-hover);
+}
+
+
+/* Teams */
+
+.game-teams {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     grid-template-areas:
-        "home score away"
-        ". info .";
-    gap: 8px 16px;
+        "home score away";
+    gap: 12px;
     align-items: center;
-
 }
 
-.home{
-    display: grid;
-    grid-template-areas:
-    "team-name team-score";
-}
-
-.away{
-    display: grid;
-    grid-template-areas:
-    "team-score team-name";
-}
-
-.game .team:first-child {
+.home {
     grid-area: home;
+
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px;
 }
 
-.game .game-score {
+.score {
     grid-area: score;
+
+    color: var(--text-light);
+    font-size: 16px;
+    font-weight: 700;
     text-align: center;
 }
 
-.game .team:nth-child(3) {
+.away {
     grid-area: away;
+
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 8px;
 }
 
-.game .game-info {
-    grid-area: info;
-    text-align: center;
+
+/* Team names */
+
+.team-name {
+    min-width: 0;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    font-size: 16px;
+    font-weight: 650;
 }
+
+
+/* Scores */
+
+.team-score {
+    min-width: 30px;
+    padding: 5px 8px;
+
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 750;
+    text-align: center;
+
+    background: #f1f5f9;
+    border-radius: 7px;
+}
+
+
+/* Info */
 
 .game-info {
     display: flex;
+    justify-content: center;
     flex-wrap: wrap;
     gap: 8px 16px;
 
@@ -67,30 +113,53 @@
 }
 
 .game-location {
+    min-width: 0;
+
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
+
+/* Mobiel */
+
 @media (max-width: 700px) {
-    .game-card {
+    .game-teams {
+        grid-template-columns: 1fr;
         grid-template-areas:
             "home"
-            "away"
-            "info";
+            "away";
+        gap: 8px;
     }
 
-    .score{
+    .score {
         display: none;
     }
 
     .home {
-        grid-template-areas:
-            "team-name team-score";
+        grid-template-columns: 1fr auto;
     }
 
     .away {
-        grid-template-areas:
-            "team-score team-name";
+        grid-template-columns: auto 1fr;
+    }
+}
+
+
+/* Kleine telefoon */
+
+@media (max-width: 500px) {
+    .game-card {
+        padding: 15px;
+    }
+
+    .team-name {
+        font-size: 15px;
+    }
+
+    .team-score {
+        min-width: 27px;
+        padding: 4px 6px;
+        font-size: 16px;
     }
 }
