@@ -13,7 +13,7 @@ def get_round(tournamentcode, roundnumber):
     return games
 
 @api.route('/tournament/<tournamentcode>/rounds')
-def get_rounds(tournamentcode, roundnumber):
+def get_rounds(tournamentcode):
     db, cursor = get_db_connection()
 
     cursor.execute("""
@@ -50,7 +50,7 @@ def get_rounds(tournamentcode, roundnumber):
         JOIN tournaments
             ON tournaments.id = rounds.tournamentId
         WHERE tournaments.code = %s
-    """)
+    """, (tournamentcode,))
     rounds = cursor.fetchall()
     cursor.close()
     db.close()
