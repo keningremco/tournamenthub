@@ -1,162 +1,106 @@
-```css
 .round {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--section-gap);
+    gap: 16px;
 }
-
-
-/* =========================
-   Game card
-   ========================= */
 
 .game-card {
     min-width: 0;
-    padding: var(--card-padding);
-
-    background: var(--card-background-color);
-    border: var(--card-border);
-    border-radius: var(--card-border-radius);
-    box-shadow: var(--card-shadow);
+    padding: 18px;
+    background: var(--card-);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
 
     transition:
-        box-shadow var(--transition-normal),
-        transform var(--transition-normal),
-        border-color var(--transition-normal);
+        box-shadow .2s ease,
+        transform .2s ease,
+        border-color .2s ease;
 }
 
 .game-card:hover {
-    border-color: var(--border-color-hover);
-    box-shadow: var(--card-shadow-hover);
+    border-color: #c9d8ea;
+    box-shadow: 0 8px 25px rgba(31, 41, 55, .08);
     transform: translateY(-1px);
 }
-
-
-/* =========================
-   Teams
-   ========================= */
 
 .game-teams {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-
-    gap: var(--spacing-medium);
+    gap: 12px;
     align-items: center;
 }
 
 .game-team {
     display: flex;
     min-width: 0;
-
     align-items: center;
-    gap: var(--spacing-small);
+    gap: 10px;
 }
 
 .game-team:last-child {
     justify-content: flex-end;
 }
 
-
-/* =========================
-   Team name
-   ========================= */
-
 .team-name {
     min-width: 0;
-
     overflow: hidden;
 
-    color: var(--color-text);
-    font-size: var(--font-size-normal);
-    font-weight: var(--font-weight-semibold);
-
+    font-size: 16px;
+    font-weight: 650;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-
-
-/* =========================
-   Team score
-   ========================= */
 
 .team-score {
     flex: 0 0 auto;
 
     min-width: 30px;
-    padding: 5px var(--spacing-small);
+    padding: 5px 8px;
 
-    color: var(--color-text);
-    font-size: var(--font-size-large);
-    font-weight: var(--font-weight-bold);
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 750;
     text-align: center;
 
-    background: var(--color-surface-hover);
-    border-radius: var(--border-radius);
+    background: #f1f5f9;
+    border-radius: 7px;
 }
-
-
-/* =========================
-   Score separator
-   ========================= */
 
 .game-score {
-    color: var(--color-text-muted);
-    font-size: var(--font-size-normal);
-    font-weight: var(--font-weight-bold);
+    color: var(--text-light);
+    font-size: 16px;
+    font-weight: 700;
 }
-
-
-/* =========================
-   Game info
-   ========================= */
 
 .game-info {
     display: flex;
     flex-wrap: wrap;
+    gap: 8px 16px;
 
-    gap: var(--spacing-small) var(--spacing-large);
+    margin-top: 16px;
+    padding-top: 12px;
 
-    margin-top: var(--spacing-large);
-    padding-top: var(--spacing-medium);
+    color: var(--text-light);
+    font-size: 13px;
 
-    color: var(--color-text-muted);
-    font-size: var(--font-size-small);
-
-    border-top: var(--card-border);
+    border-top: 1px solid var(--border);
 }
 
 .game-info span {
     min-width: 0;
 }
 
-
-/* =========================
-   Status
-   ========================= */
-
 .game-status {
-    color: var(--color-primary);
-    font-weight: var(--font-weight-semibold);
+    font-weight: 650;
+    color: var(--primary);
 }
 
-
-/* =========================
-   Location
-   ========================= */
-
 .game-location {
-    min-width: 0;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-
-
-/* =========================
-   Tablet
-   ========================= */
 
 @media (min-width: 700px) {
     .round {
@@ -164,29 +108,19 @@
     }
 }
 
-
-/* =========================
-   Desktop
-   ========================= */
-
 @media (min-width: 1100px) {
     .round {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
-
-/* =========================
-   Mobile
-   ========================= */
-
 @media (max-width: 500px) {
     .game-card {
-        padding: var(--spacing-medium);
+        padding: 15px;
     }
 
     .game-teams {
-        gap: var(--spacing-small);
+        gap: 8px;
     }
 
     .team-name {
@@ -196,7 +130,6 @@
     .team-score {
         min-width: 27px;
         padding: 4px 6px;
-        font-size: var(--font-size-normal);
+        font-size: 16px;
     }
 }
-```
