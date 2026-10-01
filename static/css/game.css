@@ -84,10 +84,13 @@
         display: none;
     }
 
-    .home,
-    .away{
-        display: grid;
+    .home {
         grid-template-areas:
-        "team-name team-score";
+            "team-name team-score";
+    }
+
+    .away {
+        grid-template-areas:
+            "team-score team-name";
     }
 }
