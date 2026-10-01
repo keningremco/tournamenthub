@@ -20,6 +20,7 @@ from scripts.build_style import build_style_css
 load_dotenv()
 
 app = Flask(__name__)
+app.jinja_env.add_extension("jinja2.ext.do")
 from api import api
 app.register_blueprint(api)
 
