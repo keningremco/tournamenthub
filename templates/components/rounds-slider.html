@@ -1,5 +1,6 @@
 
-{% macro draw_rounds_slider(rounds) %}
+{% macro draw_rounds_slider(rounds, permissions) %}
+{{permissions}}
     <div class="slider-tabs">
         <div class="slider-tabs-list">
             {% for round in rounds %}

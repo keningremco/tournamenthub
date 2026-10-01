@@ -2,12 +2,9 @@
 {% from 'components/rounds-slider.html' import draw_rounds_slider %}
 
 {% macro draw_rounds(rounds, permissions) %}
-    <div>{{permissions}}
-    hoi</div>
-    
-    {{ draw_rounds_slider(rounds) }}
+    {{ draw_rounds_slider(rounds, permissions) }}
     {% for round_var in rounds %}
-        {{ round(round_var.games, round_var.name, round_var.id, predictons) }}
+        {{ round(round_var.games, round_var.name, round_var.id, permissions) }}
     {% endfor %}   
 {% endmacro %}
 
