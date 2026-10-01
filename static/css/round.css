@@ -1,10 +1,5 @@
 .round {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
-}
-
-.round > * {
-    width: calc((100% - 32px) / 3);
-    flex: 0 0 calc((100% - 32px) / 3);
 }
