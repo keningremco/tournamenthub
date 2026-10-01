@@ -39,6 +39,24 @@ def get_rounds(tournamentcode):
                                         ON game_teams.teamId = teams.id
                                     WHERE game_teams.home_away = 'away' AND game_teams.gameId = games.id
                                 ),
+                    'homeScore', (
+                                    SELECT scores.score
+                                    FROM scores
+                                    JOIN game_teams
+                                        ON game_teams.teamId = scores.teamId
+                                    WHERE scores.gameId = games.id 
+                                    AND game_teams.gameId = games.id
+                                    AND game_teams.home_away = 'home'
+                                ),
+                    'awayScore', (
+                                    SELECT scores.score
+                                    FROM scores
+                                    JOIN game_teams
+                                        ON game_teams.teamId = scores.teamId
+                                    WHERE scores.gameId = games.id 
+                                    AND game_teams.gameId = games.id
+                                    AND game_teams.home_away = 'away'
+                                ),
                     'location', stadiums.name
                 )
             )
