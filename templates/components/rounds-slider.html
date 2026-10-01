@@ -2,13 +2,12 @@
 {% macro draw_rounds_slider(rounds) %}
     {% for round in rounds %}
 
-        <button
-            type="button"
+        <a
             class="btn {% if loop.first %}btn-primary{% else %}btn-secondary{% endif %}"
-            data-round="{{ round.id }}"
+            href="#roundId-{{ round.id}}"
         >
             {{ round.name }}
-        </button>
+        </a>
 
     {% endfor %}
 {% endmacro %}
