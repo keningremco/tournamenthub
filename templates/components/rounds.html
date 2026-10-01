@@ -3,6 +3,7 @@
 
 {% macro draw_rounds(rounds, predictons, permissions) %}
     {{permissions}}
+    hoi
     {{ draw_rounds_slider(rounds) }}
     {% for round_var in rounds %}
         {{ round(round_var.games, round_var.name, round_var.id, predictons) }}
