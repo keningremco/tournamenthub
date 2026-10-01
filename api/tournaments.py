@@ -1,6 +1,7 @@
 from . import api
 from db.connection import get_db_connection
 from services.tournaments import get_game_round
+import json
 
 @api.route('/tournament/<tournamentcode>/round/<roundnumber>')
 def get_round(tournamentcode, roundnumber):
@@ -52,6 +53,11 @@ def get_rounds(tournamentcode):
         WHERE tournaments.code = %s
     """, (tournamentcode,))
     rounds = cursor.fetchall()
+    for round in rounds:
+        if round["games"]:
+            round["games"] = json.loads(round["games"])
+        else:
+            round["games"] = []
     cursor.close()
     db.close()
     return rounds
