@@ -1,50 +1,15 @@
 {% macro prediction(game, data, user_id) %}
 
-
-
-    {# ==========================================
-       EVALUATIONS
-       ========================================== #}
-
-    {% set evaluations = game.evaluations|default({}) %}
-    {% set players = evaluations.players|default([]) %}
-
-    {# Zoek de huidige speler #}
-
-    {% set current_player = namespace(data=None) %}
-
-    {% for player in players %}
-        {% if player.userId|int == user_id|int %}
-            {% set current_player.data = player %}
-        {% endif %}
-    {% endfor %}
-
-
     <div
         class="prediction-box"
         data-game-id="{{ game.id }}"
         data-user-id="{{ user_id }}"
     >
 
-        {# ======================================
-           HIDDEN USER ID
-           ====================================== #}
-
-        <input
-            type="hidden"
-            name="user_id"
-            value="{{ user_id }}"
-        >
-
-
         <div class="prediction-title">
             Your prediction
         </div>
 
-
-        {# ======================================
-           SCHEDULED
-           ====================================== #}
 
         {% if game.status == 'scheduled' %}
 
@@ -76,7 +41,7 @@
                     type="number"
                     name="team1_score"
                     min="0"
-                    value="{% if current_player.data and current_player.data.predictedscorehome is not none %}{{ current_player.data.predictedscorehome }}{% endif %}"
+                    value="{% for player in game.evaluations.players|default([]) if player.userId|int == user_id|int %}{{ player.predictedscorehome if player.predictedscorehome is not none else '' }}{% endfor %}"
                     required
                     aria-label="Score {{ game.homeTeam }}"
                 >
@@ -91,7 +56,7 @@
                     type="number"
                     name="team2_score"
                     min="0"
-                    value="{% if current_player.data and current_player.data.predictedscoreuit is not none %}{{ current_player.data.predictedscoreuit }}{% endif %}"
+                    value="{% for player in game.evaluations.players|default([]) if player.userId|int == user_id|int %}{{ player.predictedscoreuit if player.predictedscoreuit is not none else '' }}{% endfor %}"
                     required
                     aria-label="Score {{ game.awayTeam }}"
                 >
@@ -122,29 +87,26 @@
             </form>
 
 
-        {# ======================================
-           NIET MEER WIJZIGBAAR
-           ====================================== #}
-
         {% else %}
 
             <div class="prediction-locked">
 
-                {% if current_player.data %}
+                {% for player in game.evaluations.players|default([])
+                    if player.userId|int == user_id|int %}
 
                     Your prediction:
 
                     <strong>
-                        {{ current_player.data.predictedscorehome }}
+                        {{ player.predictedscorehome }}
                         -
-                        {{ current_player.data.predictedscoreuit }}
+                        {{ player.predictedscoreuit }}
                     </strong>
 
                 {% else %}
 
                     Predictions can no longer be changed.
 
-                {% endif %}
+                {% endfor %}
 
             </div>
 
@@ -152,10 +114,6 @@
 
     </div>
 
-
-    {# ==========================================
-       EVALUATIONS BIJ COMPLETED
-       ========================================== #}
 
     {% if game.status == 'completed' %}
 
@@ -173,20 +131,14 @@
             <div
                 class="evaluation-dropdown"
                 id="evaluation-dropdown-{{ game.id }}"
-            >
+            ></div>
 
-                {# JS vult dit #}
-
-            </div>
-
-
-            {# JSON beschikbaar maken voor JS #}
 
             <script
                 type="application/json"
                 id="evaluation-data-{{ game.id }}"
             >
-                {{ evaluations | tojson }}
+                {{ game.evaluations|default({}) | tojson }}
             </script>
 
         </div>
