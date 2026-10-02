@@ -21,6 +21,13 @@ def get_rounds(tournamentcode, lobbycode=None):
     rounds = get_tournament(tournamentcode, cursor, json)
     if lobbycode:
         evals = getLobbyEvaluations(lobbycode)
+        counter = 0
+        counter2 = 0
         for round in rounds:
             for game in round['games']:
-                game['evaluations'] = evals[game['id']]
+                rounds[counter]['games'][counter2]['evaluations'] = evals[game['id']]
+                counter2 =+ 1
+            counter =+ 1
+    cursor.close()
+    db.close()
+    return rounds
