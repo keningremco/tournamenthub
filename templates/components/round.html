@@ -1,16 +1,18 @@
 {% from 'components/game-card.html' import game_card %}
-{% macro round(games, name, id, permissions, tournament) %}
+{% macro round(games, name, id, data) %}
     <div class="section section-round" id="roundId-{{ id }}">
         <h1>{{ name }}</h1>
         <div class="round">
         {% for game in games %}
-            {{ game_card(game, permissions, tournament) }}
+            {{ game_card(game, data) }}
         {% endfor %}
         </div>
 
     </div>
-
+    {% if 'tournament.edit_games' in data.permissions['tournaments'].get(data.tournament.id|string, []) %}
     <a href="{{ url_for('makeGame', roundId = id ) }}">make game</a>
+    {% endif %}
+    {% if 'tournament.edit_games' in data.permissions['tournaments'].get(data.tournament.id|string, []) %}
     <form method="POST" action="{{ url_for('delete_round', round_id = id ) }}" onsubmit="return confirm('Weet je zeker dat je deze ronde wilt verwijderen? Alle games in deze ronde worden ook verwijderd.');" style="display: inline;">
 
         <button type="submit" class="btn btn-danger">
@@ -18,4 +20,5 @@
         </button>
 
     </form>
+    {% endif %}
 {% endmacro %}

@@ -1,8 +1,8 @@
 
-{% macro draw_rounds_slider(rounds, permissions, tournament) %}
+{% macro draw_rounds_slider(data) %}
     <div class="slider-tabs">
         <div class="slider-tabs-list">
-            {% for round in rounds %}
+            {% for round in data.rounds %}
                 <a
                     href="#roundId-{{ round.id }}"
                     class="btn {% if loop.first %}btn-primary{% else %}btn-secondary{% endif %}"
@@ -10,10 +10,10 @@
                     {{ round.name }}
                 </a>
             {% endfor %}
-            {% if 'tournament.create_rounds' in permissions['tournaments'].get(tournament.id|string, []) %}
+            {% if 'tournament.create_rounds' in data.permissions['tournaments'].get(data.tournament.id|string, []) %}
 
                 <a
-                    href="{{ url_for('makeRound', id=tournament.id) }}"
+                    href="{{ url_for('makeRound', id=data.tournament.id) }}"
                     class="btn btn-primary"
                 >
                     Make round

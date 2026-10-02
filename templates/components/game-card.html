@@ -1,6 +1,6 @@
 {% from 'components/prediction-addon.html' import prediction %}
 
-{% macro game_card(game, permissions, tournament) %}
+{% macro game_card(game, data) %}
 <div class="game-card">
 
     <div class="game-teams">
@@ -55,11 +55,11 @@
         </div>
     {% endif %}
     
-    {% if predictons %}
-        prediction(game)
+    {% if data.predictions %}
+        {{ prediction(game) }}
     {% endif %}
 
-    {% if 'tournament.edit_games' in permissions['tournaments'].get(tournament.id|string, []) %}
+    {% if 'tournament.edit_games' in data.permissions['tournaments'].get(data.tournament.id|string, []) %}
         <a href="{{ url_for('edit_game', game_id = game.id ) }}" class="btn btn-primary">edit game</a>
     {% endif %}
 </div>

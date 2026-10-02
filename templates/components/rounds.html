@@ -1,10 +1,18 @@
 {% from 'components/round.html' import round %}
 {% from 'components/rounds-slider.html' import draw_rounds_slider %}
 
-{% macro draw_rounds(rounds, permissions, tournament) %}
-    {{ draw_rounds_slider(rounds, permissions, tournament) }}
+{% macro draw_rounds(rounds, permissions, tournament, predictions) %}
+    
+    {% set data = {
+        "rounds": rounds,
+        "permissions": permissions,
+        "tournament": tournament,
+        "predictions": predictions
+    } %}
+
+    {{ draw_rounds_slider(data) }}
     {% for round_var in rounds %}
-        {{ round(round_var.games, round_var.name, round_var.id, permissions, tournament) }}
+        {{ round(games, name, id, data) }}
     {% endfor %}
 {% endmacro %}
 
