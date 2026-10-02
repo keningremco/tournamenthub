@@ -1395,7 +1395,7 @@ def makeGame(roundId):
                 abort(403)
 
             stadiumId = None
-            print('stadiumId' + stadiumId)
+            print('stadiumId' + str(stadiumId))
             if location:
                 cursor.execute("""
                     SELECT id
