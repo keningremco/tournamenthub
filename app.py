@@ -1346,10 +1346,12 @@ def makeGame(roundId):
         round_data = cursor.fetchone()
 
         if not round_data:
+            print('404')
             abort(404)
 
         if not can_user(userid, 'tournament.create_games', round_data['tournamentId']):
             flash("Je hebt geen toestemming om games in dit tournament te maken.", "error")
+            print('403')
             return redirect(request.referrer or url_for("tournament", id=round_data['tournamentId']))
 
 
@@ -1360,6 +1362,7 @@ def makeGame(roundId):
             location = request.form.get("location")
 
             if not team1 or not team2:
+                print('select two teams')
                 return render_template(
                     "makegame.html",
                     roundId=roundId,
@@ -1367,6 +1370,7 @@ def makeGame(roundId):
                 )
 
             if team1 == team2:
+                print('a team cannot play against itslef')
                 return render_template(
                     "makegame.html",
                     roundId=roundId,
@@ -1387,9 +1391,11 @@ def makeGame(roundId):
             teams = cursor.fetchall()
 
             if len(teams) != 2:
+                print('not to teams found')
                 abort(403)
 
             stadiumId = None
+            print('stadiumId' + stadiumId)
             if location:
                 cursor.execute("""
                     SELECT id
