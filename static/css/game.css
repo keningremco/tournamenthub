@@ -79,7 +79,9 @@
 }
 
 .game-status {
-    background-color: black;
+    padding: 3px;
+    border-radius: 5000px;
+    background-color: blue;
 }
 
 /* ========================================
