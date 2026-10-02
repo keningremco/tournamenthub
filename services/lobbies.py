@@ -237,7 +237,7 @@ def get_lobby_leaderboard(lobbyId='', lobbyCode='', cursor=None):
     return leaderboard, 'success', 200
 
 def get_evals(cursor, lobbyCode):
-            # ==========================================
+    # ==========================================
     # LOBBY + PUNTENREGELS
     # ==========================================
 
@@ -246,12 +246,47 @@ def get_evals(cursor, lobbyCode):
             l.id AS lobby_id,
             l.tournamentId,
 
-            lpr.perfect_score,
-            lpr.correct_winner,
-            lpr.correct_draw,
-            lpr.exact_team_score,
-            lpr.correct_score_difference,
-            lpr.exact_total_score
+            COALESCE(
+                lpr.perfect_score,
+                (SELECT perfect_score
+                 FROM lobby_points_rules_default
+                 LIMIT 1)
+            ) AS perfect_score,
+
+            COALESCE(
+                lpr.correct_winner,
+                (SELECT correct_winner
+                 FROM lobby_points_rules_default
+                 LIMIT 1)
+            ) AS correct_winner,
+
+            COALESCE(
+                lpr.correct_draw,
+                (SELECT correct_draw
+                 FROM lobby_points_rules_default
+                 LIMIT 1)
+            ) AS correct_draw,
+
+            COALESCE(
+                lpr.exact_team_score,
+                (SELECT exact_team_score
+                 FROM lobby_points_rules_default
+                 LIMIT 1)
+            ) AS exact_team_score,
+
+            COALESCE(
+                lpr.correct_score_difference,
+                (SELECT correct_score_difference
+                 FROM lobby_points_rules_default
+                 LIMIT 1)
+            ) AS correct_score_difference,
+
+            COALESCE(
+                lpr.exact_total_score,
+                (SELECT exact_total_score
+                 FROM lobby_points_rules_default
+                 LIMIT 1)
+            ) AS exact_total_score
 
         FROM lobbies l
 
@@ -278,7 +313,7 @@ def get_evals(cursor, lobbyCode):
 
         FROM games g
 
-        JOIN rounds r
+        INNER JOIN rounds r
             ON r.id = g.roundId
 
         WHERE r.tournamentId = %s
@@ -306,7 +341,9 @@ def get_evals(cursor, lobbyCode):
 
 
         # ======================================
-        # HAAL DE 2 TEAMS OP
+        # HAAL GAME TEAMS OP
+        # LEFT JOIN ZODAT EEN GAME NIET
+        # VERDWIJNT ALS DE TEAM-ROW ONTBREEKT
         # ======================================
 
         cursor.execute("""
@@ -317,7 +354,7 @@ def get_evals(cursor, lobbyCode):
 
             FROM game_teams gt
 
-            JOIN teams t
+            LEFT JOIN teams t
                 ON t.id = gt.teamId
 
             WHERE gt.gameId = %s
@@ -328,13 +365,44 @@ def get_evals(cursor, lobbyCode):
         teams = cursor.fetchall()
 
 
-        # Game heeft geen 2 teams
-        if len(teams) != 2:
+        # ======================================
+        # GAME OBJECT ALTIJD AANMAKEN
+        #
+        # BELANGRIJK:
+        # Vroeger deed je:
+        #
+        # if len(teams) != 2:
+        #     continue
+        #
+        # Daardoor verdween de hele game uit
+        # de response.
+        # ======================================
+
+        team1 = teams[0] if len(teams) >= 1 else None
+        team2 = teams[1] if len(teams) >= 2 else None
+
+
+        evaluationData[gameId] = {
+            "teams": {
+                "team1": team1["team_name"] if team1 else None,
+                "team2": team2["team_name"] if team2 else None
+            },
+
+            "actual_score": None,
+
+            "players": []
+        }
+
+
+        # ======================================
+        # ZONDER 2 TEAMS KUN JE GEEN
+        # PREDICTION/EVALUATIE BEREKENEN
+        #
+        # MAAR DE GAME BLIJFT WEL IN DATA
+        # ======================================
+
+        if team1 is None or team2 is None:
             continue
-
-
-        team1 = teams[0]
-        team2 = teams[1]
 
 
         # ======================================
@@ -357,60 +425,33 @@ def get_evals(cursor, lobbyCode):
         actualScores = {}
 
         for score in scoreRows:
-
-            actualScores[score["teamId"]] = (
-                score["score"]
-            )
+            actualScores[score["teamId"]] = score["score"]
 
 
-        actual1 = actualScores.get(
-            team1["team_id"]
-        )
-
-        actual2 = actualScores.get(
-            team2["team_id"]
-        )
-
-
-        # ======================================
-        # GAME OBJECT MAKEN
-        # ======================================
-
-        evaluationData[str(gameId)] = {
-
-            "teams": {
-
-                "team1": team1["team_name"],
-                "team2": team2["team_name"]
-
-            },
-
-            "actual_score": None,
-
-            "players": []
-        }
+        actual1 = actualScores.get(team1["team_id"])
+        actual2 = actualScores.get(team2["team_id"])
 
 
         # ======================================
         # ACTUAL SCORE
         # ======================================
 
-        if (
-            actual1 is not None
-            and actual2 is not None
-        ):
-
-            evaluationData[str(gameId)][
-                "actual_score"
-            ] = f"{actual1} - {actual2}"
+        if actual1 is not None and actual2 is not None:
+            evaluationData[gameId]["actual_score"] = (
+                f"{actual1} - {actual2}"
+            )
 
 
         # ======================================
-        # HAAL ALLE VOORSPELLINGEN OP
+        # ALLE LOBBY MEMBERS + PREDICTIONS
+        #
+        # LEFT JOIN BEHOUDT OOK USERS ZONDER
+        # PREDICTION.
         # ======================================
 
         cursor.execute("""
             SELECT
+                lm.userId AS user_id,
                 u.username,
 
                 p.id AS prediction_id,
@@ -424,7 +465,7 @@ def get_evals(cursor, lobbyCode):
                 ON u.id = lm.userId
 
             LEFT JOIN predictions p
-                ON p.userId = u.id
+                ON p.userId = lm.userId
                 AND p.gameId = %s
 
             LEFT JOIN predicted_scores ps
@@ -444,31 +485,41 @@ def get_evals(cursor, lobbyCode):
 
 
         # ======================================
-        # GROEPEREN PER GEBRUIKER
+        # GROEPEREN PER USER
         # ======================================
 
         players = {}
 
-
         for prediction in predictionRows:
 
+            userId = prediction["user_id"]
             username = prediction["username"]
 
-            if username not in players:
+            if userId not in players:
+                players[userId] = {
+                    "username": username,
+                    "predictions": {}
+                }
 
-                players[username] = {}
 
+            # LEFT JOIN KAN NULL OPLEVEREN
+            # ALS ER GEEN PREDICTION BESTAAT.
+            if prediction["teamId"] is not None:
 
-            players[username][
-                prediction["teamId"]
-            ] = prediction["predicted_score"]
+                players[userId]["predictions"][
+                    prediction["teamId"]
+                ] = prediction["predicted_score"]
 
 
         # ======================================
         # ELKE SPELER BEREKENEN
         # ======================================
 
-        for username, predictions in players.items():
+        for userId, playerData in players.items():
+
+            username = playerData["username"]
+            predictions = playerData["predictions"]
+
 
             predicted1 = predictions.get(
                 team1["team_id"]
@@ -479,11 +530,15 @@ def get_evals(cursor, lobbyCode):
             )
 
 
-            # Als niet beide voorspellingen bestaan
-            if (
-                predicted1 is None
-                or predicted2 is None
-            ):
+            # ==================================
+            # ALS NIET BEIDE VOORSPELLINGEN
+            # BESTAAN:
+            #
+            # ZELFDE GEDRAG ALS JE OUDE CODE:
+            # NIET BEREKENEN / NIET TOEVOEGEN.
+            # ==================================
+
+            if predicted1 is None or predicted2 is None:
                 continue
 
 
@@ -500,13 +555,11 @@ def get_evals(cursor, lobbyCode):
 
 
             # ==================================
-            # ALLEEN BEREKENEN ALS SCORES BESTAAN
+            # ALLEEN BEREKENEN ALS ECHTE SCORES
+            # BESTAAN
             # ==================================
 
-            if (
-                actual1 is not None
-                and actual2 is not None
-            ):
+            if actual1 is not None and actual2 is not None:
 
                 # ------------------------------
                 # PERFECT SCORE
@@ -516,9 +569,8 @@ def get_evals(cursor, lobbyCode):
                     predicted1 == actual1
                     and predicted2 == actual2
                 ):
-
                     perfectScorePoints = (
-                        rules["perfect_score"]
+                        rules["perfect_score"] or 0
                     )
 
 
@@ -543,18 +595,16 @@ def get_evals(cursor, lobbyCode):
                     predictedDifference > 0
                     and actualDifference > 0
                 ):
-
                     correctWinnerPoints = (
-                        rules["correct_winner"]
+                        rules["correct_winner"] or 0
                     )
 
                 elif (
                     predictedDifference < 0
                     and actualDifference < 0
                 ):
-
                     correctWinnerPoints = (
-                        rules["correct_winner"]
+                        rules["correct_winner"] or 0
                     )
 
 
@@ -566,9 +616,8 @@ def get_evals(cursor, lobbyCode):
                     predictedDifference == 0
                     and actualDifference == 0
                 ):
-
                     correctDrawPoints = (
-                        rules["correct_draw"]
+                        rules["correct_draw"] or 0
                     )
 
 
@@ -577,16 +626,13 @@ def get_evals(cursor, lobbyCode):
                 # ------------------------------
 
                 if predicted1 == actual1:
-
                     exactTeamScorePoints += (
-                        rules["exact_team_score"]
+                        rules["exact_team_score"] or 0
                     )
 
-
                 if predicted2 == actual2:
-
                     exactTeamScorePoints += (
-                        rules["exact_team_score"]
+                        rules["exact_team_score"] or 0
                     )
 
 
@@ -599,11 +645,8 @@ def get_evals(cursor, lobbyCode):
                     ==
                     actualDifference
                 ):
-
                     correctScoreDifferencePoints = (
-                        rules[
-                            "correct_score_difference"
-                        ]
+                        rules["correct_score_difference"] or 0
                     )
 
 
@@ -616,9 +659,8 @@ def get_evals(cursor, lobbyCode):
                     ==
                     actual1 + actual2
                 ):
-
                     exactTotalScorePoints = (
-                        rules["exact_total_score"]
+                        rules["exact_total_score"] or 0
                     )
 
 
@@ -627,14 +669,12 @@ def get_evals(cursor, lobbyCode):
             # ==================================
 
             total = (
-
                 perfectScorePoints
                 + correctWinnerPoints
                 + correctDrawPoints
                 + exactTeamScorePoints
                 + correctScoreDifferencePoints
                 + exactTotalScorePoints
-
             )
 
 
@@ -642,9 +682,7 @@ def get_evals(cursor, lobbyCode):
             # SPELER TOEVOEGEN
             # ==================================
 
-            evaluationData[
-                str(gameId)
-            ]["players"].append({
+            evaluationData[gameId]["players"].append({
 
                 "username": username,
 
@@ -671,6 +709,7 @@ def get_evals(cursor, lobbyCode):
 
                 "total":
                     total
-
             })
+
+
     return evaluationData
