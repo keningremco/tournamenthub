@@ -1324,7 +1324,7 @@ def findTournament():
 
     return render_template('findtournament.html', userid=userid, error = error)
 
-@app.route("/makegame/<int:roundId>", methods=["POST", "GET"])
+@app.route("/makegame/<int:roundId>", methods=["GET", "POST"])
 @login_required
 def makeGame(roundId):
     userid = session.get("userid")
@@ -1342,154 +1342,179 @@ def makeGame(roundId):
                 ON tournaments.id = rounds.tournamentId
             WHERE rounds.id = %s
         """, (roundId,))
-	
+
         round_data = cursor.fetchone()
 
         if not round_data:
-            print('404')
             abort(404)
 
-        if not can_user(userid, 'tournament.create_games', round_data['tournamentId']):
-            flash("Je hebt geen toestemming om games in dit tournament te maken.", "error")
-            print('403')
-            return redirect(request.referrer or url_for("tournament", id=round_data['tournamentId']))
+        tournament_id = round_data["tournamentId"]
 
+        if not can_user(userid, "tournament.create_games", tournament_id):
+            flash(
+                "Je hebt geen toestemming om games in dit tournament te maken.",
+                "error"
+            )
+            return redirect(
+                request.referrer
+                or url_for("tournament", id=tournament_id)
+            )
 
-        if request.method == "POST":
-            team1 = request.form.get("team1")
-            team2 = request.form.get("team2")
-            start_time = request.form.get("start_time")
-            location = request.form.get("location")
+        if request.method == "GET":
+            return render_template(
+                "makegame.html",
+                roundId=roundId,
+                userid=userid,
+                tournamentId=tournament_id
+            )
 
-            if not team1 or not team2:
-                print('select two teams')
-                return render_template(
-                    "makegame.html",
-                    roundId=roundId,
-                    error="Select two teams."
-                )
+        team1 = request.form.get("team1")
+        team2 = request.form.get("team2")
+        start_time = request.form.get("start_time") or None
 
-            if team1 == team2:
-                print('a team cannot play against itslef')
-                return render_template(
-                    "makegame.html",
-                    roundId=roundId,
-                    error="A team cannot play against itself."
-                )
+        location = (request.form.get("location") or "").strip()
+
+        if not team1 or not team2:
+            return render_template(
+                "makegame.html",
+                roundId=roundId,
+                userid=userid,
+                tournamentId=tournament_id,
+                error="Select two teams."
+            )
+
+        if team1 == team2:
+            return render_template(
+                "makegame.html",
+                roundId=roundId,
+                userid=userid,
+                tournamentId=tournament_id,
+                error="A team cannot play against itself."
+            )
+
+        cursor.execute("""
+            SELECT id
+            FROM teams
+            WHERE id IN (%s, %s)
+              AND tournamentId = %s
+        """, (
+            team1,
+            team2,
+            tournament_id
+        ))
+
+        teams = cursor.fetchall()
+
+        if not teams or len(teams) != 2:
+            abort(403)
+
+        stadium_id = None
+
+        if location:
 
             cursor.execute("""
                 SELECT id
-                FROM teams
-                WHERE id IN (%s, %s)
-                AND tournamentId = %s
+                FROM stadiums
+                WHERE tournamentId = %s
+                  AND LOWER(TRIM(name)) = LOWER(TRIM(%s))
+                LIMIT 1
             """, (
-                team1,
-                team2,
-                round_data['tournamentId']
+                tournament_id,
+                location
             ))
 
-            teams = cursor.fetchall()
+            stadium = cursor.fetchone()
 
-            if len(teams) != 2:
-                print('not to teams found')
-                abort(403)
+            if stadium:
+                stadium_id = stadium["id"]
+            else:
 
-            stadiumId = None
-            print('stadiumId' + str(stadiumId))
-            if location:
                 cursor.execute("""
-                    SELECT id
-                    FROM stadiums
-                    WHERE tournamentId = %s AND LOWER(name) = LOWER(%s)
-                """, (userid, location))
-                stadium = cursor.fetchone()
-                if stadium:
-                    stadiumId = stadium['id']
-                if not stadiumId:
-                    cursor.execute('INSERT INTO stadiums (tournamentId, name) VALUES (%s, %s)', (round_data['tournamentId'], location))
-                    db.commit()
-                    stadiumId = cursor.lastrowid
-
-            if not stadiumId:
-                cursor.execute("""
-                    INSERT INTO games (
-                        start_time,
-                        roundId
+                    INSERT INTO stadiums (
+                        tournamentId,
+                        name
                     )
                     VALUES (%s, %s)
                 """, (
-                    start_time if start_time else None,
-                    roundId
-                ))
-            else:
-                cursor.execute("""
-                    INSERT INTO games (
-                        start_time,
-                        stadiumId,
-                        roundId
-                    )
-                    VALUES (%s, %s, %s)
-                """, (
-                    start_time if start_time else None,
-                    stadiumId,
-                    roundId
+                    tournament_id,
+                    location
                 ))
 
-            game_id = cursor.lastrowid
+                stadium_id = cursor.lastrowid
 
-            cursor.execute("""
-                INSERT INTO game_teams (
-                    gameId,
-                    teamId,
-                    home_away
-                )
-                VALUES (%s, %s, 'home')
-            """, (
-                game_id,
-                team1
-            ))
-
-            cursor.execute("""
-                INSERT INTO game_teams (
-                    gameId,
-                    teamId,
-                    home_away
-                )
-                VALUES (%s, %s, 'away')
-            """, (
-                game_id,
-                team2
-            ))
-
-            # Voor beide teams een score aanmaken
-            cursor.execute("""
-                INSERT INTO scores (gameId, teamId, score, result)
-                VALUES
-                    (%s, %s, 0, NULL),
-                    (%s, %s, 0, NULL)
-            """, (
-                game_id,
-                team1,
-                game_id,
-                team2
-            ))
-
-            db.commit()
-
-            return redirect(
-                url_for(
-                    "tournament",
-                    code=round_data["code"]
-                )
+        cursor.execute("""
+            INSERT INTO games (
+                start_time,
+                stadiumId,
+                roundId
             )
+            VALUES (%s, %s, %s)
+        """, (
+            start_time,
+            stadium_id,
+            roundId
+        ))
 
-        return render_template(
-            "makegame.html",
-            roundId=roundId, userid=userid, tournamentId = round_data['tournamentId']
+        game_id = cursor.lastrowid
+
+        if not game_id:
+            raise RuntimeError("Game kon niet worden aangemaakt.")
+
+        cursor.execute("""
+            INSERT INTO game_teams (
+                gameId,
+                teamId,
+                home_away
+            )
+            VALUES (%s, %s, 'home')
+        """, (
+            game_id,
+            team1
+        ))
+
+        cursor.execute("""
+            INSERT INTO game_teams (
+                gameId,
+                teamId,
+                home_away
+            )
+            VALUES (%s, %s, 'away')
+        """, (
+            game_id,
+            team2
+        ))
+
+        cursor.execute("""
+            INSERT INTO scores (
+                gameId,
+                teamId,
+                score,
+                result
+            )
+            VALUES
+                (%s, %s, 0, NULL),
+                (%s, %s, 0, NULL)
+        """, (
+            game_id,
+            team1,
+            game_id,
+            team2
+        ))
+
+        db.commit()
+
+        return redirect(
+            url_for(
+                "tournament",
+                code=round_data["code"]
+            )
         )
 
-    except Exception:
+    except Exception as e:
         db.rollback()
+
+        print(f"Fout bij makeGame({roundId}): {e}")
+
         raise
 
     finally:
