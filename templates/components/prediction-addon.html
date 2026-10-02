@@ -1,6 +1,42 @@
+{% macro prediction(game, data, user_id) %}
+    {% set ns.scripts = ns.scripts + [
+        {"name": "predictions", "type": "module"}
+    ] %}
 
-{% macro prediction(game, data) %}
-    <div class="prediction-box">
+
+    {# ==========================================
+       EVALUATIONS
+       ========================================== #}
+
+    {% set evaluations = game.evaluations|default({}) %}
+    {% set players = evaluations.players|default([]) %}
+
+    {# Zoek de huidige speler #}
+
+    {% set current_player = namespace(data=None) %}
+
+    {% for player in players %}
+        {% if player.userId == user_id %}
+            {% set current_player.data = player %}
+        {% endif %}
+    {% endfor %}
+
+
+    <div
+        class="prediction-box"
+        data-game-id="{{ game.id }}"
+        data-user-id="{{ user_id }}"
+    >
+
+        {# ======================================
+           HIDDEN USER ID
+           ====================================== #}
+
+        <input
+            type="hidden"
+            name="user_id"
+            value="{{ user_id }}"
+        >
 
 
         <div class="prediction-title">
@@ -8,8 +44,11 @@
         </div>
 
 
-        {% if game.status == 'scheduled' %}
+        {# ======================================
+           SCHEDULED
+           ====================================== #}
 
+        {% if game.status == 'scheduled' %}
 
             <form
                 class="prediction-form"
@@ -17,11 +56,16 @@
                 method="post"
             >
 
-
                 <input
                     type="hidden"
                     name="game_id"
                     value="{{ game.id }}"
+                >
+
+                <input
+                    type="hidden"
+                    name="user_id"
+                    value="{{ user_id }}"
                 >
 
 
@@ -34,7 +78,7 @@
                     type="number"
                     name="team1_score"
                     min="0"
-                    value="{{ game.predictedscorehome if game.predictedscorehome != None else '' }}"
+                    value="{% if current_player.data and current_player.data.predictedscorehome is not none %}{{ current_player.data.predictedscorehome }}{% endif %}"
                     required
                     aria-label="Score {{ game.homeTeam }}"
                 >
@@ -49,52 +93,54 @@
                     type="number"
                     name="team2_score"
                     min="0"
-                    value="{{ game.teams[1].predictedScore if game.teams[1].predictedScore != None else '' }}"
+                    value="{% if current_player.data and current_player.data.predictedscoreuit is not none %}{{ current_player.data.predictedscoreuit }}{% endif %}"
                     required
-                    aria-label="Score {{ game.teams[1].name }}"
+                    aria-label="Score {{ game.awayTeam }}"
                 >
 
 
                 <input
                     type="hidden"
                     name="game_ids"
-                    value='{{ {"team1Id": game.teams[0].id, "team2Id": game.teams[1].id } | tojson }}'
+                    value='{{ {
+                        "team1Id": game.homeTeamId,
+                        "team2Id": game.awayTeamId
+                    } | tojson }}'
                 >
 
 
                 <div class="prediction-team">
-                    {{ game.teams[1].name }}
+                    {{ game.awayTeam }}
                 </div>
 
 
-                <button type="submit" id="error">
+                <button
+                    type="submit"
+                    class="save-prediction"
+                >
                     Save prediction
                 </button>
-
 
             </form>
 
 
-        {% else %}
+        {# ======================================
+           NIET MEER WIJZIGBAAR
+           ====================================== #}
 
+        {% else %}
 
             <div class="prediction-locked">
 
-
-                {% if game.teams[0].predictedScore != None %}
+                {% if current_player.data %}
 
                     Your prediction:
 
                     <strong>
-
-                        {{ game.teams[0].predictedScore }}
-
+                        {{ current_player.data.predictedscorehome }}
                         -
-
-                        {{ game.teams[1].predictedScore }}
-
+                        {{ current_player.data.predictedscoreuit }}
                     </strong>
-
 
                 {% else %}
 
@@ -102,20 +148,20 @@
 
                 {% endif %}
 
-
             </div>
 
-
         {% endif %}
-
 
     </div>
 
 
+    {# ==========================================
+       EVALUATIONS BIJ COMPLETED
+       ========================================== #}
+
     {% if game.status == 'completed' %}
 
         <div class="game-evaluation">
-
 
             <button
                 type="button"
@@ -129,10 +175,24 @@
             <div
                 class="evaluation-dropdown"
                 id="evaluation-dropdown-{{ game.id }}"
-            ></div>
+            >
 
+                {# JS vult dit #}
+
+            </div>
+
+
+            {# JSON beschikbaar maken voor JS #}
+
+            <script
+                type="application/json"
+                id="evaluation-data-{{ game.id }}"
+            >
+                {{ evaluations | tojson }}
+            </script>
 
         </div>
 
     {% endif %}
+
 {% endmacro %}

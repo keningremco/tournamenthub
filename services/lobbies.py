@@ -686,6 +686,8 @@ def get_evals(cursor, lobbyCode):
 
                 "username": username,
 
+                "userId" : userId,
+                
                 "prediction_score":
                     f"{predicted1} - {predicted2}",
 
