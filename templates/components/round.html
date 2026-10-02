@@ -1,10 +1,10 @@
 {% from 'components/game-card.html' import game_card %}
-{% macro round(games, name, id, permissions) %}
+{% macro round(games, name, id, permissions, tournament) %}
     <div class="section section-round" id="roundId-{{ id }}">
         <h1>{{ name }}</h1>
         <div class="round">
         {% for game in games %}
-            {{ game_card(game, permissions) }}
+            {{ game_card(game, permissions, tournament) }}
         {% endfor %}
         </div>
 
