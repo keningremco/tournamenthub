@@ -11,8 +11,13 @@
     } %}
 
     {{ draw_rounds_slider(data) }}
-    {% for round_var in rounds %}
-        {{ round(games, name, id, data) }}
+    {% for round_var in data.rounds %}
+        {{ round(
+            round_var.games,
+            round_var.name,
+            round_var.id,
+            data
+        ) }}
     {% endfor %}
 {% endmacro %}
 
