@@ -14,7 +14,7 @@
     {% set current_player = namespace(data=None) %}
 
     {% for player in players %}
-        {% if player.userId == user_id %}
+        {% if player.userId|int == user_id|int %}
             {% set current_player.data = player %}
         {% endif %}
     {% endfor %}
