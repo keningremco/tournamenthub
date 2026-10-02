@@ -60,7 +60,7 @@
     {% endif %}
 
     {% if 'tournament.edit_games' in permissions['tournaments'].get(tournament.id|string, []) %}
-        <a href="{{ url_for('edit_game', game_id = game.id ) }}" class="btn btn-primary"></a>
+        <a href="{{ url_for('edit_game', game_id = game.id ) }}" class="btn btn-primary">edit game</a>
     {% endif %}
 </div>
 {% endmacro %}
