@@ -23,7 +23,6 @@ def get_rounds(tournamentcode, lobbycode=None):
         evals = get_evals(cursor, lobbycode)
         counter = 0
         counter2 = 0
-        print(evals)
         for round in rounds:
             for game in round['games']:
                 rounds[counter]['games'][counter2]['evaluations'] = evals.get(game['id'], [])

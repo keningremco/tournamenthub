@@ -420,14 +420,14 @@ def get_evals(cursor, lobbyCode):
 
             FROM lobby_members lm
 
-            JOIN users u
+            LEFT JOIN users u
                 ON u.id = lm.userId
 
-            JOIN predictions p
+            LEFT JOIN predictions p
                 ON p.userId = u.id
                 AND p.gameId = %s
 
-            JOIN predicted_scores ps
+            LEFT JOIN predicted_scores ps
                 ON ps.predictionId = p.id
 
             WHERE lm.lobbyId = %s
