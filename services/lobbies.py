@@ -689,6 +689,12 @@ def get_evals(cursor, lobbyCode):
                 "prediction_score":
                     f"{predicted1} - {predicted2}",
 
+                "predictedscorehome":
+                    predicted1,
+
+                "predictedscoreuit":
+                    predicted2,
+
                 "perfect_score":
                     perfectScorePoints,
 
