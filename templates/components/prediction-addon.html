@@ -25,12 +25,6 @@
                     value="{{ game.id }}"
                 >
 
-                <input
-                    type="hidden"
-                    name="user_id"
-                    value="{{ user_id }}"
-                >
-
 
                 <div class="prediction-team">
                     {{ game.homeTeam }}
@@ -41,7 +35,7 @@
                     type="number"
                     name="team1_score"
                     min="0"
-                    value="{% for player in game.evaluations.players|default([]) if player.userId|int == user_id|int %}{{ player.predictedscorehome if player.predictedscorehome is not none else '' }}{% endfor %}"
+                    value="{% for player in game.get('evaluations', {}).get('players', []) if player.userId|int == user_id|int %}{{ player.predictedscorehome if player.predictedscorehome is not none else '' }}{% endfor %}"
                     required
                     aria-label="Score {{ game.homeTeam }}"
                 >
@@ -56,7 +50,7 @@
                     type="number"
                     name="team2_score"
                     min="0"
-                    value="{% for player in game.evaluations.players|default([]) if player.userId|int == user_id|int %}{{ player.predictedscoreuit if player.predictedscoreuit is not none else '' }}{% endfor %}"
+                    value="{% for player in game.get('evaluations', {}).get('players', []) if player.userId|int == user_id|int %}{{ player.predictedscoreuit if player.predictedscoreuit is not none else '' }}{% endfor %}"
                     required
                     aria-label="Score {{ game.awayTeam }}"
                 >
@@ -91,7 +85,7 @@
 
             <div class="prediction-locked">
 
-                {% for player in game.evaluations.players|default([])
+                {% for player in game.get('evaluations', {}).get('players', [])
                     if player.userId|int == user_id|int %}
 
                     Your prediction:
@@ -138,7 +132,7 @@
                 type="application/json"
                 id="evaluation-data-{{ game.id }}"
             >
-                {{ game.evaluations|default({}) | tojson }}
+                {{ game.get('evaluations', {}) | tojson }}
             </script>
 
         </div>
