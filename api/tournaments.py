@@ -1,7 +1,7 @@
 from . import api
 from db.connection import get_db_connection
 from services.tournaments import get_game_round, get_tournament
-from api.lobbies import getLobbyEvaluations
+from services.lobbies import get_evals
 import json
 
 @api.route('/tournament/<tournamentcode>/round/<roundnumber>')
@@ -20,7 +20,7 @@ def get_rounds(tournamentcode, lobbycode=None):
     db, cursor = get_db_connection()
     rounds = get_tournament(tournamentcode, cursor, json)
     if lobbycode:
-        evals = getLobbyEvaluations(lobbycode)
+        evals = get_evals(cursor, lobbycode)
         counter = 0
         counter2 = 0
         for round in rounds:
