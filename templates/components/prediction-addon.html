@@ -1,5 +1,5 @@
 
-{% macro prediction(game) %}
+{% macro prediction(game, data) %}
     <div class="prediction-box">
 
 
@@ -13,7 +13,7 @@
 
             <form
                 class="prediction-form"
-                action="{{ url_for('savePrediction', lobbyCode=lobby.code) }}"
+                action="{{ url_for('savePrediction', lobbyCode=data.lobby.code) }}"
                 method="post"
             >
 

@@ -1,13 +1,14 @@
 {% from 'components/round.html' import round %}
 {% from 'components/rounds-slider.html' import draw_rounds_slider %}
 
-{% macro draw_rounds(rounds, permissions, tournament, predictions) %}
+{% macro draw_rounds(rounds, permissions, tournament, predictions, lobby) %}
     
     {% set data = {
         "rounds": rounds,
         "permissions": permissions,
         "tournament": tournament,
-        "predictions": predictions
+        "predictions": predictions,
+        'lobby' : lobby
     } %}
 
     {{ draw_rounds_slider(data) }}
