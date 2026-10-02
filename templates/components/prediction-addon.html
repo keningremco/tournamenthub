@@ -34,7 +34,7 @@
                     type="number"
                     name="team1_score"
                     min="0"
-                    value="{{ game.teams[0].predictedScore if game.teams[0].predictedScore != None else '' }}"
+                    value="{{ game.predictedscorehome if game.predictedscorehome != None else '' }}"
                     required
                     aria-label="Score {{ game.homeTeam }}"
                 >

@@ -67,8 +67,22 @@ def get_tournament(tournamentcode, cursor, json):
                                         ON game_teams.teamId = teams.id
                                     WHERE game_teams.home_away = 'home' AND game_teams.gameId = games.id
                                 ),
+                    'homeTeamId', (
+                                    SELECT teams.id
+                                    FROM teams
+                                    JOIN game_teams
+                                        ON game_teams.teamId = teams.id
+                                    WHERE game_teams.home_away = 'home' AND game_teams.gameId = games.id
+                                ),
                     'awayTeam', (
                                     SELECT teams.name
+                                    FROM teams
+                                    JOIN game_teams
+                                        ON game_teams.teamId = teams.id
+                                    WHERE game_teams.home_away = 'away' AND game_teams.gameId = games.id
+                                ),
+                    'awayTeamId', (
+                                    SELECT teams.id
                                     FROM teams
                                     JOIN game_teams
                                         ON game_teams.teamId = teams.id
