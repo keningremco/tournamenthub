@@ -9,4 +9,13 @@
         </div>
 
     </div>
+
+    <a href="{{ url_for('makegame', roundId = id ) }}">make game</a>
+    <form method="POST" action="{{ url_for('delete_round', round_id = id ) }}" onsubmit="return confirm('Weet je zeker dat je deze ronde wilt verwijderen? Alle games in deze ronde worden ook verwijderd.');" style="display: inline;">
+
+        <button type="submit" class="btn btn-danger">
+            Delete round
+        </button>
+
+    </form>
 {% endmacro %}

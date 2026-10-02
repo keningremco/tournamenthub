@@ -5,6 +5,6 @@
     {{ draw_rounds_slider(rounds, permissions, tournament) }}
     {% for round_var in rounds %}
         {{ round(round_var.games, round_var.name, round_var.id, permissions, tournament) }}
-    {% endfor %}   
+    {% endfor %}
 {% endmacro %}
 
