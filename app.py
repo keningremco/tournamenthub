@@ -1846,7 +1846,7 @@ def lobby(code):
                 break
     
 
-    permissions = can_user(userid, tournament.id)    
+    permissions = can_user(userid, tournament["id"])    
     
     return render_template(
         'lobby.html',
