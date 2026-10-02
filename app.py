@@ -16,7 +16,7 @@ from permissions.permission import can_user
 from services.lobbies import get_lobby_rounds_points, calc_prediction_points_game, get_lobby_leaderboard
 from scripts.build_style import build_style_css
 from api.tournaments import get_rounds
-
+from api.lobbies import getLobbyEvaluations
 
 load_dotenv()
 
@@ -1829,16 +1829,16 @@ def lobby(code):
             flash(error_msg, "error")
             return redirect(request.referrer or abort(error_code))
         
-        rounds_points = get_lobby_rounds_points(lobby["id"],userid, cursor)
+        
     finally:
         cursor.close()
         db.close()
 
-
+    predictions = getLobbyEvaluations(code)
     rounds = get_rounds(tournament['code'])
 
     permissions = can_user(userid, tournamentId = tournament["id"])    
-
+    return predictions
     return render_template(
         'lobby.html',
         userid=userid,
