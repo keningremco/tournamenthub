@@ -1416,7 +1416,7 @@ def makeGame(roundId):
                         start_time,
                         roundId
                     )
-                    VALUES (%s, %s, %s)
+                    VALUES (%s, %s)
                 """, (
                     start_time if start_time else None,
                     roundId
