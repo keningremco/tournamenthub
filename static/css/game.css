@@ -7,6 +7,13 @@
 }
 
 
+.game-card{
+    background-color: var(--card-background-color);
+    border: var(--card-border);
+    border-radius: var(--card-border-radius);
+    padding: var(--card-padding);
+}
+
 /* Home */
 
 .home {
