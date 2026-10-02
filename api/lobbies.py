@@ -490,6 +490,8 @@ def getLobbyEvaluations(lobbyCode):
         cursor.close()
         db.close()
 
+
+
 @api.route('/lobby/code/<code>/leaderboard')
 @api.route('/lobby/id/<int:id>/leaderboard')
 def api_get_lobby_leaderboard(code=None, id=None):

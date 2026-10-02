@@ -48,3 +48,70 @@ def get_game_round(tournamentcode, roundnumber, cursor):
     """, (tournamentcode, roundnumber))
     games = cursor.fetchall()
     return games
+
+
+def get_tournament(tournamentcode, cursor, json):
+    
+    cursor.execute("""
+        SELECT 
+        rounds.*,
+        (
+            SELECT JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'id', games.id,
+                    'roundId', games.roundId,
+                    'homeTeam', (
+                                    SELECT teams.name
+                                    FROM teams
+                                    JOIN game_teams
+                                        ON game_teams.teamId = teams.id
+                                    WHERE game_teams.home_away = 'home' AND game_teams.gameId = games.id
+                                ),
+                    'awayTeam', (
+                                    SELECT teams.name
+                                    FROM teams
+                                    JOIN game_teams
+                                        ON game_teams.teamId = teams.id
+                                    WHERE game_teams.home_away = 'away' AND game_teams.gameId = games.id
+                                ),
+                    'homeScore', (
+                                    SELECT scores.score
+                                    FROM scores
+                                    JOIN game_teams
+                                        ON game_teams.teamId = scores.teamId
+                                    WHERE scores.gameId = games.id 
+                                    AND game_teams.gameId = games.id
+                                    AND game_teams.home_away = 'home'
+                                ),
+                    'awayScore', (
+                                    SELECT scores.score
+                                    FROM scores
+                                    JOIN game_teams
+                                        ON game_teams.teamId = scores.teamId
+                                    WHERE scores.gameId = games.id 
+                                    AND game_teams.gameId = games.id
+                                    AND game_teams.home_away = 'away'
+                                ),
+                    'location', stadiums.name,
+                    'status', games.status,
+                    'start-date', games.start_time
+
+                )
+            )
+            FROM games
+            LEFT JOIN stadiums
+                ON games.stadiumId = stadiums.id
+            WHERE games.roundId = rounds.id
+        ) AS games
+        FROM rounds
+        JOIN tournaments
+            ON tournaments.id = rounds.tournamentId
+        WHERE tournaments.code = %s
+    """, (tournamentcode,))
+    rounds = cursor.fetchall()
+    for round in rounds:
+        if round["games"]:
+            round["games"] = json.loads(round["games"])
+        else:
+            round["games"] = []
+    return rounds
