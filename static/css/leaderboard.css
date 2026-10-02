@@ -26,9 +26,11 @@
 .scoreboard-player {
     display: flex;
     align-items: center;
-    padding: 12px;
-    background: #eee;
-    border-radius: 8px;
+    gap: 12px;
+    padding: 14px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 0px !important;
 }
 
 .rank {
