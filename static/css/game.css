@@ -92,6 +92,14 @@
     background-color: #7a7a7a;
 }
 
+.in_progress {
+    background-color: #386dff;
+}
+
+.cancelled {
+    background-color: #ff2c2c;
+}
+
 /* ========================================
    Mobiel
    ======================================== */
