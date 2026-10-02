@@ -79,9 +79,13 @@
 }
 
 .game-status {
-    padding: 3px;
+    padding: 3px 8px;
     border-radius: 5000px;
-    background-color: blue;
+    color: white;
+}
+
+.game-status .completed{
+    background-color: #08A053;
 }
 
 /* ========================================
