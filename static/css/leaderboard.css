@@ -1,0 +1,101 @@
+.scoreboard-container {
+    width: 100%;
+    max-width: 600px;
+}
+
+.scoreboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.refresh-button {
+    padding: 8px 15px;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+}
+
+.scoreboard {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.scoreboard-player {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: #eee;
+    border-radius: 8px;
+}
+
+.rank {
+    width: 40px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.player-name {
+    flex: 1;
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.player-points {
+    margin-left: auto;
+    font-weight: bold;
+}
+
+/* Desktop points */
+.normal-points,
+.bonus-points,
+.total-points {
+    display: block;
+}
+
+/* Compact points for mobile */
+.compact-points {
+    display: none;
+}
+
+.leaderboard-loading {
+    padding: 15px;
+    text-align: center;
+}
+
+@media (max-width: 500px) {
+    .scoreboard-player {
+        display: grid;
+        grid-template-columns: 40px 1fr;
+        gap: 6px 10px;
+    }
+
+    .rank {
+        grid-row: 1 / span 2;
+    }
+
+    .player-name {
+        min-width: 0;
+    }
+
+    .player-points {
+        margin-left: 0;
+    }
+
+    .normal-points,
+    .bonus-points,
+    .total-points {
+        display: none;
+    }
+
+    .compact-points {
+        display: block;
+        grid-column: 2;
+        margin-left: 0;
+        font-weight: bold;
+    }
+}
