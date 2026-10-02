@@ -1846,15 +1846,16 @@ def lobby(code):
                 break
     
 
-        
-
+    permissions = can_user(userid, tournament.id)    
+    
     return render_template(
         'lobby.html',
         userid=userid,
         lobby=lobby,
         tournament=tournament,
         rounds=rounds,
-        leaderboard=leaderboard
+        leaderboard=leaderboard,
+        permissions=permissions
     )
 
 
