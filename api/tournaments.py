@@ -64,7 +64,7 @@ def get_rounds(tournamentcode):
                 )
             )
             FROM games
-            JOIN stadiums
+            LEFT JOIN stadiums
                 ON games.stadiumId = stadiums.id
             WHERE games.roundId = rounds.id
         ) AS games
