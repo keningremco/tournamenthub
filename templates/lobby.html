@@ -390,7 +390,7 @@ html {
     {% from 'components/rounds.html' import draw_rounds %}
 
     {{ draw_rounds(rounds, permissions, tournament, 'True', lobby, userid) }}
-
+    {{userid}}
     <script>
     document.querySelectorAll(".prediction-form").forEach(form => {
         form.addEventListener("submit", async function(event) {
