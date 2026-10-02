@@ -1835,15 +1835,7 @@ def lobby(code):
         db.close()
 
 
-    rounds = get_tournament_rounds(tournament["id"], userid)
-    
-    
-    for round in rounds:
-        for round_points in rounds_points:
-            if round["id"] == round_points["id"]:
-                round["points"] = round_points["points"]
-                break
-    
+    rounds = get_rounds(tournament['code'])
 
     permissions = can_user(userid, tournamentId = tournament["id"])    
 
