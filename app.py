@@ -1806,7 +1806,7 @@ def lobby(code):
         )
 
         lobby = cursor.fetchone()
-
+        print(lobby)
         if not lobby:
             abort(404)
 
