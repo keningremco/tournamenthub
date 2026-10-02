@@ -1410,18 +1410,30 @@ def makeGame(roundId):
                     db.commit()
                     stadiumId = cursor.lastrowid
 
-            cursor.execute("""
-                INSERT INTO games (
-                    start_time,
+            if not stadiumId:
+                cursor.execute("""
+                    INSERT INTO games (
+                        start_time,
+                        roundId
+                    )
+                    VALUES (%s, %s, %s)
+                """, (
+                    start_time if start_time else None,
+                    roundId
+                ))
+            else:
+                cursor.execute("""
+                    INSERT INTO games (
+                        start_time,
+                        stadiumId,
+                        roundId
+                    )
+                    VALUES (%s, %s, %s)
+                """, (
+                    start_time if start_time else None,
                     stadiumId,
                     roundId
-                )
-                VALUES (%s, %s, %s)
-            """, (
-                start_time if start_time else None,
-                stadiumId if stadiumId else None,
-                roundId
-            ))
+                ))
 
             game_id = cursor.lastrowid
 
