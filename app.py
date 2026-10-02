@@ -155,41 +155,193 @@ def convert_to_json_string(data):
 @app.route("/saveprediction/<lobbyCode>", methods=["POST"])
 @login_required
 def savePrediction(lobbyCode):
-    userid = session.get('userid')
-    team1Score = request.form.get('team1_score')
-    
-    
-    teamIds = json.loads(convert_to_json_string(request.form.get('game_ids')))
-    if not teamIds:
-        abort(404)
-    team2Score = request.form.get('team2_score')
-    gameId = request.form.get('game_id')
-    db,cursor  =get_db_connection()
-    if (team1Score or team2Score) == None:
-        abort(404)
+    userid = session.get("userid")
+
+    team1Score = request.form.get("team1_score")
+    team2Score = request.form.get("team2_score")
+    gameId = request.form.get("game_id")
+
+    if team1Score is None or team2Score is None or gameId is None:
+        abort(400)
+
+    # Lege scores niet accepteren
+    if team1Score == "" or team2Score == "":
+        abort(400)
+
+    # Zet scores om naar integers
     try:
-        cursor.execute("SELECT id FROM predictions WHERE gameId= %s AND userId = %s", (gameId, userid))
+        team1Score = int(team1Score)
+        team2Score = int(team2Score)
+        gameId = int(gameId)
+    except (TypeError, ValueError):
+        abort(400)
+
+    # Negatieve scores niet accepteren
+    if team1Score < 0 or team2Score < 0:
+        abort(400)
+
+    # game_ids ophalen
+    try:
+        teamIds = json.loads(
+            convert_to_json_string(
+                request.form.get("game_ids")
+            )
+        )
+    except (TypeError, ValueError, json.JSONDecodeError):
+        abort(400)
+
+    if not teamIds:
+        abort(400)
+
+    team1Id = teamIds.get("team1Id")
+    team2Id = teamIds.get("team2Id")
+
+    if team1Id is None or team2Id is None:
+        abort(400)
+
+    db, cursor = get_db_connection()
+
+    try:
+        # ==========================================
+        # CONTROLEER OF GAME BESTAAT
+        # ==========================================
+
+        cursor.execute("""
+            SELECT id
+            FROM games
+            WHERE id = %s
+        """, (gameId,))
+
+        game = cursor.fetchone()
+
+        if not game:
+            abort(404)
+
+
+        # ==========================================
+        # CONTROLEER OF TEAMS BIJ GAME HOREN
+        # ==========================================
+
+        cursor.execute("""
+            SELECT teamId
+            FROM game_teams
+            WHERE gameId = %s
+            AND teamId IN (%s, %s)
+        """, (
+            gameId,
+            team1Id,
+            team2Id
+        ))
+
+        gameTeams = cursor.fetchall()
+
+        foundTeamIds = {
+            row["teamId"]
+            for row in gameTeams
+        }
+
+        if team1Id not in foundTeamIds or team2Id not in foundTeamIds:
+            abort(400)
+
+
+        # ==========================================
+        # BESTAANDE PREDICTION OPHALEN
+        # ==========================================
+
+        cursor.execute("""
+            SELECT id
+            FROM predictions
+            WHERE gameId = %s
+            AND userId = %s
+        """, (
+            gameId,
+            userid
+        ))
+
         prediction = cursor.fetchone()
+
+
+        # ==========================================
+        # PREDICTION MAKEN ALS HIJ NIET BESTAAT
+        # ==========================================
+
         if not prediction:
             makePrediction(userid, gameId, cursor)
             db.commit()
-        cursor.execute("SELECT id FROM predictions WHERE gameId= %s AND userId = %s", (gameId, userid))
-        prediction = cursor.fetchone()
-        predictionId = prediction['id']
-        cursor.execute("SELECT * FROM predicted_scores WHERE predictionId = %s", (predictionId,))
-        scores = cursor.fetchall()
-        if not scores:
-            teamId = teamIds['team1Id']
-            cursor.execute("""
-                INSERT INTO predicted_scores (predictionId, teamId) VALUES (%s, %s)
-        """, (predictionId, teamId))
-            db.commit()
 
-            teamId = teamIds['team2Id']
             cursor.execute("""
-                INSERT INTO predicted_scores (predictionId, teamId) VALUES (%s, %s)
-        """, (predictionId, teamId))
-            db.commit()
+                SELECT id
+                FROM predictions
+                WHERE gameId = %s
+                AND userId = %s
+            """, (
+                gameId,
+                userid
+            ))
+
+            prediction = cursor.fetchone()
+
+        if not prediction:
+            abort(500)
+
+        predictionId = prediction["id"]
+
+
+        # ==========================================
+        # PREDICTED SCORES CONTROLEREN
+        # ==========================================
+
+        cursor.execute("""
+            SELECT teamId
+            FROM predicted_scores
+            WHERE predictionId = %s
+        """, (predictionId,))
+
+        scores = cursor.fetchall()
+
+        existingTeamIds = {
+            row["teamId"]
+            for row in scores
+        }
+
+
+        # ==========================================
+        # TEAM 1 TOEVOEGEN
+        # ==========================================
+
+        if team1Id not in existingTeamIds:
+            cursor.execute("""
+                INSERT INTO predicted_scores
+                    (predictionId, teamId, score)
+                VALUES
+                    (%s, %s, %s)
+            """, (
+                predictionId,
+                team1Id,
+                team1Score
+            ))
+
+
+        # ==========================================
+        # TEAM 2 TOEVOEGEN
+        # ==========================================
+
+        if team2Id not in existingTeamIds:
+            cursor.execute("""
+                INSERT INTO predicted_scores
+                    (predictionId, teamId, score)
+                VALUES
+                    (%s, %s, %s)
+            """, (
+                predictionId,
+                team2Id,
+                team2Score
+            ))
+
+
+        # ==========================================
+        # SCORES BIJWERKEN
+        # ==========================================
 
         cursor.execute("""
             UPDATE predicted_scores
@@ -200,17 +352,34 @@ def savePrediction(lobbyCode):
             WHERE predictionId = %s
             AND teamId IN (%s, %s)
         """, (
-            teamIds['team1Id'], team1Score,
-            teamIds['team2Id'], team2Score,
+            team1Id,
+            team1Score,
+
+            team2Id,
+            team2Score,
+
             predictionId,
-            teamIds['team1Id'], teamIds['team2Id']
+
+            team1Id,
+            team2Id
         ))
+
+
+        # ==========================================
+        # OPSLAAN
+        # ==========================================
 
         db.commit()
 
-        return redirect(url_for('lobby', code=lobbyCode) + "#" + gameId)
+        return redirect(
+            url_for("lobby", code=lobbyCode) + "#" + str(gameId)
+        )
 
-        
+
+    except Exception:
+        db.rollback()
+        raise
+
     finally:
         cursor.close()
         db.close()
