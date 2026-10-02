@@ -1,0 +1,201 @@
+.games {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.game {
+    padding: 18px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    scroll-margin-top: 30px;
+    transition:
+        box-shadow 0.3s ease,
+        transform 0.3s ease,
+        border-color 0.3s ease;
+}
+
+.game.highlighted {
+    border-color: #2d7ff9;
+    box-shadow: 0 0 0 3px rgba(45, 127, 249, 0.2);
+    transform: scale(1.01);
+}
+
+/* =========================
+   Teams
+   ========================= */
+
+.game-teams {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.team {
+    min-width: 0;
+    padding: 15px;
+    text-align: center;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.team > div {
+    overflow: hidden;
+    font-size: 17px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.team small {
+    display: block;
+    min-height: 17px;
+    margin-top: 8px;
+    color: #64748B;
+    font-size: 14px;
+}
+
+.vs {
+    color: #64748B;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* =========================
+   Game information
+   ========================= */
+
+.game-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    margin-bottom: 15px;
+    color: #64748B;
+    font-size: 14px;
+    background: #f8f8f8;
+    border-radius: 7px;
+}
+
+.game-info span {
+    min-width: 0;
+}
+
+.game-info strong {
+    color: #334155;
+}
+
+.game-info a {
+    color: #2d7ff9;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.game-info a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================
+   No games / loading / errors
+   ========================= */
+
+.no-games {
+    padding: 25px;
+    color: #64748B;
+    text-align: center;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.no-games.error {
+    color: #8f2929;
+    background: #fff5f5;
+    border-color: #e4aaaa;
+}
+
+/* =========================
+   Header
+   ========================= */
+
+.tournament-header-title {
+    display: inline-block;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* =========================
+   Responsive
+   ========================= */
+
+@media (min-width: 700px) {
+
+    .games {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .game-teams {
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    }
+
+    .game-info {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+}
+
+@media (max-width: 699px) {
+
+    .tournament-summary {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .round-tabs {
+        scrollbar-width: thin;
+    }
+
+    .game {
+        padding: 15px;
+    }
+
+    .round-heading {
+        align-items: flex-start;
+    }
+
+}
+
+@media (max-width: 420px) {
+
+    .round-tab {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .game {
+        padding: 12px;
+    }
+
+    .team {
+        padding: 12px;
+    }
+
+    .round-heading {
+        flex-direction: column;
+    }
+
+    .round-refresh {
+        width: 100%;
+    }
+
+}
