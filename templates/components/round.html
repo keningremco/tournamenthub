@@ -12,7 +12,6 @@
     {% if 'tournament.edit_games' in data.permissions['tournaments'].get(data.tournament.id|string, []) %}
     <a href="{{ url_for('makeGame', roundId = id ) }}">make game</a>
     {% endif %}
-    {{data.permissions}}
     {% if 'tournament.edit_games' in data.permissions['tournaments'].get(data.tournament.id|string, []) %}
     <form method="POST" action="{{ url_for('delete_round', round_id = id ) }}" onsubmit="return confirm('Weet je zeker dat je deze ronde wilt verwijderen? Alle games in deze ronde worden ook verwijderd.');" style="display: inline;">
 
