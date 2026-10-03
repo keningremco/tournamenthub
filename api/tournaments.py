@@ -21,6 +21,7 @@ def get_rounds(tournamentcode, lobbycode=None, userid=None):
     rounds = get_tournament(tournamentcode, cursor, json)
     if lobbycode and userid:
         evals = get_evals(cursor, lobbycode)
+        return evals
         counter = 0
         counter2 = 0
         for round in rounds:
