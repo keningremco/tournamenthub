@@ -1,22 +1,46 @@
 {% macro prediction(game, data, user_id) %}
 
 {# ==========================================
-   EVALUATIONS
+   BASISDATA
    ========================================== #}
 
+{% set status = game.status|default('')|string|lower|trim %}
 {% set evaluations = game.evaluations|default({}) %}
 {% set players = evaluations.players|default([]) %}
 
-{# Zoek de huidige speler #}
+{# ==========================================
+   HUIDIGE GEBRUIKER ZOEKEN
+   userId uit JSON kan integer zijn,
+   user_id uit Flask kan string zijn.
+   Daarom beide naar string.
+   ========================================== #}
 
 {% set current_player = namespace(data=None) %}
+{% set current_user_id = user_id|string %}
 
 {% for player in players %}
-    {% if player.userId == user_id %}
+    {% if player.userId|string == current_user_id %}
         {% set current_player.data = player %}
     {% endif %}
 {% endfor %}
 
+
+{# ==========================================
+   VOORSPELLING HUIDIGE GEBRUIKER
+   ========================================== #}
+
+{% set predicted_home = none %}
+{% set predicted_away = none %}
+
+{% if current_player.data %}
+    {% set predicted_home = current_player.data.predictedscorehome %}
+    {% set predicted_away = current_player.data.predictedscoreuit %}
+{% endif %}
+
+
+{# ==========================================
+   GAME
+   ========================================== #}
 
 <div
     class="prediction-box"
@@ -24,16 +48,11 @@
     data-user-id="{{ user_id }}"
 >
 
-    {# ======================================
-       HIDDEN USER ID
-       ====================================== #}
-
     <input
         type="hidden"
         name="user_id"
         value="{{ user_id }}"
     >
-
 
     <div class="prediction-title">
         Your prediction
@@ -41,10 +60,10 @@
 
 
     {# ======================================
-       SCHEDULED
+       VOORSPELLING KAN WORDEN AANGEPAST
        ====================================== #}
 
-    {% if game.status == 'scheduled' %}
+    {% if status == 'scheduled' %}
 
         <form
             class="prediction-form"
@@ -64,36 +83,31 @@
                 value="{{ user_id }}"
             >
 
-
             <div class="prediction-team">
                 {{ game.homeTeam }}
             </div>
-
 
             <input
                 type="number"
                 name="team1_score"
                 min="0"
-                value="{% if current_player.data and current_player.data.predictedscorehome is not none %}{{ current_player.data.predictedscorehome }}{% endif %}"
+                value="{{ predicted_home if predicted_home is not none else '' }}"
                 required
                 aria-label="Score {{ game.homeTeam }}"
             >
-
 
             <div class="prediction-separator">
                 -
             </div>
 
-
             <input
                 type="number"
                 name="team2_score"
                 min="0"
-                value="{% if current_player.data and current_player.data.predictedscoreuit is not none %}{{ current_player.data.predictedscoreuit }}{% endif %}"
+                value="{{ predicted_away if predicted_away is not none else '' }}"
                 required
                 aria-label="Score {{ game.awayTeam }}"
             >
-
 
             <input
                 type="hidden"
@@ -104,11 +118,9 @@
                 } | tojson }}'
             >
 
-
             <div class="prediction-team">
                 {{ game.awayTeam }}
             </div>
-
 
             <button
                 type="submit"
@@ -121,7 +133,7 @@
 
 
     {# ======================================
-       NIET MEER WIJZIGBAAR
+       GAME COMPLETED / NIET MEER WIJZIGBAAR
        ====================================== #}
 
     {% else %}
@@ -130,17 +142,35 @@
 
             {% if current_player.data %}
 
-                Your prediction:
+                <div class="prediction-result">
 
-                <strong>
-                    {{ current_player.data.predictedscorehome }}
-                    -
-                    {{ current_player.data.predictedscoreuit }}
-                </strong>
+                    <div>
+                        Your prediction:
+                        <strong>
+                            {{ predicted_home }}
+                            -
+                            {{ predicted_away }}
+                        </strong>
+                    </div>
+
+                    {% if status == 'completed' %}
+                        <div>
+                            Actual result:
+                            <strong>
+                                {{ game.homeScore }}
+                                -
+                                {{ game.awayScore }}
+                            </strong>
+                        </div>
+                    {% endif %}
+
+                </div>
 
             {% else %}
 
-                Predictions can no longer be changed.
+                <div>
+                    Predictions can no longer be changed.
+                </div>
 
             {% endif %}
 
@@ -155,7 +185,7 @@
    EVALUATIONS BIJ COMPLETED
    ========================================== #}
 
-{% if game.status == 'completed' %}
+{% if status == 'completed' %}
 
     <div class="game-evaluation">
 
@@ -167,18 +197,12 @@
             View predictions
         </button>
 
-
         <div
             class="evaluation-dropdown"
             id="evaluation-dropdown-{{ game.id }}"
         >
-
             {# JS vult dit #}
-
         </div>
-
-
-        {# JSON beschikbaar maken voor JS #}
 
         <script
             type="application/json"
@@ -190,6 +214,5 @@
     </div>
 
 {% endif %}
-
 
 {% endmacro %}
