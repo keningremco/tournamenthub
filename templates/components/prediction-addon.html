@@ -1,190 +1,1136 @@
-
 {% macro prediction(game, data, user_id) %}
 
-{# ==========================================
-   BASISDATA
-   ========================================== #}
+{# ==========================================================
+   PREDICTION MACRO - FAIL LOUD / DEBUG VERSION
+   GEEN NAMESPACE
+   ========================================================== #}
+
+{# ==========================================================
+   BASIS
+   ========================================================== #}
 
 {% set status = game.status|default('')|string|lower|trim %}
+{% set game_id = game.id|default(none) %}
+{% set current_user_id = user_id|string|trim %}
+{% set current_user_id_int = user_id|int %}
+
+{% set home_team = game.homeTeam|default(none) %}
+{% set away_team = game.awayTeam|default(none) %}
+{% set home_team_id = game.homeTeamId|default(none) %}
+{% set away_team_id = game.awayTeamId|default(none) %}
+
 {% set evaluations = game.evaluations|default({}) %}
-{% set players = evaluations.players|default([]) %}
+{% set players = [] %}
 
-{# ==========================================
-   HUIDIGE GEBRUIKER
-   Flask user_id kan string zijn,
-   userId uit JSON is meestal integer.
-   Daarom user_id naar int.
-   ========================================== #}
+{% if evaluations is mapping and evaluations.players is defined %}
+    {% set players = evaluations.players|default([]) %}
+{% endif %}
 
-{% set current_user_id = user_id|int %}
 
-{% set current_player = players
-    |selectattr('userId', 'equalto', current_user_id)
-    |list
-    |first
-%}
+{# ==========================================================
+   PREDICTION RECORD ZOEKEN
+   We proberen verschillende mogelijke API-structuren.
+   ========================================================== #}
 
-{# ==========================================
-   VOORSPELLING HUIDIGE GEBRUIKER
-   ========================================== #}
+{% set prediction_record = none %}
+{% set prediction_source = 'GEEN BRON GEVONDEN' %}
+
+
+{# ----------------------------------------------------------
+   SOURCE 1: game.user_prediction
+   ---------------------------------------------------------- #}
+
+{% if game.user_prediction is defined and game.user_prediction %}
+
+    {% set prediction_record = game.user_prediction %}
+    {% set prediction_source = 'game.user_prediction' %}
+
+{% endif %}
+
+
+{# ----------------------------------------------------------
+   SOURCE 2: game.userPrediction
+   ---------------------------------------------------------- #}
+
+{% if prediction_record is none %}
+
+    {% if game.userPrediction is defined and game.userPrediction %}
+
+        {% set prediction_record = game.userPrediction %}
+        {% set prediction_source = 'game.userPrediction' %}
+
+    {% endif %}
+
+{% endif %}
+
+
+{# ----------------------------------------------------------
+   SOURCE 3: game.prediction
+   ---------------------------------------------------------- #}
+
+{% if prediction_record is none %}
+
+    {% if game.prediction is defined and game.prediction %}
+
+        {% set prediction_record = game.prediction %}
+        {% set prediction_source = 'game.prediction' %}
+
+    {% endif %}
+
+{% endif %}
+
+
+{# ----------------------------------------------------------
+   SOURCE 4: game.predictions
+   Als dictionary/mapping met user ID als key.
+   ---------------------------------------------------------- #}
+
+{% if prediction_record is none %}
+
+    {% if game.predictions is defined and game.predictions is mapping %}
+
+        {% if game.predictions[current_user_id] is defined %}
+
+            {% set prediction_record = game.predictions[current_user_id] %}
+            {% set prediction_source = 'game.predictions[user_id:string]' %}
+
+        {% elif game.predictions[current_user_id_int] is defined %}
+
+            {% set prediction_record = game.predictions[current_user_id_int] %}
+            {% set prediction_source = 'game.predictions[user_id:int]' %}
+
+        {% endif %}
+
+    {% endif %}
+
+{% endif %}
+
+
+{# ----------------------------------------------------------
+   SOURCE 5: game.predictions als lijst.
+   ---------------------------------------------------------- #}
+
+{% if prediction_record is none %}
+
+    {% if game.predictions is defined and game.predictions is sequence %}
+
+        {% set prediction_matches_int = game.predictions
+            |selectattr('userId', 'equalto', current_user_id_int)
+            |list
+        %}
+
+        {% if prediction_matches_int|length > 0 %}
+
+            {% set prediction_record = prediction_matches_int[0] %}
+            {% set prediction_source = 'game.predictions[list:userId=int]' %}
+
+        {% endif %}
+
+    {% endif %}
+
+{% endif %}
+
+
+{# ----------------------------------------------------------
+   SOURCE 6: game.players
+   ---------------------------------------------------------- #}
+
+{% if prediction_record is none %}
+
+    {% if game.players is defined and game.players is sequence %}
+
+        {% set game_player_matches = game.players
+            |selectattr('userId', 'equalto', current_user_id_int)
+            |list
+        %}
+
+        {% if game_player_matches|length > 0 %}
+
+            {% set prediction_record = game_player_matches[0] %}
+            {% set prediction_source = 'game.players' %}
+
+        {% endif %}
+
+    {% endif %}
+
+{% endif %}
+
+
+{# ----------------------------------------------------------
+   SOURCE 7: evaluations.players
+   Dit is de structuur die jouw completed games al gebruiken.
+   ---------------------------------------------------------- #}
+
+{% if prediction_record is none %}
+
+    {% if players is sequence %}
+
+        {% set evaluation_matches_int = players
+            |selectattr('userId', 'equalto', current_user_id_int)
+            |list
+        %}
+
+        {% set evaluation_matches_str = players
+            |selectattr('userId', 'equalto', current_user_id)
+            |list
+        %}
+
+        {% if evaluation_matches_int|length > 0 %}
+
+            {% set prediction_record = evaluation_matches_int[0] %}
+            {% set prediction_source = 'game.evaluations.players[userId=int]' %}
+
+        {% elif evaluation_matches_str|length > 0 %}
+
+            {% set prediction_record = evaluation_matches_str[0] %}
+            {% set prediction_source = 'game.evaluations.players[userId=string]' %}
+
+        {% endif %}
+
+    {% endif %}
+
+{% endif %}
+
+
+{# ==========================================================
+   VOORSPELLING SCORE VELDEN
+   ========================================================== #}
 
 {% set predicted_home = none %}
 {% set predicted_away = none %}
 
-{% if current_player %}
-    {% set predicted_home = current_player.predictedscorehome %}
-    {% set predicted_away = current_player.predictedscoreuit %}
+{% set home_score_field = 'GEEN' %}
+{% set away_score_field = 'GEEN' %}
+
+
+{% if prediction_record %}
+
+    {# ------------------------------------------
+       Home score
+       ------------------------------------------ #}
+
+    {% if prediction_record.predictedscorehome is defined %}
+
+        {% set predicted_home = prediction_record.predictedscorehome %}
+        {% set home_score_field = 'predictedscorehome' %}
+
+    {% elif prediction_record.predictedUserHome is defined %}
+
+        {% set predicted_home = prediction_record.predictedUserHome %}
+        {% set home_score_field = 'predictedUserHome' %}
+
+    {% elif prediction_record.team1_score is defined %}
+
+        {% set predicted_home = prediction_record.team1_score %}
+        {% set home_score_field = 'team1_score' %}
+
+    {% elif prediction_record.home_score is defined %}
+
+        {% set predicted_home = prediction_record.home_score %}
+        {% set home_score_field = 'home_score' %}
+
+    {% elif prediction_record.homeScore is defined %}
+
+        {% set predicted_home = prediction_record.homeScore %}
+        {% set home_score_field = 'homeScore' %}
+
+    {% endif %}
+
+
+    {# ------------------------------------------
+       Away score
+       ------------------------------------------ #}
+
+    {% if prediction_record.predictedscoreuit is defined %}
+
+        {% set predicted_away = prediction_record.predictedscoreuit %}
+        {% set away_score_field = 'predictedscoreuit' %}
+
+    {% elif prediction_record.predictedUserAway is defined %}
+
+        {% set predicted_away = prediction_record.predictedUserAway %}
+        {% set away_score_field = 'predictedUserAway' %}
+
+    {% elif prediction_record.team2_score is defined %}
+
+        {% set predicted_away = prediction_record.team2_score %}
+        {% set away_score_field = 'team2_score' %}
+
+    {% elif prediction_record.away_score is defined %}
+
+        {% set predicted_away = prediction_record.away_score %}
+        {% set away_score_field = 'away_score' %}
+
+    {% elif prediction_record.awayScore is defined %}
+
+        {% set predicted_away = prediction_record.awayScore %}
+        {% set away_score_field = 'awayScore' %}
+
+    {% endif %}
+
 {% endif %}
 
 
-{# ==========================================
-   GAME / PREDICTION BOX
-   ========================================== #}
+{# ==========================================================
+   CHECKS
+   ========================================================== #}
+
+{% set check_game_id =
+    game_id is not none
+    and game_id|string|trim != ''
+%}
+
+{% set check_user_id =
+    current_user_id != ''
+%}
+
+{% set check_status =
+    status in ['scheduled', 'completed']
+%}
+
+{% set check_home_team =
+    home_team is not none
+    and home_team|string|trim != ''
+%}
+
+{% set check_away_team =
+    away_team is not none
+    and away_team|string|trim != ''
+%}
+
+{% set check_home_team_id =
+    home_team_id is not none
+    and home_team_id|string|trim != ''
+%}
+
+{% set check_away_team_id =
+    away_team_id is not none
+    and away_team_id|string|trim != ''
+%}
+
+{% set check_prediction_record =
+    prediction_record is not none
+%}
+
+{% set check_home_prediction =
+    predicted_home is not none
+%}
+
+{% set check_away_prediction =
+    predicted_away is not none
+%}
+
+{% set check_players =
+    players is sequence
+%}
+
+{% set check_matching_player_int = 0 %}
+{% set check_matching_player_str = 0 %}
+
+{% if players is sequence %}
+
+    {% set check_matching_player_int = players
+        |selectattr('userId', 'equalto', current_user_id_int)
+        |list
+        |length
+    %}
+
+    {% set check_matching_player_str = players
+        |selectattr('userId', 'equalto', current_user_id)
+        |list
+        |length
+    %}
+
+{% endif %}
+
+
+{# ==========================================================
+   SCORE VALIDATIE
+   ========================================================== #}
+
+{% set check_home_score_valid = false %}
+{% set check_away_score_valid = false %}
+
+
+{% if predicted_home is not none %}
+
+    {% if predicted_home is number %}
+
+        {% if predicted_home >= 0 %}
+
+            {% set check_home_score_valid = true %}
+
+        {% endif %}
+
+    {% else %}
+
+        {% set home_score_string = predicted_home|string|trim %}
+
+        {% if home_score_string != ''
+              and home_score_string == (predicted_home|int)|string
+              and predicted_home|int >= 0 %}
+
+            {% set check_home_score_valid = true %}
+
+        {% endif %}
+
+    {% endif %}
+
+{% endif %}
+
+
+{% if predicted_away is not none %}
+
+    {% if predicted_away is number %}
+
+        {% if predicted_away >= 0 %}
+
+            {% set check_away_score_valid = true %}
+
+        {% endif %}
+
+    {% else %}
+
+        {% set away_score_string = predicted_away|string|trim %}
+
+        {% if away_score_string != ''
+              and away_score_string == (predicted_away|int)|string
+              and predicted_away|int >= 0 %}
+
+            {% set check_away_score_valid = true %}
+
+        {% endif %}
+
+    {% endif %}
+
+{% endif %}
+
+
+{# ==========================================================
+   FOUTEN / WAARSCHUWINGEN TELLEN
+   ========================================================== #}
+
+{% set error_count = 0 %}
+{% set warning_count = 0 %}
+
+
+{% if not check_game_id %}
+    {% set error_count = error_count + 1 %}
+{% endif %}
+
+{% if not check_user_id %}
+    {% set error_count = error_count + 1 %}
+{% endif %}
+
+{% if not check_status %}
+    {% set error_count = error_count + 1 %}
+{% endif %}
+
+{% if not check_home_team %}
+    {% set error_count = error_count + 1 %}
+{% endif %}
+
+{% if not check_away_team %}
+    {% set error_count = error_count + 1 %}
+{% endif %}
+
+{% if not check_home_team_id %}
+    {% set error_count = error_count + 1 %}
+{% endif %}
+
+{% if not check_away_team_id %}
+    {% set error_count = error_count + 1 %}
+{% endif %}
+
+
+{% if status == 'scheduled' %}
+
+    {% if not check_prediction_record %}
+        {% set error_count = error_count + 1 %}
+    {% endif %}
+
+    {% if check_prediction_record and not check_home_prediction %}
+        {% set error_count = error_count + 1 %}
+    {% endif %}
+
+    {% if check_prediction_record and not check_away_prediction %}
+        {% set error_count = error_count + 1 %}
+    {% endif %}
+
+{% endif %}
+
+
+{% if status == 'completed' %}
+
+    {% if not check_prediction_record %}
+        {% set warning_count = warning_count + 1 %}
+    {% endif %}
+
+{% endif %}
+
+
+{% if check_home_prediction and not check_home_score_valid %}
+    {% set error_count = error_count + 1 %}
+{% endif %}
+
+{% if check_away_prediction and not check_away_score_valid %}
+    {% set error_count = error_count + 1 %}
+{% endif %}
+
+
+{# ==========================================================
+   UI
+   ========================================================== #}
 
 <div
     class="prediction-box"
-    data-game-id="{{ game.id }}"
+    data-game-id="{{ game_id if game_id is not none else '' }}"
     data-user-id="{{ user_id }}"
 >
-
-    <input
-        type="hidden"
-        name="user_id"
-        value="{{ user_id }}"
-    >
 
     <div class="prediction-title">
         Your prediction
     </div>
 
 
-    {# ======================================
-       VOORSPELLING KAN WORDEN AANGEPAST
-       ====================================== #}
+    {# ======================================================
+       DEBUG STATUS
+       ====================================================== #}
+
+    <div
+        class="prediction-debug-status"
+        style="
+            margin-bottom:12px;
+            padding:12px;
+            border-radius:8px;
+            border:1px solid {% if error_count > 0 %}#dc2626{% elif warning_count > 0 %}#d97706{% else %}#16a34a{% endif %};
+            background:{% if error_count > 0 %}#fef2f2{% elif warning_count > 0 %}#fffbeb{% else %}#f0fdf4{% endif %};
+            color:{% if error_count > 0 %}#991b1b{% elif warning_count > 0 %}#92400e{% else %}#166534{% endif %};
+        "
+    >
+
+        {% if error_count > 0 %}
+
+            <strong>
+                ❌ Prediction data has {{ error_count }} error(s)
+            </strong>
+
+        {% elif warning_count > 0 %}
+
+            <strong>
+                ⚠ Prediction data has {{ warning_count }} warning(s)
+            </strong>
+
+        {% else %}
+
+            <strong>
+                ✅ Prediction data looks valid
+            </strong>
+
+        {% endif %}
+
+    </div>
+
+
+    {# ======================================================
+       CHECK OVERZICHT
+       ====================================================== #}
+
+    <details style="margin-bottom:12px;">
+
+        <summary
+            style="
+                cursor:pointer;
+                font-weight:700;
+                padding:8px 0;
+            "
+        >
+            Data checks
+        </summary>
+
+        <div
+            style="
+                margin-top:8px;
+                overflow-x:auto;
+            "
+        >
+
+            <table
+                style="
+                    width:100%;
+                    border-collapse:collapse;
+                    font-size:13px;
+                "
+            >
+
+                <tr>
+                    <th style="text-align:left;padding:6px;border-bottom:1px solid #ddd;">
+                        Check
+                    </th>
+                    <th style="text-align:left;padding:6px;border-bottom:1px solid #ddd;">
+                        Result
+                    </th>
+                    <th style="text-align:left;padding:6px;border-bottom:1px solid #ddd;">
+                        Value
+                    </th>
+                </tr>
+
+
+                <tr>
+                    <td style="padding:6px;">Game ID</td>
+                    <td style="padding:6px;">
+                        {% if check_game_id %}✅ OK{% else %}❌ MISSING{% endif %}
+                    </td>
+                    <td style="padding:6px;">{{ game_id }}</td>
+                </tr>
+
+
+                <tr>
+                    <td style="padding:6px;">User ID</td>
+                    <td style="padding:6px;">
+                        {% if check_user_id %}✅ OK{% else %}❌ MISSING{% endif %}
+                    </td>
+                    <td style="padding:6px;">
+                        {{ current_user_id }}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td style="padding:6px;">Status</td>
+                    <td style="padding:6px;">
+                        {% if check_status %}✅ OK{% else %}❌ UNKNOWN{% endif %}
+                    </td>
+                    <td style="padding:6px;">
+                        {{ status }}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td style="padding:6px;">Home team</td>
+                    <td style="padding:6px;">
+                        {% if check_home_team %}✅ OK{% else %}❌ MISSING{% endif %}
+                    </td>
+                    <td style="padding:6px;">
+                        {{ home_team }}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td style="padding:6px;">Away team</td>
+                    <td style="padding:6px;">
+                        {% if check_away_team %}✅ OK{% else %}❌ MISSING{% endif %}
+                    </td>
+                    <td style="padding:6px;">
+                        {{ away_team }}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td style="padding:6px;">Home team ID</td>
+                    <td style="padding:6px;">
+                        {% if check_home_team_id %}✅ OK{% else %}❌ MISSING{% endif %}
+                    </td>
+                    <td style="padding:6px;">
+                        {{ home_team_id }}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td style="padding:6px;">Away team ID</td>
+                    <td style="padding:6px;">
+                        {% if check_away_team_id %}✅ OK{% else %}❌ MISSING{% endif %}
+                    </td>
+                    <td style="padding:6px;">
+                        {{ away_team_id }}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td style="padding:6px;">Evaluations players</td>
+                    <td style="padding:6px;">
+                        {% if check_players %}✅ OK{% else %}⚠ NONE{% endif %}
+                    </td>
+                    <td style="padding:6px;">
+                        {{ players|length }}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td style="padding:6px;">Matching userId as int</td>
+                    <td style="padding:6px;">
+                        {% if check_matching_player_int > 0 %}
+                            ✅ FOUND
+                        {% else %}
+                            ❌ NOT FOUND
+                        {% endif %}
+                    </td>
+                    <td style="padding:6px;">
+                        {{ check_matching_player_int }}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td style="padding:6px;">Matching userId as string</td>
+                    <td style="padding:6px;">
+                        {% if check_matching_player_str > 0 %}
+                            ✅ FOUND
+                        {% else %}
+                            ❌ NOT FOUND
+                        {% endif %}
+                    </td>
+                    <td style="padding:6px;">
+                        {{ check_matching_player_str }}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td style="padding:6px;">Prediction source</td>
+                    <td style="padding:6px;">
+                        {% if check_prediction_record %}
+                            ✅ FOUND
+                        {% else %}
+                            ❌ NONE
+                        {% endif %}
+                    </td>
+                    <td style="padding:6px;">
+                        {{ prediction_source }}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td style="padding:6px;">Home prediction</td>
+                    <td style="padding:6px;">
+                        {% if check_home_prediction %}
+                            {% if check_home_score_valid %}
+                                ✅ VALID
+                            {% else %}
+                                ❌ INVALID
+                            {% endif %}
+                        {% else %}
+                            ❌ MISSING
+                        {% endif %}
+                    </td>
+                    <td style="padding:6px;">
+                        {{ predicted_home }}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td style="padding:6px;">Away prediction</td>
+                    <td style="padding:6px;">
+                        {% if check_away_prediction %}
+                            {% if check_away_score_valid %}
+                                ✅ VALID
+                            {% else %}
+                                ❌ INVALID
+                            {% endif %}
+                        {% else %}
+                            ❌ MISSING
+                        {% endif %}
+                    </td>
+                    <td style="padding:6px;">
+                        {{ predicted_away }}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td style="padding:6px;">Home score field</td>
+                    <td style="padding:6px;">
+                        {% if check_home_prediction %}✅{% else %}❌{% endif %}
+                    </td>
+                    <td style="padding:6px;">
+                        {{ home_score_field }}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td style="padding:6px;">Away score field</td>
+                    <td style="padding:6px;">
+                        {% if check_away_prediction %}✅{% else %}❌{% endif %}
+                    </td>
+                    <td style="padding:6px;">
+                        {{ away_score_field }}
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+
+    </details>
+
+
+    {# ======================================================
+       SCHEDULED
+       ====================================================== #}
 
     {% if status == 'scheduled' %}
 
-        <form
-            class="prediction-form"
-            action="{{ url_for('savePrediction', lobbyCode=data.lobby.code) }}"
-            method="post"
-        >
+        {% if check_prediction_record
+              and check_home_prediction
+              and check_away_prediction
+              and check_home_score_valid
+              and check_away_score_valid %}
 
-            <input
-                type="hidden"
-                name="game_id"
-                value="{{ game.id }}"
+            <form
+                class="prediction-form"
+                action="{{ url_for('savePrediction', lobbyCode=data.lobby.code) }}"
+                method="post"
             >
 
-            <input
-                type="hidden"
-                name="user_id"
-                value="{{ user_id }}"
+                <input
+                    type="hidden"
+                    name="game_id"
+                    value="{{ game_id }}"
+                >
+
+                <input
+                    type="hidden"
+                    name="user_id"
+                    value="{{ user_id }}"
+                >
+
+
+                <div class="prediction-team">
+                    {{ home_team }}
+                </div>
+
+
+                <input
+                    type="number"
+                    name="team1_score"
+                    min="0"
+                    value="{{ predicted_home }}"
+                    required
+                    aria-label="Score {{ home_team }}"
+                >
+
+
+                <div class="prediction-separator">
+                    -
+                </div>
+
+
+                <input
+                    type="number"
+                    name="team2_score"
+                    min="0"
+                    value="{{ predicted_away }}"
+                    required
+                    aria-label="Score {{ away_team }}"
+                >
+
+
+                <input
+                    type="hidden"
+                    name="game_ids"
+                    value='{{ {
+                        "team1Id": home_team_id,
+                        "team2Id": away_team_id
+                    } | tojson }}'
+                >
+
+
+                <div class="prediction-team">
+                    {{ away_team }}
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="save-prediction"
+                >
+                    Save prediction
+                </button>
+
+            </form>
+
+
+        {% else %}
+
+            <div
+                style="
+                    padding:14px;
+                    border:2px solid #dc2626;
+                    border-radius:8px;
+                    background:#fef2f2;
+                    color:#991b1b;
+                "
             >
 
-            <div class="prediction-team">
-                {{ game.homeTeam }}
+                <strong>
+                    ❌ Cannot render your saved prediction
+                </strong>
+
+                <div style="margin-top:8px;">
+
+                    {% if not check_prediction_record %}
+
+                        No prediction record was found for
+                        user <strong>{{ current_user_id }}</strong>.
+
+                    {% elif not check_home_prediction %}
+
+                        Prediction record exists, but the home score is missing.
+
+                    {% elif not check_away_prediction %}
+
+                        Prediction record exists, but the away score is missing.
+
+                    {% elif not check_home_score_valid %}
+
+                        Home prediction exists but is not a valid non-negative score:
+                        <strong>{{ predicted_home }}</strong>
+
+                    {% elif not check_away_score_valid %}
+
+                        Away prediction exists but is not a valid non-negative score:
+                        <strong>{{ predicted_away }}</strong>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div style="margin-top:8px;font-size:13px;">
+
+                    Source checked:
+                    <strong>{{ prediction_source }}</strong>
+
+                </div>
+
             </div>
 
-            <input
-                type="number"
-                name="team1_score"
-                min="0"
-                value="{{ predicted_home if predicted_home is not none else '' }}"
-                required
-                aria-label="Score {{ game.homeTeam }}"
-            >
 
-            <div class="prediction-separator">
-                -
-            </div>
-
-            <input
-                type="number"
-                name="team2_score"
-                min="0"
-                value="{{ predicted_away if predicted_away is not none else '' }}"
-                required
-                aria-label="Score {{ game.awayTeam }}"
-            >
-
-            <input
-                type="hidden"
-                name="game_ids"
-                value='{{ {
-                    "team1Id": game.homeTeamId,
-                    "team2Id": game.awayTeamId
-                } | tojson }}'
-            >
-
-            <div class="prediction-team">
-                {{ game.awayTeam }}
-            </div>
-
-            <button
-                type="submit"
-                class="save-prediction"
-            >
-                Save prediction
-            </button>
-
-        </form>
+        {% endif %}
 
 
-    {# ======================================
-       GAME NIET MEER WIJZIGBAAR
-       ====================================== #}
+    {# ======================================================
+       COMPLETED
+       ====================================================== #}
 
-    {% else %}
+    {% elif status == 'completed' %}
 
         <div class="prediction-locked">
 
-            {% if current_player %}
+            {% if check_prediction_record
+                  and check_home_prediction
+                  and check_away_prediction %}
 
                 <div class="prediction-result">
 
                     <div>
                         Your prediction:
                         <strong>
-                            {{ predicted_home }}
-                            -
-                            {{ predicted_away }}
+                            {{ predicted_home }} - {{ predicted_away }}
                         </strong>
                     </div>
 
-                    {% if status == 'completed' %}
 
-                        <div>
-                            Actual result:
-                            <strong>
-                                {{ game.homeScore }}
-                                -
-                                {{ game.awayScore }}
-                            </strong>
-                        </div>
+                    <div>
 
-                    {% endif %}
+                        Actual result:
+
+                        <strong>
+                            {{ game.homeScore|default('?') }}
+                            -
+                            {{ game.awayScore|default('?') }}
+                        </strong>
+
+                    </div>
 
                 </div>
 
+
             {% else %}
 
-                <div>
-                    Predictions can no longer be changed.
+                <div
+                    style="
+                        padding:12px;
+                        border:2px solid #dc2626;
+                        border-radius:8px;
+                        background:#fef2f2;
+                        color:#991b1b;
+                    "
+                >
+
+                    <strong>
+                        ❌ No saved prediction returned
+                    </strong>
+
+                    <div style="margin-top:6px;">
+                        User:
+                        <strong>{{ current_user_id }}</strong>
+                    </div>
+
+                    <div>
+                        Source checked:
+                        <strong>{{ prediction_source }}</strong>
+                    </div>
+
                 </div>
 
             {% endif %}
 
         </div>
 
+
+    {% else %}
+
+        <div
+            style="
+                padding:14px;
+                border:2px solid #dc2626;
+                border-radius:8px;
+                background:#fef2f2;
+                color:#991b1b;
+            "
+        >
+
+            <strong>
+                ❌ Unknown game status
+            </strong>
+
+            <div style="margin-top:6px;">
+                Received:
+                <strong>{{ status }}</strong>
+            </div>
+
+            <div>
+                Expected:
+                <strong>scheduled</strong>
+                or
+                <strong>completed</strong>
+            </div>
+
+        </div>
+
     {% endif %}
+
+
+    {# ======================================================
+       RAW DEBUG DATA
+       ====================================================== #}
+
+    <details
+        style="
+            margin-top:12px;
+            border-top:1px solid #ccc;
+            padding-top:10px;
+        "
+    >
+
+        <summary
+            style="
+                cursor:pointer;
+                font-weight:700;
+            "
+        >
+            🔎 Raw game data
+        </summary>
+
+        <pre
+            style="
+                margin-top:10px;
+                padding:12px;
+                max-height:500px;
+                overflow:auto;
+                background:#111827;
+                color:#f9fafb;
+                border-radius:8px;
+                font-size:12px;
+                white-space:pre-wrap;
+                word-break:break-word;
+            "
+        >{{ game|tojson(indent=2) }}</pre>
+
+    </details>
+
+
+    <details
+        style="
+            margin-top:8px;
+        "
+    >
+
+        <summary
+            style="
+                cursor:pointer;
+                font-weight:700;
+            "
+        >
+            🔎 Raw evaluations
+        </summary>
+
+        <pre
+            style="
+                margin-top:10px;
+                padding:12px;
+                max-height:500px;
+                overflow:auto;
+                background:#111827;
+                color:#f9fafb;
+                border-radius:8px;
+                font-size:12px;
+                white-space:pre-wrap;
+                word-break:break-word;
+            "
+        >{{ evaluations|tojson(indent=2) }}</pre>
+
+    </details>
+
+
+    <details
+        style="
+            margin-top:8px;
+        "
+    >
+
+        <summary
+            style="
+                cursor:pointer;
+                font-weight:700;
+            "
+        >
+            🔎 Raw template data
+        </summary>
+
+        <pre
+            style="
+                margin-top:10px;
+                padding:12px;
+                max-height:500px;
+                overflow:auto;
+                background:#111827;
+                color:#f9fafb;
+                border-radius:8px;
+                font-size:12px;
+                white-space:pre-wrap;
+                word-break:break-word;
+            "
+        >{{ data|tojson(indent=2) }}</pre>
+
+    </details>
 
 </div>
 
 
-{# ==========================================
+{# ==========================================================
    EVALUATIONS BIJ COMPLETED
-   ========================================== #}
+   ========================================================== #}
 
 {% if status == 'completed' %}
 
@@ -193,23 +1139,25 @@
         <button
             type="button"
             class="evaluation-toggle"
-            data-game-id="{{ game.id }}"
+            data-game-id="{{ game_id }}"
         >
             View predictions
         </button>
 
+
         <div
             class="evaluation-dropdown"
-            id="evaluation-dropdown-{{ game.id }}"
+            id="evaluation-dropdown-{{ game_id }}"
         >
             {# JS vult dit #}
         </div>
 
+
         <script
             type="application/json"
-            id="evaluation-data-{{ game.id }}"
+            id="evaluation-data-{{ game_id }}"
         >
-            {{ evaluations | tojson }}
+            {{ evaluations|tojson }}
         </script>
 
     </div>
