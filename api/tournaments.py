@@ -19,7 +19,7 @@ def get_round(tournamentcode, roundnumber):
 def get_rounds(tournamentcode, lobbycode=None, userid=None):
     db, cursor = get_db_connection()
     rounds = get_tournament(tournamentcode, cursor, json)
-    if lobbycode:
+    if lobbycode and userid:
         evals = get_evals(cursor, lobbycode, userid)
         counter = 0
         counter2 = 0
