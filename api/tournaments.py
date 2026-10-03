@@ -16,6 +16,7 @@ def get_round(tournamentcode, roundnumber):
 
 @api.route('/tournament/<tournamentcode>/rounds')
 @api.route('/tournament/<tournamentcode>/rounds/<lobbycode>')
+@api.route('/tournament/<tournamentcode>/rounds/<lobbycode>/<userid>')
 def get_rounds(tournamentcode, lobbycode=None, userid=None):
     return [userid]
     db, cursor = get_db_connection()
