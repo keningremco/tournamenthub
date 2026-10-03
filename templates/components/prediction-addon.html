@@ -1,3 +1,4 @@
+```jinja2
 {% macro prediction(game, data, user_id) %}
 
     <div
@@ -5,7 +6,6 @@
         data-game-id="{{ game.id }}"
         data-user-id="{{ user_id }}"
     >
-
 
         <div class="prediction-title">
             Your prediction
@@ -46,9 +46,9 @@
                     type="number"
                     name="team1_score"
                     min="0"
-                    value="{% if current_player.data and current_player.data.predictedscorehome is not none %}{{ current_player.data.predictedscorehome }}{% endif %}"
+                    value="{% if game.evaluations and game.evaluations.predictedHome is not none %}{{ game.evaluations.predictedHome }}{% endif %}"
                     required
-                    aria-label="Score {{ game.evaluations.predictedHome }}"
+                    aria-label="Score {{ game.homeTeam }}"
                 >
 
 
@@ -61,9 +61,9 @@
                     type="number"
                     name="team2_score"
                     min="0"
-                    value="{% if current_player.data and current_player.data.predictedscoreuit is not none %}{{ current_player.data.predictedscoreuit }}{% endif %}"
+                    value="{% if game.evaluations and game.evaluations.predictedAway is not none %}{{ game.evaluations.predictedAway }}{% endif %}"
                     required
-                    aria-label="Score {{ game.evaluations.predictedAway }}"
+                    aria-label="Score {{ game.awayTeam }}"
                 >
 
 
@@ -100,14 +100,16 @@
 
             <div class="prediction-locked">
 
-                
-                {% if game.evaluations %}
+                {% if game.evaluations
+                      and game.evaluations.predictedHome is not none
+                      and game.evaluations.predictedAway is not none %}
+
                     Your prediction:
 
                     <strong>
-                        {{ game.evaluations.predictedAway }}
-                        -
                         {{ game.evaluations.predictedHome }}
+                        -
+                        {{ game.evaluations.predictedAway }}
                     </strong>
 
                 {% else %}
@@ -144,19 +146,19 @@
                 class="evaluation-dropdown"
                 id="evaluation-dropdown-{{ game.id }}"
             >
-
                 {# JS vult dit #}
-
             </div>
 
 
-            {# JSON beschikbaar maken voor JS #}
+            {# ==================================
+               JSON BESCHIKBAAR VOOR JS
+               ================================== #}
 
             <script
                 type="application/json"
                 id="evaluation-data-{{ game.id }}"
             >
-                {{ data | tojson }}
+                {{ game.evaluations | tojson }}
             </script>
 
         </div>
@@ -164,3 +166,4 @@
     {% endif %}
 
 {% endmacro %}
+```
