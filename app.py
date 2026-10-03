@@ -1835,9 +1835,9 @@ def lobby(code):
         db.close()
 
     predictions = getLobbyEvaluations(code)
-    return predictions
+    
     rounds = get_rounds(tournament['code'])
-
+    return rounds
     permissions = can_user(userid, tournamentId = tournament["id"])    
     return render_template(
         'lobby.html',
