@@ -1,40 +1,10 @@
 {% macro prediction(game, data, user_id) %}
 
-
-
-    {# ==========================================
-       EVALUATIONS
-       ========================================== #}
-
-    {% set evaluations = game.evaluations|default({}) %}
-    {% set players = evaluations.players|default([]) %}
-
-    {# Zoek de huidige speler #}
-
-    {% set current_player = namespace(data=None) %}
-
-    {% for player in players %}
-        {% if player.userId == user_id %}
-            {% set current_player.data = player %}
-        {% endif %}
-    {% endfor %}
-
-
     <div
         class="prediction-box"
         data-game-id="{{ game.id }}"
         data-user-id="{{ user_id }}"
     >
-
-        {# ======================================
-           HIDDEN USER ID
-           ====================================== #}
-
-        <input
-            type="hidden"
-            name="user_id"
-            value="{{ user_id }}"
-        >
 
 
         <div class="prediction-title">
@@ -78,7 +48,7 @@
                     min="0"
                     value="{% if current_player.data and current_player.data.predictedscorehome is not none %}{{ current_player.data.predictedscorehome }}{% endif %}"
                     required
-                    aria-label="Score {{ game.homeTeam }}"
+                    aria-label="Score {{ game.evaluations.predictedHome }}"
                 >
 
 
@@ -93,7 +63,7 @@
                     min="0"
                     value="{% if current_player.data and current_player.data.predictedscoreuit is not none %}{{ current_player.data.predictedscoreuit }}{% endif %}"
                     required
-                    aria-label="Score {{ game.awayTeam }}"
+                    aria-label="Score {{ game.evaluations.predictedAway }}"
                 >
 
 
