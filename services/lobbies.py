@@ -236,7 +236,7 @@ def get_lobby_leaderboard(lobbyId='', lobbyCode='', cursor=None):
 
     return leaderboard, 'success', 200
 
-def get_evals(cursor, lobbyCode, userid):
+def get_evals(cursor, lobbyCode):
     # ==========================================
     # LOBBY + PUNTENREGELS
     # ==========================================
