@@ -9,53 +9,36 @@
 {% set evaluations = game.evaluations|default({}) %}
 {% set players = evaluations.players|default([]) %}
 
-{# Flask user_id kan string zijn, JSON userId integer #}
-{% set current_user_id = user_id|string %}
+{# ==========================================
+   HUIDIGE GEBRUIKER
+   Flask user_id kan string zijn,
+   userId uit JSON is meestal integer.
+   Daarom user_id naar int.
+   ========================================== #}
 
+{% set current_user_id = user_id|int %}
+
+{% set current_player = players
+    |selectattr('userId', 'equalto', current_user_id)
+    |list
+    |first
+%}
 
 {# ==========================================
-   VOORSPELLING VAN HUIDIGE GEBRUIKER
+   VOORSPELLING HUIDIGE GEBRUIKER
    ========================================== #}
 
 {% set predicted_home = none %}
 {% set predicted_away = none %}
 
-
-{# ------------------------------------------
-   1. Scheduled:
-      gebruik prediction die Flask aan game
-      heeft meegegeven.
-   ------------------------------------------ #}
-
-{% if game.user_prediction is defined and game.user_prediction %}
-
-    {% set predicted_home = game.user_prediction.home %}
-    {% set predicted_away = game.user_prediction.away %}
-
-
-{# ------------------------------------------
-   2. Completed:
-      zoek gebruiker in evaluations.players.
-   ------------------------------------------ #}
-
-{% else %}
-
-    {% for player in players %}
-
-        {% if player.userId|string == current_user_id %}
-
-            {% set predicted_home = player.predictedscorehome %}
-            {% set predicted_away = player.predictedscoreuit %}
-
-        {% endif %}
-
-    {% endfor %}
-
+{% if current_player %}
+    {% set predicted_home = current_player.predictedscorehome %}
+    {% set predicted_away = current_player.predictedscoreuit %}
 {% endif %}
 
 
 {# ==========================================
-   GAME
+   GAME / PREDICTION BOX
    ========================================== #}
 
 <div
@@ -76,7 +59,7 @@
 
 
     {# ======================================
-       SCHEDULED
+       VOORSPELLING KAN WORDEN AANGEPAST
        ====================================== #}
 
     {% if status == 'scheduled' %}
@@ -107,9 +90,7 @@
                 type="number"
                 name="team1_score"
                 min="0"
-                {% if predicted_home is not none %}
-                    value="{{ predicted_home }}"
-                {% endif %}
+                value="{{ predicted_home if predicted_home is not none else '' }}"
                 required
                 aria-label="Score {{ game.homeTeam }}"
             >
@@ -122,9 +103,7 @@
                 type="number"
                 name="team2_score"
                 min="0"
-                {% if predicted_away is not none %}
-                    value="{{ predicted_away }}"
-                {% endif %}
+                value="{{ predicted_away if predicted_away is not none else '' }}"
                 required
                 aria-label="Score {{ game.awayTeam }}"
             >
@@ -153,21 +132,23 @@
 
 
     {# ======================================
-       NIET MEER WIJZIGBAAR
+       GAME NIET MEER WIJZIGBAAR
        ====================================== #}
 
     {% else %}
 
         <div class="prediction-locked">
 
-            {% if predicted_home is not none and predicted_away is not none %}
+            {% if current_player %}
 
                 <div class="prediction-result">
 
                     <div>
                         Your prediction:
                         <strong>
-                            {{ predicted_home }} - {{ predicted_away }}
+                            {{ predicted_home }}
+                            -
+                            {{ predicted_away }}
                         </strong>
                     </div>
 
@@ -176,7 +157,9 @@
                         <div>
                             Actual result:
                             <strong>
-                                {{ game.homeScore }} - {{ game.awayScore }}
+                                {{ game.homeScore }}
+                                -
+                                {{ game.awayScore }}
                             </strong>
                         </div>
 
