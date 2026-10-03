@@ -1,3 +1,4 @@
+
 {% macro prediction(game, data, user_id) %}
 
 {# ==========================================
@@ -9,21 +10,19 @@
 {% set players = evaluations.players|default([]) %}
 
 {# ==========================================
-   HUIDIGE GEBRUIKER ZOEKEN
-   userId uit JSON kan integer zijn,
-   user_id uit Flask kan string zijn.
-   Daarom beide naar string.
+   HUIDIGE GEBRUIKER
+   Flask user_id kan string zijn,
+   userId uit JSON is meestal integer.
+   Daarom user_id naar int.
    ========================================== #}
 
-{% set current_player = namespace(data=None) %}
-{% set current_user_id = user_id|string %}
+{% set current_user_id = user_id|int %}
 
-{% for player in players %}
-    {% if player.userId|string == current_user_id %}
-        {% set current_player.data = player %}
-    {% endif %}
-{% endfor %}
-
+{% set current_player = players
+    |selectattr('userId', 'equalto', current_user_id)
+    |list
+    |first
+%}
 
 {# ==========================================
    VOORSPELLING HUIDIGE GEBRUIKER
@@ -32,14 +31,14 @@
 {% set predicted_home = none %}
 {% set predicted_away = none %}
 
-{% if current_player.data %}
-    {% set predicted_home = current_player.data.predictedscorehome %}
-    {% set predicted_away = current_player.data.predictedscoreuit %}
+{% if current_player %}
+    {% set predicted_home = current_player.predictedscorehome %}
+    {% set predicted_away = current_player.predictedscoreuit %}
 {% endif %}
 
 
 {# ==========================================
-   GAME
+   GAME / PREDICTION BOX
    ========================================== #}
 
 <div
@@ -133,14 +132,14 @@
 
 
     {# ======================================
-       GAME COMPLETED / NIET MEER WIJZIGBAAR
+       GAME NIET MEER WIJZIGBAAR
        ====================================== #}
 
     {% else %}
 
         <div class="prediction-locked">
 
-            {% if current_player.data %}
+            {% if current_player %}
 
                 <div class="prediction-result">
 
@@ -154,6 +153,7 @@
                     </div>
 
                     {% if status == 'completed' %}
+
                         <div>
                             Actual result:
                             <strong>
@@ -162,6 +162,7 @@
                                 {{ game.awayScore }}
                             </strong>
                         </div>
+
                     {% endif %}
 
                 </div>
