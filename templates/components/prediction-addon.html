@@ -129,6 +129,7 @@
        EVALUATIONS BIJ COMPLETED
        ========================================== #}
 
+
     {% if game.status == 'completed' %}
 
         <div class="game-evaluation">
@@ -141,29 +142,39 @@
                 View predictions
             </button>
 
-
             <div
                 class="evaluation-dropdown"
                 id="evaluation-dropdown-{{ game.id }}"
             >
-                {# JS vult dit #}
             </div>
 
-
             {# ==================================
-               JSON BESCHIKBAAR VOOR JS
-               ================================== #}
+            VEILIGE JSON VOOR JAVASCRIPT
+            ================================== #}
+
+            {% set eval = game.evaluations | default({}, true) %}
+
+            {% set evaluation_json = {
+                "actual_score": eval.actual_score | default(none),
+                "players": eval.players | default([], true),
+                "predictedHome": eval.predictedHome | default(none),
+                "predictedAway": eval.predictedAway | default(none),
+                "teams": {
+                    "team1": eval.teams.team1 | default(none),
+                    "team2": eval.teams.team2 | default(none)
+                }
+            } %}
 
             <script
                 type="application/json"
                 id="evaluation-data-{{ game.id }}"
-            >
-                {{ game.evaluations | tojson }}
-            </script>
+            >{{ evaluation_json | tojson }}</script>
 
         </div>
 
     {% endif %}
 
+
+
 {% endmacro %}
-```
+
