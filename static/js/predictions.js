@@ -137,7 +137,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     row.className = "evaluation-player";
 
 
-                    /* Eigen speler herkennen */
+                    /* =================================
+                       EIGEN SPELER HERKENNEN
+                       ================================= */
 
                     if (
                         currentUserId !== null &&
@@ -148,19 +150,41 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
 
 
+                    /* =================================
+                       USERNAME
+                       ================================= */
+
                     const username = escapeHtml(
                         player.username ?? ""
                     );
 
 
+                    /* =================================
+                       VOORSPELLING
+                       ================================= */
+
+                    const predictedHome =
+                        player.predictedUserHome ?? "-";
+
+                    const predictedAway =
+                        player.predictedUserAway ?? "-";
+
                     const prediction =
                         player.prediction_score ??
-                        `${player.predictedscorehome ?? "-"} - ${player.predictedscoreuit ?? "-"}`;
+                        `${predictedHome} - ${predictedAway}`;
 
+
+                    /* =================================
+                       TOTALE PUNTEN
+                       ================================= */
 
                     const total =
                         player.total ?? 0;
 
+
+                    /* =================================
+                       HTML
+                       ================================= */
 
                     row.innerHTML = `
 
