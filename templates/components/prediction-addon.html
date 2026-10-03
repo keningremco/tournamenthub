@@ -100,14 +100,14 @@
 
             <div class="prediction-locked">
 
-                {% if current_player.data %}
-
+                
+                {% if game.evaluations %}
                     Your prediction:
 
                     <strong>
-                        {{ current_player.data.predictedscorehome }}
+                        {{ game.evaluations.predictedAway }}
                         -
-                        {{ current_player.data.predictedscoreuit }}
+                        {{ game.evaluations.predictedHome }}
                     </strong>
 
                 {% else %}
