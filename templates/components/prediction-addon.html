@@ -1,8 +1,9 @@
+
 {% macro prediction(game, data, user_id) %}
 
 {# ==========================================================
-   PREDICTION MACRO - FAIL LOUD / DEBUG VERSION
-   GEEN NAMESPACE
+   PREDICTION MACRO - DEBUG VERSION
+   Geen namespace
    ========================================================== #}
 
 {# ==========================================================
@@ -29,61 +30,41 @@
 
 {# ==========================================================
    PREDICTION RECORD ZOEKEN
-   We proberen verschillende mogelijke API-structuren.
    ========================================================== #}
 
 {% set prediction_record = none %}
 {% set prediction_source = 'GEEN BRON GEVONDEN' %}
 
 
-{# ----------------------------------------------------------
-   SOURCE 1: game.user_prediction
-   ---------------------------------------------------------- #}
+{# SOURCE 1: game.user_prediction #}
 
 {% if game.user_prediction is defined and game.user_prediction %}
-
     {% set prediction_record = game.user_prediction %}
     {% set prediction_source = 'game.user_prediction' %}
-
 {% endif %}
 
 
-{# ----------------------------------------------------------
-   SOURCE 2: game.userPrediction
-   ---------------------------------------------------------- #}
+{# SOURCE 2: game.userPrediction #}
 
 {% if prediction_record is none %}
-
     {% if game.userPrediction is defined and game.userPrediction %}
-
         {% set prediction_record = game.userPrediction %}
         {% set prediction_source = 'game.userPrediction' %}
-
     {% endif %}
-
 {% endif %}
 
 
-{# ----------------------------------------------------------
-   SOURCE 3: game.prediction
-   ---------------------------------------------------------- #}
+{# SOURCE 3: game.prediction #}
 
 {% if prediction_record is none %}
-
     {% if game.prediction is defined and game.prediction %}
-
         {% set prediction_record = game.prediction %}
         {% set prediction_source = 'game.prediction' %}
-
     {% endif %}
-
 {% endif %}
 
 
-{# ----------------------------------------------------------
-   SOURCE 4: game.predictions
-   Als dictionary/mapping met user ID als key.
-   ---------------------------------------------------------- #}
+{# SOURCE 4: game.predictions als mapping #}
 
 {% if prediction_record is none %}
 
@@ -106,9 +87,7 @@
 {% endif %}
 
 
-{# ----------------------------------------------------------
-   SOURCE 5: game.predictions als lijst.
-   ---------------------------------------------------------- #}
+{# SOURCE 5: game.predictions als lijst #}
 
 {% if prediction_record is none %}
 
@@ -131,9 +110,7 @@
 {% endif %}
 
 
-{# ----------------------------------------------------------
-   SOURCE 6: game.players
-   ---------------------------------------------------------- #}
+{# SOURCE 6: game.players #}
 
 {% if prediction_record is none %}
 
@@ -156,10 +133,7 @@
 {% endif %}
 
 
-{# ----------------------------------------------------------
-   SOURCE 7: evaluations.players
-   Dit is de structuur die jouw completed games al gebruiken.
-   ---------------------------------------------------------- #}
+{# SOURCE 7: evaluations.players #}
 
 {% if prediction_record is none %}
 
@@ -205,9 +179,7 @@
 
 {% if prediction_record %}
 
-    {# ------------------------------------------
-       Home score
-       ------------------------------------------ #}
+    {# HOME #}
 
     {% if prediction_record.predictedscorehome is defined %}
 
@@ -237,9 +209,7 @@
     {% endif %}
 
 
-    {# ------------------------------------------
-       Away score
-       ------------------------------------------ #}
+    {# AWAY #}
 
     {% if prediction_record.predictedscoreuit is defined %}
 
@@ -324,6 +294,11 @@
     players is sequence
 %}
 
+
+{# ==========================================================
+   MATCHING PLAYERS
+   ========================================================== #}
+
 {% set check_matching_player_int = 0 %}
 {% set check_matching_player_str = 0 %}
 
@@ -357,9 +332,7 @@
     {% if predicted_home is number %}
 
         {% if predicted_home >= 0 %}
-
             {% set check_home_score_valid = true %}
-
         {% endif %}
 
     {% else %}
@@ -384,9 +357,7 @@
     {% if predicted_away is number %}
 
         {% if predicted_away >= 0 %}
-
             {% set check_away_score_valid = true %}
-
         {% endif %}
 
     {% else %}
@@ -407,7 +378,9 @@
 
 
 {# ==========================================================
-   FOUTEN / WAARSCHUWINGEN TELLEN
+   FOUTEN / WAARSCHUWINGEN
+   BELANGRIJK:
+   GEEN prediction_record is GEEN ERROR MEER bij scheduled.
    ========================================================== #}
 
 {% set error_count = 0 %}
@@ -443,24 +416,12 @@
 {% endif %}
 
 
+{# ----------------------------------------------------------
+   SCHEDULED
+   Geen prediction = NORMAAL, dus alleen warning.
+   ---------------------------------------------------------- #}
+
 {% if status == 'scheduled' %}
-
-    {% if not check_prediction_record %}
-        {% set error_count = error_count + 1 %}
-    {% endif %}
-
-    {% if check_prediction_record and not check_home_prediction %}
-        {% set error_count = error_count + 1 %}
-    {% endif %}
-
-    {% if check_prediction_record and not check_away_prediction %}
-        {% set error_count = error_count + 1 %}
-    {% endif %}
-
-{% endif %}
-
-
-{% if status == 'completed' %}
 
     {% if not check_prediction_record %}
         {% set warning_count = warning_count + 1 %}
@@ -468,6 +429,10 @@
 
 {% endif %}
 
+
+{# ----------------------------------------------------------
+   Alleen scores die daadwerkelijk bestaan valideren.
+   ---------------------------------------------------------- #}
 
 {% if check_home_prediction and not check_home_score_valid %}
     {% set error_count = error_count + 1 %}
@@ -567,9 +532,11 @@
                     <th style="text-align:left;padding:6px;border-bottom:1px solid #ddd;">
                         Check
                     </th>
+
                     <th style="text-align:left;padding:6px;border-bottom:1px solid #ddd;">
                         Result
                     </th>
+
                     <th style="text-align:left;padding:6px;border-bottom:1px solid #ddd;">
                         Value
                     </th>
@@ -698,7 +665,7 @@
                         {% if check_prediction_record %}
                             ✅ FOUND
                         {% else %}
-                            ❌ NONE
+                            ⚠ NONE YET
                         {% endif %}
                     </td>
                     <td style="padding:6px;">
@@ -710,18 +677,25 @@
                 <tr>
                     <td style="padding:6px;">Home prediction</td>
                     <td style="padding:6px;">
+
                         {% if check_home_prediction %}
+
                             {% if check_home_score_valid %}
                                 ✅ VALID
                             {% else %}
                                 ❌ INVALID
                             {% endif %}
+
                         {% else %}
-                            ❌ MISSING
+
+                            ⚠ EMPTY
+
                         {% endif %}
+
                     </td>
+
                     <td style="padding:6px;">
-                        {{ predicted_home }}
+                        {{ predicted_home if predicted_home is not none else '' }}
                     </td>
                 </tr>
 
@@ -729,18 +703,25 @@
                 <tr>
                     <td style="padding:6px;">Away prediction</td>
                     <td style="padding:6px;">
+
                         {% if check_away_prediction %}
+
                             {% if check_away_score_valid %}
                                 ✅ VALID
                             {% else %}
                                 ❌ INVALID
                             {% endif %}
+
                         {% else %}
-                            ❌ MISSING
+
+                            ⚠ EMPTY
+
                         {% endif %}
+
                     </td>
+
                     <td style="padding:6px;">
-                        {{ predicted_away }}
+                        {{ predicted_away if predicted_away is not none else '' }}
                     </td>
                 </tr>
 
@@ -748,7 +729,7 @@
                 <tr>
                     <td style="padding:6px;">Home score field</td>
                     <td style="padding:6px;">
-                        {% if check_home_prediction %}✅{% else %}❌{% endif %}
+                        {% if check_home_prediction %}✅{% else %}⚠{% endif %}
                     </td>
                     <td style="padding:6px;">
                         {{ home_score_field }}
@@ -759,7 +740,7 @@
                 <tr>
                     <td style="padding:6px;">Away score field</td>
                     <td style="padding:6px;">
-                        {% if check_away_prediction %}✅{% else %}❌{% endif %}
+                        {% if check_away_prediction %}✅{% else %}⚠{% endif %}
                     </td>
                     <td style="padding:6px;">
                         {{ away_score_field }}
@@ -779,143 +760,97 @@
 
     {% if status == 'scheduled' %}
 
-        {% if check_prediction_record
-              and check_home_prediction
-              and check_away_prediction
-              and check_home_score_valid
-              and check_away_score_valid %}
+        {#
+           BELANGRIJK:
+           Het formulier wordt ALTIJD getoond voor scheduled games.
 
-            <form
-                class="prediction-form"
-                action="{{ url_for('savePrediction', lobbyCode=data.lobby.code) }}"
-                method="post"
+           Heeft de gebruiker al een prediction?
+             -> waarden worden ingevuld.
+
+           Heeft de gebruiker nog geen prediction?
+             -> inputs zijn leeg.
+
+           Dus prediction_record is NIET langer vereist.
+        #}
+
+        <form
+            class="prediction-form"
+            action="{{ url_for('savePrediction', lobbyCode=data.lobby.code) }}"
+            method="post"
+        >
+
+            <input
+                type="hidden"
+                name="game_id"
+                value="{{ game_id }}"
             >
 
-                <input
-                    type="hidden"
-                    name="game_id"
-                    value="{{ game_id }}"
-                >
-
-                <input
-                    type="hidden"
-                    name="user_id"
-                    value="{{ user_id }}"
-                >
-
-
-                <div class="prediction-team">
-                    {{ home_team }}
-                </div>
-
-
-                <input
-                    type="number"
-                    name="team1_score"
-                    min="0"
-                    value="{{ predicted_home }}"
-                    required
-                    aria-label="Score {{ home_team }}"
-                >
-
-
-                <div class="prediction-separator">
-                    -
-                </div>
-
-
-                <input
-                    type="number"
-                    name="team2_score"
-                    min="0"
-                    value="{{ predicted_away }}"
-                    required
-                    aria-label="Score {{ away_team }}"
-                >
-
-
-                <input
-                    type="hidden"
-                    name="game_ids"
-                    value='{{ {
-                        "team1Id": home_team_id,
-                        "team2Id": away_team_id
-                    } | tojson }}'
-                >
-
-
-                <div class="prediction-team">
-                    {{ away_team }}
-                </div>
-
-
-                <button
-                    type="submit"
-                    class="save-prediction"
-                >
-                    Save prediction
-                </button>
-
-            </form>
-
-
-        {% else %}
-
-            <div
-                style="
-                    padding:14px;
-                    border:2px solid #dc2626;
-                    border-radius:8px;
-                    background:#fef2f2;
-                    color:#991b1b;
-                "
+            <input
+                type="hidden"
+                name="user_id"
+                value="{{ user_id }}"
             >
 
-                <strong>
-                    ❌ Cannot render your saved prediction
-                </strong>
 
-                <div style="margin-top:8px;">
-
-                    {% if not check_prediction_record %}
-
-                        No prediction record was found for
-                        user <strong>{{ current_user_id }}</strong>.
-
-                    {% elif not check_home_prediction %}
-
-                        Prediction record exists, but the home score is missing.
-
-                    {% elif not check_away_prediction %}
-
-                        Prediction record exists, but the away score is missing.
-
-                    {% elif not check_home_score_valid %}
-
-                        Home prediction exists but is not a valid non-negative score:
-                        <strong>{{ predicted_home }}</strong>
-
-                    {% elif not check_away_score_valid %}
-
-                        Away prediction exists but is not a valid non-negative score:
-                        <strong>{{ predicted_away }}</strong>
-
-                    {% endif %}
-
-                </div>
-
-
-                <div style="margin-top:8px;font-size:13px;">
-
-                    Source checked:
-                    <strong>{{ prediction_source }}</strong>
-
-                </div>
-
+            <div class="prediction-team">
+                {{ home_team }}
             </div>
 
 
-        {% endif %}
+            <input
+                type="number"
+                name="team1_score"
+                min="0"
+                value="{{ predicted_home if predicted_home is not none else '' }}"
+                required
+                aria-label="Score {{ home_team }}"
+                placeholder="0"
+            >
+
+
+            <div class="prediction-separator">
+                -
+            </div>
+
+
+            <input
+                type="number"
+                name="team2_score"
+                min="0"
+                value="{{ predicted_away if predicted_away is not none else '' }}"
+                required
+                aria-label="Score {{ away_team }}"
+                placeholder="0"
+            >
+
+
+            <input
+                type="hidden"
+                name="game_ids"
+                value='{{ {
+                    "team1Id": home_team_id,
+                    "team2Id": away_team_id
+                } | tojson }}'
+            >
+
+
+            <div class="prediction-team">
+                {{ away_team }}
+            </div>
+
+
+            <button
+                type="submit"
+                class="save-prediction"
+            >
+                {% if check_prediction_record %}
+                    Save prediction
+                {% else %}
+                    Submit prediction
+                {% endif %}
+            </button>
+
+        </form>
 
 
     {# ======================================================
@@ -987,6 +922,10 @@
 
         </div>
 
+
+    {# ======================================================
+       UNKNOWN STATUS
+       ====================================================== #}
 
     {% else %}
 
