@@ -388,7 +388,6 @@ html {
 
 
     {% from 'components/rounds.html' import draw_rounds %}
-    {{rounds}}
     {{ draw_rounds(rounds, permissions, tournament, 'True', lobby, userid) }}
     <script>
     document.querySelectorAll(".prediction-form").forEach(form => {
