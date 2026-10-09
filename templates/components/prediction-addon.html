@@ -266,7 +266,7 @@
 
         </form>
 
-    {% elif status == 'completed' %}
+    {% elif status == 'completed' or  status == 'in_progress' %}
 
         <div class="prediction-locked">
 
@@ -282,7 +282,7 @@
                             {{ predicted_home }} - {{ predicted_away }}
                         </strong>
                     </div>
-
+                    {% if status == 'completed' %}
                     <div>
 
                         Actual result:
@@ -294,6 +294,8 @@
                         </strong>
 
                     </div>
+                    {% endif %}
+
 
                 </div>
 
