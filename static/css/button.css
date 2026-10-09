@@ -5,6 +5,7 @@
     border: 1px solid #ccc;
     text-decoration: none;
     height: 45px;
+    padding: 10px;
     min-width: 125px;
     display: flex;
     justify-content: center;
