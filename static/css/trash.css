@@ -31,7 +31,6 @@
     grid-template-columns: 1fr;
     gap: 12px;
     align-items: center;
-    margin-bottom: 18px;
 }
 
 .team {
@@ -75,7 +74,6 @@
     flex-direction: column;
     gap: 8px;
     padding: 12px;
-    margin-bottom: 15px;
     color: #64748B;
     font-size: 14px;
     background: #f8f8f8;
