@@ -91,6 +91,28 @@
     align-items: center;
 }
 
+#home_team {
+    grid-area: home_team;
+}
+#input_home_team{
+    grid-area: input_home_team;
+}
+#away_team {
+    grid-area: away_team;
+}
+#input_away_team{
+    grid-area: input_away_team;
+}
+
+@media (max-width: 300px) {
+    /* Jouw custom CSS hier */
+    .prediction-form{
+        grid-template-areas:
+        "home_team input_home_team"
+        "away_team input_away_team";    
+    }
+}
+
 .prediction-team {
     display: block;
 }

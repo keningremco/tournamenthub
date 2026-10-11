@@ -212,7 +212,7 @@
                 value="{{ user_id }}"
             >
 
-            <div class="prediction-team">
+            <div class="prediction-team" id="home_team">
                 {{ home_team }}
             </div>
 
@@ -223,10 +223,10 @@
                 value="{{ predicted_home if predicted_home is not none else '' }}"
                 required
                 aria-label="Score {{ home_team }}"
-                placeholder="0"
+                placeholder="0" id="input_home_team"
             >
 
-            <div class="prediction-separator">
+            <div class="prediction-separator" id="prediction-separator">
                 -
             </div>
 
@@ -238,6 +238,7 @@
                 required
                 aria-label="Score {{ away_team }}"
                 placeholder="0"
+                id="input_away_team"
             >
 
             <input
@@ -249,7 +250,7 @@
                 } | tojson }}'
             >
 
-            <div class="prediction-team">
+            <div class="prediction-team" id="away_team">
                 {{ away_team }}
             </div>
 
