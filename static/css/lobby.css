@@ -115,6 +115,22 @@
 
 
 
+#prediction-separator {
+    grid-area: separator;
+}
+
+.prediction-form {
+    width: 100%;
+    padding: var(--card-padding);
+    display: grid;
+    grid-template-columns: 1fr 70px 20px 70px 1fr;
+    grid-template-areas: "home_team input_home_team separator input_away_team away_team";
+    gap: 8px;
+    align-items: center;
+}
+
+
+
 @container (max-width: 300px) {
     .prediction-form {
         grid-template-columns: minmax(0, 1fr) 50px;
