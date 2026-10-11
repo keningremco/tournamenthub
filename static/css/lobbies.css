@@ -1,0 +1,233 @@
+.lobby-page {
+    max-width: 1000px;
+}
+
+.lobby-intro {
+    margin-bottom: 25px;
+    color: #64748B;
+}
+
+.lobby-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.lobby-box {
+    padding: 20px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.public-lobbies-box {
+    grid-column: 1 / -1;
+}
+
+.lobby-box h2 {
+    margin-bottom: 10px;
+    font-size: 21px;
+}
+
+.lobby-box > p {
+    margin-bottom: 20px;
+    color: #64748B;
+    line-height: 1.5;
+}
+
+.lobby-box form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.lobby-box label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.lobby-box input{
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+}
+
+
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.checkbox-row input {
+    width: auto;
+}
+
+.checkbox-row label {
+    margin: 0;
+    font-weight: normal;
+}
+
+.password-field {
+    display: none;
+}
+
+.password-field.show {
+    display: block;
+}
+
+.public-search-row {
+    display: flex;
+    gap: 8px;
+}
+
+.public-search-row input {
+    width: 100%;
+}
+
+
+
+.public-results {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.public-lobby-result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 12px;
+    background: #eee;
+    border-radius: 6px;
+}
+
+.public-lobby-name {
+    margin-bottom: 4px;
+    font-weight: 700;
+}
+
+.public-lobby-meta {
+    color: #64748B;
+    font-size: 14px;
+}
+
+.public-lobby-result form {
+    flex-shrink: 0;
+}
+
+
+.result-message {
+    padding: 12px;
+    color: #64748B;
+    text-align: center;
+    background: #eee;
+    border-radius: 6px;
+}
+
+.error {
+    padding: 10px;
+    color: #8f2929;
+    background: #fff1f1;
+    border: 1px solid #e4aaaa;
+    border-radius: 6px;
+}
+
+.section-title {
+    margin-bottom: 18px;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.lobby-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.lobby-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 15px;
+    color: inherit;
+    text-decoration: none;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    transition: background .2s;
+}
+
+.lobby-row:hover {
+    background: #f9f9f9;
+}
+
+.lobby-name {
+    margin-bottom: 5px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.lobby-tournament {
+    color: #64748B;
+    font-size: 14px;
+}
+
+.lobby-status {
+    flex-shrink: 0;
+    padding: 8px 10px;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 600;
+    background: #eee;
+    border-radius: 6px;
+}
+
+.lobby-status.locked {
+    color: #8f2929;
+    background: #fff1f1;
+    border: 1px solid #e4aaaa;
+}
+
+.empty {
+    padding: 30px;
+    color: #64748B;
+    text-align: center;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+@media (max-width: 700px) {
+    .lobby-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .public-lobbies-box {
+        grid-column: auto;
+    }
+
+    .lobby-row,
+    .public-lobby-result {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .lobby-status {
+        align-self: flex-start;
+    }
+
+    .public-search-row {
+        flex-direction: column;
+    }
+
+
+}
