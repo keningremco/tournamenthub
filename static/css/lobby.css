@@ -117,7 +117,7 @@
         grid-template-columns: minmax(0, 1fr) 50px;
         grid-template-areas:
             "home_team input_home_team"
-            "away_team input_away_team";
+            "away_team input_away_team" !important;
         gap: 8px;
     }
     #prediction-separator{
