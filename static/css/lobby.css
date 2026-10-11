@@ -83,6 +83,8 @@
 }
 
 .prediction-form {
+    width: 100%;
+    padding: var(--card-padding);
     display: grid;
     grid-template-columns: 1fr 70px 20px 70px 1fr;
     gap: 8px;
