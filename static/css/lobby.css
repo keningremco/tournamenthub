@@ -82,15 +82,6 @@
     font-weight: 600;
 }
 
-.prediction-form {
-    width: 100%;
-    padding: var(--card-padding);
-    display: grid;
-    grid-template-columns: 1fr 70px 20px 70px 1fr;
-    gap: 8px;
-    align-items: center;
-}
-
 #home_team {
     grid-area: home_team;
 }
@@ -104,12 +95,30 @@
     grid-area: input_away_team;
 }
 
+#prediction-separator {
+    grid-area: separator;
+}
+
+.prediction-form {
+    width: 100%;
+    padding: var(--card-padding);
+    display: grid;
+    grid-template-columns: 1fr 70px 20px 70px 1fr;
+    grid-template-areas: "home_team input_home_team separator input_away_team away_team";
+    gap: 8px;
+    align-items: center;
+}
+
+
+
 @media (max-width: 300px) {
     /* Jouw custom CSS hier */
-    .prediction-form{
+    .prediction-form {
+        grid-template-columns: minmax(0, 1fr) 50px;
         grid-template-areas:
-        "home_team input_home_team"
-        "away_team input_away_team";    
+            "home_team input_home_team"
+            "away_team input_away_team";
+        gap: 8px;
     }
     #prediction-separator{
         display: none;
