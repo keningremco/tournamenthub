@@ -73,7 +73,10 @@
 .prediction-box {
     padding: 12px;
     background: #eee;
+
     container-type: inline-size;
+
+
     border-radius: 8px;
 }
 

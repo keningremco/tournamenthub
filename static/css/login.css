@@ -28,10 +28,12 @@
     margin: 10px 0;
 }
 
+
 #login-form {
     max-width: 500px;
     margin: 0 auto;
 }
+
 
 #login-form > a {
     display: block;
