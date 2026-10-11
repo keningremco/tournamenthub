@@ -111,6 +111,9 @@
         "home_team input_home_team"
         "away_team input_away_team";    
     }
+    #prediction-separator{
+        display: none;
+    }
 }
 
 .prediction-team {
