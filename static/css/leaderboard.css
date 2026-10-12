@@ -101,3 +101,11 @@
         font-weight: bold;
     }
 }
+
+@media (min-width: 700px) {
+
+    .scoreboard {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+}
