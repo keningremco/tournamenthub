@@ -33,6 +33,8 @@ app.config["MAIL_PASSWORD"] = os.environ["MAIL_PASSWORD"]
 app.config["MAIL_DEFAULT_SENDER"] = os.environ["MAIL_USERNAME"]
 
 
+build_style_css()
+
 mail = Mail(app)
 
 @app.route("/")
@@ -1970,5 +1972,4 @@ def test_round():
     return render_template("components/rounds.html", rounds=rounds)
 
 if __name__ == "__main__":
-    build_style_css()
     app.run(port=os.getenv("PORT"))
