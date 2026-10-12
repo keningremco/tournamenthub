@@ -73,10 +73,7 @@
 .prediction-box {
     padding: 12px;
     background: #eee;
-
     container-type: inline-size;
-
-
     border-radius: 8px;
 }
 
@@ -115,8 +112,7 @@
 
 
 
-@media (max-width: 300px) {
-    /* Jouw custom CSS hier */
+@container (max-width: 300px) {
     .prediction-form {
         grid-template-columns: minmax(0, 1fr) 50px;
         grid-template-areas:
@@ -124,7 +120,8 @@
             "away_team input_away_team";
         gap: 8px;
     }
-    #prediction-separator{
+
+    #prediction-separator {
         display: none;
     }
 }
