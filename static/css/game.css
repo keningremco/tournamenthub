@@ -111,7 +111,7 @@
    Mobiel
    ======================================== */
 
-@media (max-width: 700px) {
+@media (max-width: 500px) {
     .game-teams {
         grid-template-columns: minmax(0, 1fr);
         grid-template-areas:
