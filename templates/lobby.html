@@ -30,7 +30,7 @@
 
                 <a
                     class="back-link"
-                    href="/tournament/{{ tournament.code }}"
+                    href="{{ url_for('tournament', code=tournament.code ) }}"
                 >
                     {{ tournament.name }}
                 </a>
