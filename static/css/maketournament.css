@@ -80,25 +80,6 @@
     display: block;
 }
 
-.card {
-    background: white;
-    border: 1px solid #dedee2;
-    border-radius: 14px;
-    padding: 22px;
-    margin-bottom: 15px;
-}
-
-.card h2 {
-    margin: 0 0 5px;
-    font-size: 21px;
-}
-
-.card-description {
-    color: #777;
-    margin: 0 0 22px;
-    line-height: 1.5;
-}
-
 /* =========================================================
    INPUTS
    ========================================================= */
