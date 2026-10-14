@@ -229,13 +229,7 @@ main {
     margin: 0 auto;
 }
 
-.card {
-    padding: 25px;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-}
+
 
 /* Footer */
 footer {

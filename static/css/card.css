@@ -39,3 +39,12 @@ found in nav.css
     border-radius: var(--radius);
     box-shadow: var(--shadow);
 }
+
+found in menu.css
+.card {
+    padding: 25px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
