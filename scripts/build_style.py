@@ -16,7 +16,7 @@ CSS_ORDER = [
 
 # True  = print alle gevonden CSS-bestanden en hun inhoud
 # False = geen uitgebreide terminal-output
-PRINT_CSS_FILES = True
+PRINT_CSS_FILES = False
 
 
 def build_style_css():
