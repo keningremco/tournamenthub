@@ -12,6 +12,10 @@
     align-items: center;
 }
 
+.width-100 {
+    width: 100%;
+}
+
 .btn-primary {
     background-color: var(--color-primary);
     color: white;
