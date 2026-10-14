@@ -112,3 +112,27 @@
     --transition-normal: 0.2s ease;
     --transition-slow: 0.3s ease;
 }
+
+/*
+
+        :root {
+
+            --sidebar-width: 240px;
+            --header-height: 70px;
+            --footer-height: 70px;
+            --content-width: 1400px;
+
+            --nav-bg: #EAF3FF;
+            --nav-text: #334155;
+            --header-bg: #F8FBFF;
+            --main-bg: #F6F8FB;
+            --footer-bg: #EEF4F8;
+            --card-bg: #FFFFFF;
+            --border: #DCE5EE;
+            --primary: #4F7DF3;
+            --primary-hover: #3B6AE6;
+            --text: #1F2937;
+            --text-light: #64748B;
+            --shadow: 0 5px 20px rgba(0, 0, 0, .05);
+            --radius: 16px;
+        }
