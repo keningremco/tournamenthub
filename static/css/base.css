@@ -7,3 +7,13 @@ body {
     min-height: 100vh;
     background: var(--color-background);
 }
+
+main{
+    flex: 1 0 auto;
+    padding: 40px;
+}
+
+.container {
+    width: min(100%, var(--content-width));
+    margin: 0 auto;
+}
