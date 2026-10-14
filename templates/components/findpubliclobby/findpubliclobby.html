@@ -1,0 +1,27 @@
+<section class="public-lobbies-box card">
+    <h2>Find public lobbies</h2>
+
+    <p>
+        Enter a tournament code to find public lobbies that you can join.
+    </p>
+
+    <div class="public-search-row">
+        <input
+            type="text"
+            id="publicTournamentCode"
+            value="{{ tournament_code or '' }}"
+            placeholder="Enter tournament code..."
+            autocomplete="off"
+        >
+
+        <button type="button" id="findPublicLobbies" class="btn btn-primary">
+            Find lobbies
+        </button>
+    </div>
+
+    <div class="public-results" id="publicLobbyResults">
+        <div class="result-message">
+            Enter a tournament code to search for public lobbies.
+        </div>
+    </div>
+</section>
