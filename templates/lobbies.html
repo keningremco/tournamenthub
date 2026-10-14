@@ -16,68 +16,9 @@
 
     <section>
 
-        {% include 'components/joinlobby.html'   %}
+        {% include 'components/joinlobby/joinlobby.html'   %}
 
-        <section class="card">
-            <h2>Create a lobby</h2>
-
-            <p>
-                Link your lobby to a tournament. Everyone predicts the matches from that tournament.
-            </p>
-
-            <form action="/createlobby" method="post">
-                <div>
-                    <label for="name">Lobby name</label>
-
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        placeholder="For example: Friends prediction league"
-                        required
-                    >
-                </div>
-
-                <div>
-                    <label for="tournamentCode">Tournament code</label>
-
-                    <input
-                        type="text"
-                        id="tournamentCode"
-                        name="tournament_code"
-                        value="{{ tournament_code or '' }}"
-                        placeholder="Enter tournament code..."
-                        autocomplete="off"
-                        required
-                    >
-                </div>
-
-                <div class="checkbox-row">
-                    <input
-                        type="checkbox"
-                        id="isPrivate"
-                        name="isPrivate"
-                    >
-
-                    <label for="isPrivate">
-                        Private lobby with password
-                    </label>
-                </div>
-
-                <div class="password-field" id="passwordField">
-                    <label for="lobbyPassword">Lobby password</label>
-
-                    <input
-                        type="password"
-                        id="lobbyPassword"
-                        name="password"
-                        placeholder="Enter a password"
-                    >
-                </div>
-
-                <button type="submit" class="btn btn-primary">Create lobby</button>
-            </form>
-        </section>
+        {% include 'components\createlobby\createlobby.html'   %}
 
         <section class="public-lobbies-box card">
             <h2>Find public lobbies</h2>
