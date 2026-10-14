@@ -31,12 +31,6 @@
 .lobby-info {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    margin-bottom: 30px;
-    padding: 18px;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 8px;
 }
 
 .lobby-info h1 {
