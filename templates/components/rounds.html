@@ -10,16 +10,18 @@
         "predictions": predictions,
         'lobby' : lobby
     } %}
+    <section>
+        {{ draw_rounds_slider(data) }}
+        {% for round_var in data.rounds %}
+            {{ round(
+                round_var.games,
+                round_var.name,
+                round_var.id,
+                data,
+                user_id
+            ) }}
+        {% endfor %}
+    </section>
 
-    {{ draw_rounds_slider(data) }}
-    {% for round_var in data.rounds %}
-        {{ round(
-            round_var.games,
-            round_var.name,
-            round_var.id,
-            data,
-            user_id
-        ) }}
-    {% endfor %}
 {% endmacro %}
 
