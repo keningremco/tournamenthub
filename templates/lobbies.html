@@ -16,41 +16,7 @@
 
     <section>
 
-        <section class="card">
-            <h2>Join a lobby</h2>
-
-            <p>
-                Vul de lobbycode in die je van de maker hebt ontvangen.
-            </p>
-
-            <form action="/joinlobby" method="post">
-                <div>
-                    <label for="joinCode">Lobby code</label>
-
-                    <input
-                        type="text"
-                        id="joinCode"
-                        name="code"
-                        placeholder="Enter lobby code..."
-                        autocomplete="off"
-                        required
-                    >
-                </div>
-
-                <div>
-                    <label for="joinPassword">Password</label>
-
-                    <input
-                        type="password"
-                        id="joinPassword"
-                        name="password"
-                        placeholder="Only needed for private lobbies"
-                    >
-                </div>
-
-                <button type="submit" class="btn btn-primary">Join lobby</button>
-            </form>
-        </section>
+        {% include 'components.joinlobby.html'   %}
 
         <section class="card">
             <h2>Create a lobby</h2>
