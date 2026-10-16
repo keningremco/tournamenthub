@@ -42,6 +42,9 @@ def main() -> int:
     print(f"\nKlaar: {len(sources)} JavaScript-bestand(en) verwerkt.")
     return 0
 
+def build_scripts():
+    main()
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
