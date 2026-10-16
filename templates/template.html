@@ -170,7 +170,7 @@
     {% endblock %}
     {% for script in ns.scripts %}
         <script
-            src="script.url"
+            src="{{script.url}}"
             {% if script.module %}type="module"{% endif %}
         ></script>
     {% endfor %}
