@@ -17,6 +17,7 @@ from services.lobbies import get_lobby_rounds_points, calc_prediction_points_gam
 from scripts.build_style import build_style_css
 from api.tournaments import get_rounds
 from api.lobbies import getLobbyEvaluations
+from scripts.build_scripts import build_scripts
 
 load_dotenv()
 
@@ -34,6 +35,7 @@ app.config["MAIL_DEFAULT_SENDER"] = os.environ["MAIL_USERNAME"]
 
 
 build_style_css()
+build_scripts()
 
 mail = Mail(app)
 

@@ -170,10 +170,9 @@
     {% endblock %}
     {% for script in ns.scripts %}
         <script
-            {% if script.type %}type="{{ script.type }}"{% endif %}
-            src="{{ url_for('static', filename='js/' ~ script.name ~ '.js') }}"
+            src="script.url"
+            {% if script.module %}type="module"{% endif %}
         ></script>
-        <!-- hoi -->
     {% endfor %}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6784101204913368"
      crossorigin="anonymous"></script>

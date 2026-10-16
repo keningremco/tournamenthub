@@ -1,3 +1,8 @@
+{% set _ = ns.scripts.append({
+    'url': url_for('static', filename = js/generated/createlobby.js),
+    'module': True
+}) %}
+
 <section class="card">
     <h2>Create a lobby</h2>
 
