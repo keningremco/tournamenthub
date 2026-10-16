@@ -1,3 +1,8 @@
+{% set _ = ns.scripts.append({
+    'url': url_for('static', filename='js/generated/findpubliclobby.js'),
+    'module': False
+}) %}
+
 <section class="public-lobbies-box card">
     <h2>Find public lobbies</h2>
 
