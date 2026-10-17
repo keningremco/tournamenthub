@@ -138,7 +138,7 @@ def get_tournament_leaderboard(tournamentCode):
     db, cursor = get_db_connection()
 
     cursor.execute('SELECT id FROM tournaments WHERE code = %s', (tournamentCode,))
-    tournamentId = cursor.fetchone()
+    tournamentId = cursor.fetchone()['id']
 
     cursor.execute("""
         SELECT 
