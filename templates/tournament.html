@@ -192,6 +192,8 @@ html {
 
 </div>
 
+{% include "components/tournamentleaderboard/tournamentleaderboard.html" %}
+
 {% from 'components/rounds.html' import draw_rounds %}
 
 {{ draw_rounds(rounds, permissions, tournament, none, none, none) }}

@@ -1,0 +1,80 @@
+
+{% set _ = ns.scripts.append({
+    'url': url_for('static', filename='js/generated/tournamentleaderboard.js'),
+    'module': False
+}) %}
+
+<section class="card">
+    <table class="league-table" id="tournament-leaderboard">
+        <thead>
+            <tr>
+                <th class="col-pos">Pos</th>
+                <th class="col-team">Team</th>
+                <th class="col-mp">MP</th>
+                <th class="col-w">W</th>
+                <th class="col-d">D</th>
+                <th class="col-l">L</th>
+                <th class="col-gf">GF</th>
+                <th class="col-ga">GA</th>
+                <th class="col-gd">GD</th>
+                <th class="col-pts">Pts</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% if iterable %}
+                {% for item in iterable %}
+                    <tr>
+                        <td class="col-pos">{{ loop.index }}</td>
+
+                        <td class="col-team">
+                            {% if item.team %}
+                                {{ item.team }}
+                            {% else %}
+                                <span class="stat-error">Team onbekend</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="col-mp">
+                            {{ item.mp if item.mp is not none else 'N/B' }}
+                        </td>
+
+                        <td class="col-w">
+                            {{ item.w if item.w is not none else 'N/B' }}
+                        </td>
+
+                        <td class="col-d">
+                            {{ item.d if item.d is not none else 'N/B' }}
+                        </td>
+
+                        <td class="col-l">
+                            {{ item.l if item.l is not none else 'N/B' }}
+                        </td>
+
+                        <td class="col-gf">
+                            {{ item.gf if item.gf is not none else 'N/B' }}
+                        </td>
+
+                        <td class="col-ga">
+                            {{ item.ga if item.ga is not none else 'N/B' }}
+                        </td>
+
+                        <td class="col-gd">
+                            {{ item.gd if item.gd is not none else 'N/B' }}
+                        </td>
+
+                        <td class="col-pts">
+                            {{ item.pts if item.pts is not none else 'N/B' }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="10" class="table-error">
+                        Geen standen beschikbaar.
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</section>
