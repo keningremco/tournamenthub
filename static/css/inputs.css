@@ -1,0 +1,22 @@
+input[type="text"],
+input[type="number"],
+input[type="datetime-local"],
+input[type='password'],
+select,
+textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: white;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #2d7ff9;
+    box-shadow: 0 0 0 3px rgba(45,127,249,.08);
+}
