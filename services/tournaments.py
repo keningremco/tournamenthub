@@ -134,20 +134,33 @@ def get_tournament(tournamentcode, cursor, json):
             round["games"] = []
     return rounds
 
+
 def get_tournament_leaderboard(tournamentCode):
+    import json
+
     db, cursor = get_db_connection()
 
-    cursor.execute('SELECT id FROM tournaments WHERE code = %s', (tournamentCode,))
-    tournamentId = cursor.fetchone()['id']
+    cursor.execute(
+        "SELECT id FROM tournaments WHERE code = %s",
+        (tournamentCode,)
+    )
+    tournament = cursor.fetchone()
+
+    if not tournament:
+        cursor.close()
+        db.close()
+        return []
+
+    tournamentId = tournament["id"]
 
     cursor.execute("""
-        SELECT 
-
+        SELECT
+            teams.id AS teamId,
+            teams.name AS name,
             (
                 SELECT JSON_ARRAYAGG(
                     JSON_OBJECT(
                         'gameId', games.id,
-                        'status', games.status,
                         'score', scores.score,
                         'result', scores.result
                     )
@@ -157,10 +170,10 @@ def get_tournament_leaderboard(tournamentCode):
                     ON scores.gameId = games.id
                 JOIN rounds
                     ON games.roundId = rounds.id
-                WHERE games.status = 'completed' AND scores.teamId = teams.id
-            ) AS games,
-            teams.name
-
+                WHERE rounds.tournamentId = %s
+                  AND games.status = 'completed'
+                  AND scores.teamId = teams.id
+            ) AS games
         FROM teams
         JOIN game_teams
             ON teams.id = game_teams.teamId
@@ -169,10 +182,12 @@ def get_tournament_leaderboard(tournamentCode):
         JOIN rounds
             ON games.roundId = rounds.id
         WHERE rounds.tournamentId = %s
-    """, (tournamentId,))
+        GROUP BY teams.id, teams.name
+    """, (tournamentId, tournamentId))
 
     data = cursor.fetchall()
     leaderboard_unsorted = []
+
     for teamData in data:
         pts = 0
         GF = 0
@@ -181,32 +196,42 @@ def get_tournament_leaderboard(tournamentCode):
         L = 0
         MP = 0
 
+        games = teamData["games"]
 
+        # JSON uit MariaDB omzetten naar een Python-lijst
+        if isinstance(games, str):
+            games = json.loads(games)
 
-        for games in teamData:
-            if isinstance(games, str):
-                games = json.loads(games)
-            if games['result'] == 'won':
+        for game in games or []:
+            if game["result"] == "won":
                 pts += 3
                 W += 1
-            elif games['result'] == 'draw':
+            elif game["result"] == "draw":
                 pts += 1
                 D += 1
-            else:
+            elif game["result"] == "lost":
                 L += 1
-            GF += int(games['score'])
+
+            GF += int(game["score"] or 0)
             MP += 1
-            leaderboard_unsorted.append({
-                "teamName": teamData["name"],
-                "pts": pts,
-                "GF": GF,
-                "W": W,
-                "D": D,
-                "L": L,
-                "MP": MP
-            })
+
+        # Voeg ieder team precies één keer toe
+        leaderboard_unsorted.append({
+            "teamId": teamData["teamId"],
+            "team": teamData["name"],
+            "mp": MP,
+            "w": W,
+            "d": D,
+            "l": L,
+            "gf": GF,
+            "ga": None,
+            "gd": None,
+            "pts": pts
+        })
+
+    cursor.close()
+    db.close()
+
     return leaderboard_unsorted
-
-
 
     
