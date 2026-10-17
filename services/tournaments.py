@@ -186,7 +186,6 @@ def get_tournament_leaderboard(tournamentCode):
     """, (tournamentId, tournamentId))
 
     data = cursor.fetchall()
-    return data
     leaderboard_unsorted = []
 
     for teamData in data:

@@ -582,7 +582,6 @@ def tournament(code='', id=''):
 
         rounds = get_rounds(tournament['code'])
         tournament_leaderboard = get_tournament_leaderboard(tournament['code'])
-        return tournament_leaderboard
         permissions = can_user(userid)
         return render_template(
             "tournament.html",
