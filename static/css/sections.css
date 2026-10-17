@@ -11,3 +11,15 @@
     width: var(--section-width);
     padding: var(--section-padding);
 }
+
+.section-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1rem, 3vw, 2rem);
+}
+
+@media (max-width: 600px) {
+    .section-grid {
+        grid-template-columns: 1fr;
+    }
+}
