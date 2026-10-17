@@ -1,7 +1,6 @@
 from flask import Flask, render_template, session, request, redirect, url_for, abort, jsonify, flash
 from functools import wraps
 import secrets
-import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
 import string
@@ -18,6 +17,7 @@ from scripts.build_style import build_style_css
 from api.tournaments import get_rounds
 from api.lobbies import getLobbyEvaluations
 from scripts.build_scripts import build_scripts
+from services.tournaments import get_tournament_leaderboard
 
 load_dotenv()
 
@@ -581,14 +581,15 @@ def tournament(code='', id=''):
         
 
         rounds = get_rounds(tournament['code'])
-
+        tournament_leaderboard = get_tournament_leaderboard(tournament['code'])
         permissions = can_user(userid)
         return render_template(
             "tournament.html",
             tournament=tournament,
             rounds=rounds,
             userid=userid,
-            permissions=permissions
+            permissions=permissions,
+            tournament_leaderboard = tournament_leaderboard
         )
 
     finally:

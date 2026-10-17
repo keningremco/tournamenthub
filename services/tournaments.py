@@ -1,3 +1,7 @@
+from db.connection import get_db_connection
+import json
+
+
 def get_game_round(tournamentcode, roundnumber, cursor):
 
     cursor.execute("""
@@ -129,3 +133,79 @@ def get_tournament(tournamentcode, cursor, json):
         else:
             round["games"] = []
     return rounds
+
+def get_tournament_leaderboard(tournamentCode):
+    db, cursor = get_db_connection()
+
+    cursor.execute('SELECT id FROM tournaments WHERE code = %s', (tournamentCode))
+    tournamentId = cursor.fetchone()
+
+    cursor.execute("""
+        SELECT 
+
+            (
+                SELECT JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'gameId', games.id,
+                        'status', games.status,
+                        'score', scores.score,
+                        'result', scores.result
+                    )
+                )
+                FROM scores
+                JOIN games
+                    ON scores.gameId = games.id
+                JOIN rounds
+                    ON games.roundId = rounds.id
+                WHERE games.status = 'completed' AND scores.teamId = teams.id
+            ) AS games,
+            teams.name
+
+        FROM teams
+        JOIN game_teams
+            ON teams.id = game_teams.teamId
+        JOIN games
+            ON game_teams.gameId = games.id
+        JOIN rounds
+            ON games.roundId = rounds.id
+        WHERE rounds.tournamentId = %s
+    """, (tournamentId,))
+
+    data = cursor.fetchall()
+    leaderboard_unsorted = []
+    for teamData in data:
+        pts = 0
+        GF = 0
+        W = 0
+        D = 0
+        L = 0
+        MP = 0
+
+        if isinstance(games, str):
+            games = json.loads(games)
+
+        for games in teamData:
+            if games['result'] == 'won':
+                pts += 3
+                W += 1
+            elif games['result'] == 'draw':
+                pts += 1
+                D += 1
+            else:
+                L += 1
+            GF += int(games['score'])
+            MP += 1
+            leaderboard_unsorted.append({
+                "teamName": teamData["name"],
+                "pts": pts,
+                "GF": GF,
+                "W": W,
+                "D": D,
+                "L": L,
+                "MP": MP
+            })
+    return leaderboard_unsorted
+
+
+
+    
