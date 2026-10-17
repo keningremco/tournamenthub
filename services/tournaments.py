@@ -181,10 +181,11 @@ def get_tournament_leaderboard(tournamentCode):
         L = 0
         MP = 0
 
-        if isinstance(games, str):
-            games = json.loads(games)
+
 
         for games in teamData:
+            if isinstance(games, str):
+                games = json.loads(games)
             if games['result'] == 'won':
                 pts += 3
                 W += 1
