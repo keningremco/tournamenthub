@@ -22,8 +22,8 @@
         </thead>
 
         <tbody>
-            {% if iterable %}
-                {% for item in iterable %}
+            {% if tournament_leaderboard %}
+                {% for item in tournament_leaderboard %}
                     <tr>
                         <td class="col-pos">{{ loop.index }}</td>
 
