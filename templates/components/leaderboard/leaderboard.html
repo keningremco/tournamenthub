@@ -1,6 +1,7 @@
-{% set ns.scripts = ns.scripts + [
-    {"name": "leaderboard", "type": "module"}
-] %}
+{% set _ = ns.scripts.append({
+    'url': url_for('static', filename = 'js/generated/leaderboard.js'),
+    'module': True
+}) %}
 
 <div class="scoreboard-container">
     <h2>Leaderboard</h2>
